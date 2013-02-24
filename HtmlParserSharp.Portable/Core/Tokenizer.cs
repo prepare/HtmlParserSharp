@@ -409,7 +409,7 @@ namespace HtmlParserSharp.Portable.Core
         /**
 		 * The current tag token name.
 		 */
-        private ElementName _tagName = null;
+        private ElementName _tagName;
 
         /**
 		 * The current attribute name.
@@ -421,7 +421,7 @@ namespace HtmlParserSharp.Portable.Core
         /**
 		 * Whether comment tokens are emitted.
 		 */
-        private bool _wantsComments = false;
+        private bool _wantsComments;
 
         /**
 		 * <code>true</code> when HTML4-specific additional errors are requested.
@@ -758,12 +758,9 @@ namespace HtmlParserSharp.Portable.Core
             {
                 return new HtmlAttributes(_mappingLangToXmlLang);
             }
-            else
-            {
-                // ]NOCPP]
-                return HtmlAttributes.EMPTY_ATTRIBUTES;
-                // [NOCPP[
-            }
+            // ]NOCPP]
+            return HtmlAttributes.EMPTY_ATTRIBUTES;
+            // [NOCPP[
             // ]NOCPP]
         }
 
@@ -1114,9 +1111,7 @@ namespace HtmlParserSharp.Portable.Core
             _cstart = pos + 1;
             MaybeErrSlashInEndTag(selfClosing);
             _stateSave = DATA;
-            HtmlAttributes attrs = (_attributes == null
-                                        ? HtmlAttributes.EMPTY_ATTRIBUTES
-                                        : _attributes);
+            HtmlAttributes attrs = _attributes ?? HtmlAttributes.EMPTY_ATTRIBUTES;
             if (_endTag)
             {
                 /*
@@ -1190,15 +1185,13 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     if (_attributeName.IsBoolean)
                     {
-                        if (_html4ModeCompatibleWithXhtml1Schemata)
+                        if (_attributes != null)
                         {
                             _attributes.AddAttribute(_attributeName,
-                                                     _attributeName.GetLocal(AttributeName.HTML),
+                                                     _html4ModeCompatibleWithXhtml1Schemata
+                                                         ? _attributeName.GetLocal(AttributeName.HTML)
+                                                         : "",
                                                      _xmlnsPolicy);
-                        }
-                        else
-                        {
-                            _attributes.AddAttribute(_attributeName, "", _xmlnsPolicy);
                         }
                     }
                     else
@@ -1304,7 +1297,7 @@ namespace HtmlParserSharp.Portable.Core
         {
             int state = _stateSave;
             int returnState = _returnStateSave;
-            char c = '\u0000';
+            const char c = '\u0000';
             _shouldSuspend = false;
             _lastCR = false;
 
@@ -1552,7 +1545,7 @@ namespace HtmlParserSharp.Portable.Core
                                 goto breakTagopenloop;
                                 // goto continueStateloop;
                             }
-                            else if (c >= 'a' && c <= 'z')
+                            if (c >= 'a' && c <= 'z')
                             {
                                 /*
 								 * U+0061 LATIN SMALL LETTER A through to U+007A
@@ -2512,11 +2505,8 @@ namespace HtmlParserSharp.Portable.Core
                                         state = Transition(state, CDATA_START, reconsume, pos);
                                         goto continueStateloop;
                                     }
-                                    else
-                                    {
-                                        // else fall through
-                                        goto default;
-                                    }
+                                    // else fall through
+                                    goto default;
                                 default:
                                     ErrBogusComment();
                                     ClearLongStrBuf();
@@ -2936,7 +2926,6 @@ namespace HtmlParserSharp.Portable.Core
                                     goto continueStateloop;
                                 }
                                 _index++;
-                                continue;
                             }
                             else
                             {
@@ -3345,7 +3334,7 @@ namespace HtmlParserSharp.Portable.Core
                                 {
                                     goto breakOuter;
                                 }
-                                else if (c < NamedCharacters.NAMES[_hi][_entCol])
+                                if (c < NamedCharacters.NAMES[_hi][_entCol])
                                 {
                                     _hi--;
                                 }
@@ -3362,7 +3351,6 @@ namespace HtmlParserSharp.Portable.Core
                                 goto breakOuter;
                             }
                             AppendStrBuf(c);
-                            continue;
                         }
 
                         breakOuter:
@@ -3383,42 +3371,29 @@ namespace HtmlParserSharp.Portable.Core
                             reconsume = true;
                             goto continueStateloop;
                         }
-                        else
+                        // c can't be CR, LF or nul if we got here
+                        string candidateName = NamedCharacters.NAMES[_candidate];
+                        if (candidateName.Length == 0
+                            || candidateName[candidateName.Length - 1] != ';')
                         {
-                            // c can't be CR, LF or nul if we got here
-                            string candidateName = NamedCharacters.NAMES[_candidate];
-                            if (candidateName.Length == 0
-                                || candidateName[candidateName.Length - 1] != ';')
-                            {
-                                /*
+                            /*
 								 * If the last character matched is not a U+003B
 								 * SEMICOLON (;), there is a parse error.
 								 */
-                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-                                {
-                                    /*
+                            if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                            {
+                                /*
 									 * If the entity is being consumed as part of an
 									 * attribute, and the last character matched is
 									 * not a U+003B SEMICOLON (;),
 									 */
-                                    char ch;
-                                    if (_strBufMark == _strBufLen)
-                                    {
-                                        ch = c;
-                                    }
-                                    else
-                                    {
-                                        // if (strBufOffset != -1) {
-                                        // ch = buf[strBufOffset + strBufMark];
-                                        // } else {
-                                        ch = _strBuf[_strBufMark];
-                                        // }
-                                    }
-                                    if (ch == '=' || (ch >= '0' && ch <= '9')
-                                        || (ch >= 'A' && ch <= 'Z')
-                                        || (ch >= 'a' && ch <= 'z'))
-                                    {
-                                        /*
+                                char ch;
+                                ch = _strBufMark == _strBufLen ? c : _strBuf[_strBufMark];
+                                if (ch == '=' || (ch >= '0' && ch <= '9')
+                                    || (ch >= 'A' && ch <= 'Z')
+                                    || (ch >= 'a' && ch <= 'z'))
+                                {
+                                    /*
 										 * and the next character is either a U+003D
 										 * EQUALS SIGN character (=) or in the range
 										 * U+0030 DIGIT ZERO to U+0039 DIGIT NINE,
@@ -3430,86 +3405,85 @@ namespace HtmlParserSharp.Portable.Core
 										 * after the U+0026 AMPERSAND (&) must be
 										 * unconsumed, and nothing is returned.
 										 */
-                                        ErrNoNamedCharacterMatch();
-                                        AppendStrBufToLongStrBuf();
-                                        state = Transition(state, returnState, reconsume, pos);
-                                        reconsume = true;
-                                        goto continueStateloop;
-                                    }
-                                }
-                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-                                {
-                                    ErrUnescapedAmpersandInterpretedAsCharacterReference();
-                                }
-                                else
-                                {
-                                    ErrNotSemicolonTerminated();
+                                    ErrNoNamedCharacterMatch();
+                                    AppendStrBufToLongStrBuf();
+                                    state = Transition(state, returnState, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
                                 }
                             }
+                            if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                            {
+                                ErrUnescapedAmpersandInterpretedAsCharacterReference();
+                            }
+                            else
+                            {
+                                ErrNotSemicolonTerminated();
+                            }
+                        }
 
-                            /*
+                        /*
 							 * Otherwise, return a character token for the character
 							 * corresponding to the entity name (as given by the
 							 * second column of the named character references
 							 * table).
 							 */
-                            char[] val = NamedCharacters.VALUES[_candidate];
-                            if (
-                                // [NOCPP[
-                                val.Length == 1
-                                // ]NOCPP]
-                                // CPPONLY: val[1] == 0
-                                )
+                        char[] val = NamedCharacters.VALUES[_candidate];
+                        if (
+                            // [NOCPP[
+                            val.Length == 1
+                            // ]NOCPP]
+                            // CPPONLY: val[1] == 0
+                            )
+                        {
+                            EmitOrAppendOne(val, returnState);
+                        }
+                        else
+                        {
+                            EmitOrAppendTwo(val, returnState);
+                        }
+                        // this is so complicated!
+                        if (_strBufMark < _strBufLen)
+                        {
+                            // if (strBufOffset != -1) {
+                            // if ((returnState & (~1)) != 0) {
+                            // for (int i = strBufMark; i < strBufLen; i++) {
+                            // appendLongStrBuf(buf[strBufOffset + i]);
+                            // }
+                            // } else {
+                            // tokenHandler.Characters(buf, strBufOffset
+                            // + strBufMark, strBufLen
+                            // - strBufMark);
+                            // }
+                            // } else {
+                            if ((returnState & DATA_AND_RCDATA_MASK) != 0)
                             {
-                                EmitOrAppendOne(val, returnState);
+                                for (int i = _strBufMark; i < _strBufLen; i++)
+                                {
+                                    AppendLongStrBuf(_strBuf[i]);
+                                }
                             }
                             else
                             {
-                                EmitOrAppendTwo(val, returnState);
+                                TokenHandler.Characters(_strBuf, _strBufMark,
+                                                        _strBufLen - _strBufMark);
                             }
-                            // this is so complicated!
-                            if (_strBufMark < _strBufLen)
-                            {
-                                // if (strBufOffset != -1) {
-                                // if ((returnState & (~1)) != 0) {
-                                // for (int i = strBufMark; i < strBufLen; i++) {
-                                // appendLongStrBuf(buf[strBufOffset + i]);
-                                // }
-                                // } else {
-                                // tokenHandler.Characters(buf, strBufOffset
-                                // + strBufMark, strBufLen
-                                // - strBufMark);
-                                // }
-                                // } else {
-                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-                                {
-                                    for (int i = _strBufMark; i < _strBufLen; i++)
-                                    {
-                                        AppendLongStrBuf(_strBuf[i]);
-                                    }
-                                }
-                                else
-                                {
-                                    TokenHandler.Characters(_strBuf, _strBufMark,
-                                                            _strBufLen - _strBufMark);
-                                }
-                                // }
-                            }
-                            if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                            {
-                                _cstart = pos;
-                            }
-                            state = Transition(state, returnState, reconsume, pos);
-                            reconsume = true;
-                            goto continueStateloop;
-                            /*
+                            // }
+                        }
+                        if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                        {
+                            _cstart = pos;
+                        }
+                        state = Transition(state, returnState, reconsume, pos);
+                        reconsume = true;
+                        goto continueStateloop;
+                        /*
 							 * If the markup contains I'm &notit; I tell you, the
 							 * entity is parsed as "not", as in, I'm Â¬it; I tell
 							 * you. But if the markup was I'm &notin; I tell you,
 							 * the entity would be parsed as "notin;", resulting in
 							 * I'm âˆ‰ I tell you.
 							 */
-                        }
                         // XXX reorder point
                     case CONSUME_NCR:
                         if (++pos == endPos)
@@ -3595,9 +3569,8 @@ namespace HtmlParserSharp.Portable.Core
                                 _seenDigits = true;
                                 _value *= 10;
                                 _value += c - '0';
-                                continue;
                             }
-                            else if (c == ';')
+                            if (c == ';')
                             {
                                 if (_seenDigits)
                                 {
@@ -3609,22 +3582,17 @@ namespace HtmlParserSharp.Portable.Core
                                     // FALL THROUGH goto continueStateloop;
                                     goto breakDecimalloop;
                                 }
-                                else
+                                ErrNoDigitsInNCR();
+                                AppendStrBuf(';');
+                                EmitOrAppendStrBuf(returnState);
+                                if ((returnState & DATA_AND_RCDATA_MASK) == 0)
                                 {
-                                    ErrNoDigitsInNCR();
-                                    AppendStrBuf(';');
-                                    EmitOrAppendStrBuf(returnState);
-                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                                    {
-                                        _cstart = pos + 1;
-                                    }
-                                    state = Transition(state, returnState, reconsume, pos);
-                                    goto continueStateloop;
+                                    _cstart = pos + 1;
                                 }
+                                state = Transition(state, returnState, reconsume, pos);
+                                goto continueStateloop;
                             }
-                            else
-                            {
-                                /*
+                            /*
 								 * If no characters match the range, then don't
 								 * consume any characters (and unconsume the U+0023
 								 * NUMBER SIGN character and, if appropriate, the X
@@ -3635,31 +3603,27 @@ namespace HtmlParserSharp.Portable.Core
 								 * SEMICOLON, consume that too. If it isn't, there
 								 * is a parse error.
 								 */
-                                if (!_seenDigits)
+                            if (!_seenDigits)
+                            {
+                                ErrNoDigitsInNCR();
+                                EmitOrAppendStrBuf(returnState);
+                                if ((returnState & DATA_AND_RCDATA_MASK) == 0)
                                 {
-                                    ErrNoDigitsInNCR();
-                                    EmitOrAppendStrBuf(returnState);
-                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                                    {
-                                        _cstart = pos;
-                                    }
-                                    state = Transition(state, returnState, reconsume, pos);
-                                    reconsume = true;
-                                    goto continueStateloop;
+                                    _cstart = pos;
                                 }
-                                else
-                                {
-                                    ErrCharRefLacksSemicolon();
-                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                                    {
-                                        _cstart = pos;
-                                    }
-                                    state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
-                                    reconsume = true;
-                                    // FALL THROUGH goto continueStateloop;
-                                    goto breakDecimalloop;
-                                }
+                                state = Transition(state, returnState, reconsume, pos);
+                                reconsume = true;
+                                goto continueStateloop;
                             }
+                            ErrCharRefLacksSemicolon();
+                            if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                            {
+                                _cstart = pos;
+                            }
+                            state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
+                            reconsume = true;
+                            // FALL THROUGH goto continueStateloop;
+                            goto breakDecimalloop;
                         }
                         breakDecimalloop:
                         goto case HANDLE_NCR_VALUE;
@@ -3696,21 +3660,18 @@ namespace HtmlParserSharp.Portable.Core
                                 _seenDigits = true;
                                 _value *= 16;
                                 _value += c - '0';
-                                continue;
                             }
                             else if (c >= 'A' && c <= 'F')
                             {
                                 _seenDigits = true;
                                 _value *= 16;
                                 _value += c - 'A' + 10;
-                                continue;
                             }
                             else if (c >= 'a' && c <= 'f')
                             {
                                 _seenDigits = true;
                                 _value *= 16;
                                 _value += c - 'a' + 10;
-                                continue;
                             }
                             else if (c == ';')
                             {
@@ -3723,18 +3684,15 @@ namespace HtmlParserSharp.Portable.Core
                                     state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
                                     goto continueStateloop;
                                 }
-                                else
+                                ErrNoDigitsInNCR();
+                                AppendStrBuf(';');
+                                EmitOrAppendStrBuf(returnState);
+                                if ((returnState & DATA_AND_RCDATA_MASK) == 0)
                                 {
-                                    ErrNoDigitsInNCR();
-                                    AppendStrBuf(';');
-                                    EmitOrAppendStrBuf(returnState);
-                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                                    {
-                                        _cstart = pos + 1;
-                                    }
-                                    state = Transition(state, returnState, reconsume, pos);
-                                    goto continueStateloop;
+                                    _cstart = pos + 1;
                                 }
+                                state = Transition(state, returnState, reconsume, pos);
+                                goto continueStateloop;
                             }
                             else
                             {
@@ -3761,17 +3719,14 @@ namespace HtmlParserSharp.Portable.Core
                                     reconsume = true;
                                     goto continueStateloop;
                                 }
-                                else
+                                ErrCharRefLacksSemicolon();
+                                if ((returnState & DATA_AND_RCDATA_MASK) == 0)
                                 {
-                                    ErrCharRefLacksSemicolon();
-                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                                    {
-                                        _cstart = pos;
-                                    }
-                                    state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
-                                    reconsume = true;
-                                    goto continueStateloop;
+                                    _cstart = pos;
                                 }
+                                state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
+                                reconsume = true;
+                                goto continueStateloop;
                             }
                         }
                         // XXX reorder point
@@ -3883,17 +3838,14 @@ namespace HtmlParserSharp.Portable.Core
                                     state = Transition(state, TAG_NAME, reconsume, pos);
                                     goto continueStateloop;
                                 }
-                                else
-                                {
-                                    /* Anything else Parse error. */
-                                    ErrGarbageAfterLtSlash();
-                                    /*
+                                /* Anything else Parse error. */
+                                ErrGarbageAfterLtSlash();
+                                /*
 									 * Switch to the bogus comment state.
 									 */
-                                    ClearLongStrBufAndAppend(c);
-                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
-                                    goto continueStateloop;
-                                }
+                                ClearLongStrBufAndAppend(c);
+                                state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                goto continueStateloop;
                         }
                         // XXX reorder point
                     case RCDATA:
@@ -4080,7 +4032,6 @@ namespace HtmlParserSharp.Portable.Core
                                 }
                                 AppendStrBuf(c);
                                 _index++;
-                                continue;
                             }
                             else
                             {
@@ -4265,7 +4216,7 @@ namespace HtmlParserSharp.Portable.Core
                                     goto continueStateloop;
                             }
                             continueBoguscommenthyphenloop:
-                            continue;
+                            ;
                         }
 
                         // XXX reorder point
@@ -5054,7 +5005,6 @@ namespace HtmlParserSharp.Portable.Core
                                     goto continueStateloop;
                                 }
                                 _index++;
-                                continue;
                             }
                             else
                             {
@@ -5399,7 +5349,6 @@ namespace HtmlParserSharp.Portable.Core
                                     goto continueStateloop;
                                 }
                                 _index++;
-                                continue;
                             }
                             else
                             {
@@ -5929,8 +5878,10 @@ namespace HtmlParserSharp.Portable.Core
                                     continue;
                             }
                         }
-                        breakDoctypesystemidentifierdoublequotedloop:
-                        goto case AFTER_DOCTYPE_SYSTEM_IDENTIFIER;
+                        // TODO: double check to see if this still exists in upstream code. This is 
+                        // detected as unreachable code
+                        //breakDoctypesystemidentifierdoublequotedloop:
+                        //goto case AFTER_DOCTYPE_SYSTEM_IDENTIFIER;
                         // FALLTHRU DON'T REORDER
                     case AFTER_DOCTYPE_SYSTEM_IDENTIFIER:
                         /*afterdoctypesystemidentifierloop:*/
@@ -6069,13 +6020,10 @@ namespace HtmlParserSharp.Portable.Core
                                 _index++;
                                 goto continueStateloop;
                             }
-                            else
-                            {
-                                state = Transition(state, AFTER_DOCTYPE_SYSTEM_KEYWORD, reconsume, pos);
-                                reconsume = true;
-                                goto breakDoctypeystemloop;
-                                // goto continueStateloop;
-                            }
+                            state = Transition(state, AFTER_DOCTYPE_SYSTEM_KEYWORD, reconsume, pos);
+                            reconsume = true;
+                            goto breakDoctypeystemloop;
+                            // goto continueStateloop;
                         }
                         breakDoctypeystemloop:
                         goto case AFTER_DOCTYPE_SYSTEM_KEYWORD;
@@ -6436,14 +6384,8 @@ namespace HtmlParserSharp.Portable.Core
         private void InitDoctypeFields()
         {
             _doctypeName = "";
-            if (_systemIdentifier != null)
-            {
-                _systemIdentifier = null;
-            }
-            if (_publicIdentifier != null)
-            {
-                _publicIdentifier = null;
-            }
+            _systemIdentifier = null;
+            _publicIdentifier = null;
             _forceQuirks = false;
         }
 
@@ -6809,14 +6751,8 @@ namespace HtmlParserSharp.Portable.Core
 							 * to on.
 							 */
                             _doctypeName = "";
-                            if (_systemIdentifier != null)
-                            {
-                                _systemIdentifier = null;
-                            }
-                            if (_publicIdentifier != null)
-                            {
-                                _publicIdentifier = null;
-                            }
+                            _systemIdentifier = null;
+                            _publicIdentifier = null;
                             _forceQuirks = true;
                             /*
 							 * Emit the token.
@@ -6825,7 +6761,6 @@ namespace HtmlParserSharp.Portable.Core
                             /*
 							 * Reconsume the EOF character in the data state.
 							 */
-                            goto breakEofloop;
                         }
                         goto breakEofloop;
                     case COMMENT_START:
@@ -7019,7 +6954,7 @@ namespace HtmlParserSharp.Portable.Core
                         /*outer:*/
                         for (;;)
                         {
-                            char c = '\u0000';
+                            const char c = '\u0000';
                             _entCol++;
                             /*
 							 * Consume the maximum number of characters possible,
@@ -7043,14 +6978,11 @@ namespace HtmlParserSharp.Portable.Core
                                 {
                                     goto breakOuter;
                                 }
-                                else if (c < NamedCharacters.NAMES[_hi][_entCol])
-                                {
-                                    _hi--;
-                                }
-                                else
+                                if (c >= NamedCharacters.NAMES[_hi][_entCol])
                                 {
                                     goto breakHiloop;
                                 }
+                                _hi--;
                             }
 
                             breakHiloop:
@@ -7088,7 +7020,6 @@ namespace HtmlParserSharp.Portable.Core
                             {
                                 goto breakOuter;
                             }
-                            continue;
                         }
 
                         breakOuter:
@@ -7103,37 +7034,22 @@ namespace HtmlParserSharp.Portable.Core
                             state = returnState;
                             goto continueEofloop;
                         }
-                        else
+                        string candidateName = NamedCharacters.NAMES[_candidate];
+                        if (candidateName.Length == 0
+                            || candidateName[candidateName.Length - 1] != ';')
                         {
-                            string candidateName = NamedCharacters.NAMES[_candidate];
-                            if (candidateName.Length == 0
-                                || candidateName[candidateName.Length - 1] != ';')
-                            {
-                                /*
+                            /*
 								 * If the last character matched is not a U+003B
 								 * SEMICOLON (;), there is a parse error.
 								 */
-                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                            if ((returnState & DATA_AND_RCDATA_MASK) != 0 && _strBuf.Length > _strBufMark)
+                            {
+                                char ch = _strBufMark == _strBufLen ? '\u0000' : _strBuf[_strBufMark];
+                                if ((ch >= '0' && ch <= '9')
+                                    || (ch >= 'A' && ch <= 'Z')
+                                    || (ch >= 'a' && ch <= 'z'))
                                 {
                                     /*
-									 * If the entity is being consumed as part of an
-									 * attribute, and the last character matched is
-									 * not a U+003B SEMICOLON (;),
-									 */
-                                    char ch;
-                                    if (_strBufMark == _strBufLen)
-                                    {
-                                        ch = '\u0000';
-                                    }
-                                    else
-                                    {
-                                        ch = _strBuf[_strBufMark];
-                                    }
-                                    if ((ch >= '0' && ch <= '9')
-                                        || (ch >= 'A' && ch <= 'Z')
-                                        || (ch >= 'a' && ch <= 'z'))
-                                    {
-                                        /*
 										 * and the next character is in the range
 										 * U+0030 DIGIT ZERO to U+0039 DIGIT NINE,
 										 * U+0041 LATIN CAPITAL LETTER A to U+005A
@@ -7144,68 +7060,67 @@ namespace HtmlParserSharp.Portable.Core
 										 * after the U+0026 AMPERSAND (&) must be
 										 * unconsumed, and nothing is returned.
 										 */
-                                        ErrNoNamedCharacterMatch();
-                                        AppendStrBufToLongStrBuf();
-                                        state = returnState;
-                                        goto continueEofloop;
-                                    }
-                                }
-                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-                                {
-                                    ErrUnescapedAmpersandInterpretedAsCharacterReference();
-                                }
-                                else
-                                {
-                                    ErrNotSemicolonTerminated();
+                                    ErrNoNamedCharacterMatch();
+                                    AppendStrBufToLongStrBuf();
+                                    state = returnState;
+                                    goto continueEofloop;
                                 }
                             }
+                            if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                            {
+                                ErrUnescapedAmpersandInterpretedAsCharacterReference();
+                            }
+                            else
+                            {
+                                ErrNotSemicolonTerminated();
+                            }
+                        }
 
-                            /*
+                        /*
 							 * Otherwise, return a character token for the character
 							 * corresponding to the entity name (as given by the
 							 * second column of the named character references
 							 * table).
 							 */
-                            char[] val = NamedCharacters.VALUES[_candidate];
-                            if (
-                                // [NOCPP[
-                                val.Length == 1
-                                // ]NOCPP]
-                                // CPPONLY: val[1] == 0
-                                )
+                        char[] val = NamedCharacters.VALUES[_candidate];
+                        if (
+                            // [NOCPP[
+                            val.Length == 1
+                            // ]NOCPP]
+                            // CPPONLY: val[1] == 0
+                            )
+                        {
+                            EmitOrAppendOne(val, returnState);
+                        }
+                        else
+                        {
+                            EmitOrAppendTwo(val, returnState);
+                        }
+                        // this is so complicated!
+                        if (_strBufMark < _strBufLen)
+                        {
+                            if ((returnState & DATA_AND_RCDATA_MASK) != 0)
                             {
-                                EmitOrAppendOne(val, returnState);
+                                for (int i = _strBufMark; i < _strBufLen; i++)
+                                {
+                                    AppendLongStrBuf(_strBuf[i]);
+                                }
                             }
                             else
                             {
-                                EmitOrAppendTwo(val, returnState);
+                                TokenHandler.Characters(_strBuf, _strBufMark,
+                                                        _strBufLen - _strBufMark);
                             }
-                            // this is so complicated!
-                            if (_strBufMark < _strBufLen)
-                            {
-                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-                                {
-                                    for (int i = _strBufMark; i < _strBufLen; i++)
-                                    {
-                                        AppendLongStrBuf(_strBuf[i]);
-                                    }
-                                }
-                                else
-                                {
-                                    TokenHandler.Characters(_strBuf, _strBufMark,
-                                                            _strBufLen - _strBufMark);
-                                }
-                            }
-                            state = returnState;
-                            goto continueEofloop;
-                            /*
+                        }
+                        state = returnState;
+                        goto continueEofloop;
+                        /*
 							 * If the markup contains I'm &notit; I tell you, the
 							 * entity is parsed as "not", as in, I'm Â¬it; I tell
 							 * you. But if the markup was I'm &notin; I tell you,
 							 * the entity would be parsed as "notin;", resulting in
 							 * I'm âˆ‰ I tell you.
 							 */
-                        }
                     case CONSUME_NCR:
                     case DECIMAL_NRC_LOOP:
                     case HEX_NCR_LOOP:
@@ -7225,10 +7140,7 @@ namespace HtmlParserSharp.Portable.Core
                             state = returnState;
                             continue;
                         }
-                        else
-                        {
-                            ErrCharRefLacksSemicolon();
-                        }
+                        ErrCharRefLacksSemicolon();
                         // WARNING previous state sets reconsume
                         HandleNcrValue(returnState);
                         state = returnState;
@@ -7239,13 +7151,12 @@ namespace HtmlParserSharp.Portable.Core
                     case CDATA_RSQB_RSQB:
                         TokenHandler.Characters(RSQB_RSQB, 0, 2);
                         goto breakEofloop;
-                    case DATA:
                     default:
                         goto breakEofloop;
                 }
 
                 continueEofloop:
-                continue;
+                ;
             } // eofloop
 
             breakEofloop:
@@ -7254,7 +7165,6 @@ namespace HtmlParserSharp.Portable.Core
 			 * EOF Emit an end-of-file token.
 			 */
             TokenHandler.Eof();
-            return;
         }
 
         private void EmitDoctypeToken(int pos)
@@ -7435,22 +7345,13 @@ namespace HtmlParserSharp.Portable.Core
             _endTag = false;
             _shouldSuspend = false;
             InitDoctypeFields();
-            if (_tagName != null)
-            {
-                _tagName = null;
-            }
-            if (_attributeName != null)
-            {
-                _attributeName = null;
-            }
+            _tagName = null;
+            _attributeName = null;
             // [NOCPP[
             if (_newAttributesEachTime)
             {
                 // ]NOCPP]
-                if (_attributes != null)
-                {
-                    _attributes = null;
-                }
+                _attributes = null;
                 // [NOCPP[
             }
             // ]NOCPP]
@@ -7493,59 +7394,26 @@ namespace HtmlParserSharp.Portable.Core
             _endTag = other._endTag;
             _shouldSuspend = false;
 
-            if (other._doctypeName == null)
-            {
-                _doctypeName = null;
-            }
-            else
+            if (other._doctypeName != null)
             {
                 _doctypeName = other._doctypeName;
             }
 
-            if (other._systemIdentifier == null)
-            {
-                _systemIdentifier = null;
-            }
-            else
+            if (other._systemIdentifier != null)
             {
                 _systemIdentifier = other._systemIdentifier;
             }
 
-            if (other._publicIdentifier == null)
-            {
-                _publicIdentifier = null;
-            }
-            else
+            if (other._publicIdentifier != null)
             {
                 _publicIdentifier = other._publicIdentifier;
             }
 
-            if (other._tagName == null)
-            {
-                _tagName = null;
-            }
-            else
-            {
-                _tagName = other._tagName.CloneElementName();
-            }
+            _tagName = other._tagName == null ? null : other._tagName.CloneElementName();
 
-            if (other._attributeName == null)
-            {
-                _attributeName = null;
-            }
-            else
-            {
-                _attributeName = other._attributeName.CloneAttributeName();
-            }
+            _attributeName = other._attributeName == null ? null : other._attributeName.CloneAttributeName();
 
-            if (other._attributes == null)
-            {
-                _attributes = null;
-            }
-            else
-            {
-                _attributes = other._attributes.CloneAttributes();
-            }
+            _attributes = other._attributes == null ? null : other._attributes.CloneAttributes();
         }
 
         public void InitializeWithoutStarting()
