@@ -24,11 +24,10 @@
 
 using System;
 using System.IO;
-using System.Xml;
 using HtmlParserSharp.Portable.Core;
 using System.Xml.Linq;
 
-namespace HtmlParserSharp
+namespace HtmlParserSharp.Portable
 {
 	/// <summary>
 	/// This is a simple API for the parsing process.
@@ -37,8 +36,8 @@ namespace HtmlParserSharp
 	/// </summary>
 	public class SimpleHtmlParser
 	{
-		private Tokenizer tokenizer;
-		private DomTreeBuilder treeBuilder;
+		private Tokenizer _tokenizer;
+		private DomTreeBuilder _treeBuilder;
 
         //public XmlDocumentFragment ParseStringFragment(string str, string fragmentContext)
         //{
@@ -61,8 +60,8 @@ namespace HtmlParserSharp
 		public XDocument Parse(TextReader reader)
 		{
 			Reset();
-			Tokenize(reader);
-			return treeBuilder.Document;
+			Tokenize(reader, swallowBom: true);
+			return _treeBuilder.Document;
 		}
 
         //public XmlDocumentFragment ParseFragment(TextReader reader, string fragmentContext)
@@ -75,9 +74,9 @@ namespace HtmlParserSharp
 
 		private void Reset()
 		{
-			treeBuilder = new DomTreeBuilder();
-			tokenizer = new Tokenizer(treeBuilder, false);
-			treeBuilder.IsIgnoringComments = false;
+			_treeBuilder = new DomTreeBuilder();
+			_tokenizer = new Tokenizer(_treeBuilder, false);
+			_treeBuilder.IsIgnoringComments = false;
 
 			// optionally: report errors and more
 
@@ -91,27 +90,26 @@ namespace HtmlParserSharp
 			//tokenizer.EncodingDeclared += (sender, a) => Console.WriteLine("Encoding: " + a.Encoding + " (currently ignored)");
 		}
 
-		private void Tokenize(TextReader reader)
+		private void Tokenize(TextReader reader, bool swallowBom)
 		{
 			if (reader == null)
 			{
 			    throw new ArgumentNullException("reader");
 			}
 
-			tokenizer.Start();
-			bool swallowBom = true;
+			_tokenizer.Start();
 
 			try
 			{
-				char[] buffer = new char[2048];
-				UTF16Buffer bufr = new UTF16Buffer(buffer, 0, 0);
-				bool lastWasCR = false;
-				int len = -1;
+				var buffer = new char[2048];
+				var bufr = new UTF16Buffer(buffer, 0, 0);
+				var lastWasCR = false;
+				int len;
 				if ((len = reader.Read(buffer, 0, buffer.Length)) != 0)
 				{
-					int streamOffset = 0;
-					int offset = 0;
-					int length = len;
+					var streamOffset = 0;
+					var offset = 0;
+					var length = len;
 					if (swallowBom)
 					{
 						if (buffer[0] == '\uFEFF')
@@ -123,7 +121,7 @@ namespace HtmlParserSharp
 					}
 					if (length > 0)
 					{
-						tokenizer.SetTransitionBaseOffset(streamOffset);
+						_tokenizer.SetTransitionBaseOffset(streamOffset);
 						bufr.Start = offset;
 						bufr.End = offset + length;
 						while (bufr.HasMore)
@@ -132,14 +130,14 @@ namespace HtmlParserSharp
 							lastWasCR = false;
 							if (bufr.HasMore)
 							{
-								lastWasCR = tokenizer.TokenizeBuffer(bufr);
+								lastWasCR = _tokenizer.TokenizeBuffer(bufr);
 							}
 						}
 					}
 					streamOffset = length;
 					while ((len = reader.Read(buffer, 0, buffer.Length)) != 0)
 					{
-						tokenizer.SetTransitionBaseOffset(streamOffset);
+						_tokenizer.SetTransitionBaseOffset(streamOffset);
 						bufr.Start = 0;
 						bufr.End = len;
 						while (bufr.HasMore)
@@ -148,17 +146,17 @@ namespace HtmlParserSharp
 							lastWasCR = false;
 							if (bufr.HasMore)
 							{
-								lastWasCR = tokenizer.TokenizeBuffer(bufr);
+								lastWasCR = _tokenizer.TokenizeBuffer(bufr);
 							}
 						}
 						streamOffset += len;
 					}
 				}
-				tokenizer.Eof();
+				_tokenizer.Eof();
 			}
 			finally
 			{
-				tokenizer.End();
+				_tokenizer.End();
 			}
 		}
 	}
