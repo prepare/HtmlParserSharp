@@ -25,60 +25,59 @@ using System;
 
 namespace HtmlParserSharp.Portable.Core
 {
-	/// <summary>
-	/// A common superclass for tree builders that coalesce their text nodes.
-	/// </summary>
-	public abstract class CoalescingTreeBuilder<T> : TreeBuilder<T> where T : class
-	{
-		protected override void AccumulateCharacters(char[] buf, int start, int length)
-		{
-			int newLen = charBufferLen + length;
-			if (newLen > charBuffer.Length)
-			{
-				char[] newBuf = new char[newLen];
-				Array.Copy(charBuffer, newBuf, charBufferLen);
-				charBuffer = null; // release the old buffer in C++
-				charBuffer = newBuf;
-			}
-			Array.Copy(buf, start, charBuffer, charBufferLen, length);
-			charBufferLen = newLen;
-		}
+    /// <summary>
+    ///     A common superclass for tree builders that coalesce their text nodes.
+    /// </summary>
+    public abstract class CoalescingTreeBuilder<T> : TreeBuilder<T> where T : class
+    {
+        protected override void AccumulateCharacters(char[] buf, int start, int length)
+        {
+            int newLen = charBufferLen + length;
+            if (newLen > charBuffer.Length)
+            {
+                var newBuf = new char[newLen];
+                Array.Copy(charBuffer, newBuf, charBufferLen);
+                charBuffer = null; // release the old buffer in C++
+                charBuffer = newBuf;
+            }
+            Array.Copy(buf, start, charBuffer, charBufferLen, length);
+            charBufferLen = newLen;
+        }
 
-		override protected void AppendCharacters(T parent, char[] buf, int start, int length)
-		{
-			AppendCharacters(parent, new String(buf, start, length));
-		}
+        protected override void AppendCharacters(T parent, char[] buf, int start, int length)
+        {
+            AppendCharacters(parent, new String(buf, start, length));
+        }
 
 
-		override protected void AppendIsindexPrompt(T parent)
-		{
-			AppendCharacters(parent, "This is a searchable index. Enter search keywords: ");
-		}
+        protected override void AppendIsindexPrompt(T parent)
+        {
+            AppendCharacters(parent, "This is a searchable index. Enter search keywords: ");
+        }
 
-		protected abstract void AppendCharacters(T parent, string text);
+        protected abstract void AppendCharacters(T parent, string text);
 
-		override protected void AppendComment(T parent, char[] buf, int start, int length)
-		{
-			AppendComment(parent, new String(buf, start, length));
-		}
+        protected override void AppendComment(T parent, char[] buf, int start, int length)
+        {
+            AppendComment(parent, new String(buf, start, length));
+        }
 
-		protected abstract void AppendComment(T parent, string comment);
+        protected abstract void AppendComment(T parent, string comment);
 
-		override protected void AppendCommentToDocument(char[] buf, int start, int length)
-		{
-			// TODO Auto-generated method stub
-			AppendCommentToDocument(new String(buf, start, length));
-		}
+        protected override void AppendCommentToDocument(char[] buf, int start, int length)
+        {
+            // TODO Auto-generated method stub
+            AppendCommentToDocument(new String(buf, start, length));
+        }
 
-		protected abstract void AppendCommentToDocument(string comment);
+        protected abstract void AppendCommentToDocument(string comment);
 
-		override protected void InsertFosterParentedCharacters(char[] buf, int start,
-				int length, T table, T stackParent)
-		{
-			InsertFosterParentedCharacters(new String(buf, start, length), table, stackParent);
-		}
+        protected override void InsertFosterParentedCharacters(char[] buf, int start,
+                                                               int length, T table, T stackParent)
+        {
+            InsertFosterParentedCharacters(new String(buf, start, length), table, stackParent);
+        }
 
-		protected abstract void InsertFosterParentedCharacters(string text, T table, T stackParent);
-	}
-
+        protected abstract void InsertFosterParentedCharacters(string text, T table, T stackParent);
+    }
 }
