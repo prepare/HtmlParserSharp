@@ -23,76 +23,76 @@
 
 namespace HtmlParserSharp.Portable.Core
 {
-	/// <summary>
-	/// Interface for exposing the state of the HTML5 tree builder so that the
-	/// interface can be implemented by the tree builder itself and by snapshots.
-	/// </summary>
-	public interface ITreeBuilderState<T> where T : class
-	{
-		/// <summary>
-		/// Gets the stack.
-		/// </summary>
-		/// <returns>The stack</returns>
-		StackNode<T>[] Stack { get; }
+    /// <summary>
+    ///     Interface for exposing the state of the HTML5 tree builder so that the
+    ///     interface can be implemented by the tree builder itself and by snapshots.
+    /// </summary>
+    public interface ITreeBuilderState<T> where T : class
+    {
+        /// <summary>
+        ///     Gets the stack.
+        /// </summary>
+        /// <returns>The stack</returns>
+        StackNode<T>[] Stack { get; }
 
-		/// <summary>
-		/// Gets the list of active formatting elements.
-		/// </summary>
-		/// <returns>The list of active formatting elements.</returns>
-		StackNode<T>[] ListOfActiveFormattingElements { get; }
+        /// <summary>
+        ///     Gets the list of active formatting elements.
+        /// </summary>
+        /// <returns>The list of active formatting elements.</returns>
+        StackNode<T>[] ListOfActiveFormattingElements { get; }
 
-		/// <summary>
-		/// Gets the form pointer.
-		/// </summary>
-		/// <returns>The form pointer</returns>
-		T FormPointer { get; }
+        /// <summary>
+        ///     Gets the form pointer.
+        /// </summary>
+        /// <returns>The form pointer</returns>
+        T FormPointer { get; }
 
-		/// <summary>
-		/// Gets the head pointer.
-		/// </summary>
-		/// <returns>The head pointer.</returns>
-		T HeadPointer { get; }
+        /// <summary>
+        ///     Gets the head pointer.
+        /// </summary>
+        /// <returns>The head pointer.</returns>
+        T HeadPointer { get; }
 
-		/// <summary>
-		/// Gets the deep tree surrogate parent.
-		/// </summary>
-		/// <returns>The deep tree surrogate parent.</returns>
-		T DeepTreeSurrogateParent { get; }
+        /// <summary>
+        ///     Gets the deep tree surrogate parent.
+        /// </summary>
+        /// <returns>The deep tree surrogate parent.</returns>
+        T DeepTreeSurrogateParent { get; }
 
-		/// <summary>
-		/// Gets the mode.
-		/// </summary>
-		/// <returns>The mode.</returns>
-		InsertionMode Mode { get; }
+        /// <summary>
+        ///     Gets the mode.
+        /// </summary>
+        /// <returns>The mode.</returns>
+        InsertionMode Mode { get; }
 
-		/// <summary>
-		/// Gets the original mode.
-		/// </summary>
-		/// <returns>The original mode.</returns>
-		InsertionMode OriginalMode { get; }
+        /// <summary>
+        ///     Gets the original mode.
+        /// </summary>
+        /// <returns>The original mode.</returns>
+        InsertionMode OriginalMode { get; }
 
-		/// <summary>
-		/// Determines whether the frameset is OK.
-		/// </summary>
-		/// <returns>
-		///   <c>true</c> if the frameset is OK; otherwise, <c>false</c>.
-		/// </returns>
-		bool IsFramesetOk { get; }
+        /// <summary>
+        ///     Determines whether the frameset is OK.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if the frameset is OK; otherwise, <c>false</c>.
+        /// </returns>
+        bool IsFramesetOk { get; }
 
-		/// <summary>
-		/// Determines whether we need to drop LF.
-		/// </summary>
-		/// <returns>
-		///   <c>true</c> if we need to drop LF; otherwise, <c>false</c>.
-		/// </returns>
-		bool IsNeedToDropLF { get; }
+        /// <summary>
+        ///     Determines whether we need to drop LF.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if we need to drop LF; otherwise, <c>false</c>.
+        /// </returns>
+        bool IsNeedToDropLF { get; }
 
-		/// <summary>
-		/// Determines whether this instance is in quirks mode.
-		/// </summary>
-		/// <returns>
-		///   <c>true</c> if this instance is in quirks mode; otherwise, <c>false</c>.
-		/// </returns>
-		bool IsQuirks { get; }
-	}
+        /// <summary>
+        ///     Determines whether this instance is in quirks mode.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this instance is in quirks mode; otherwise, <c>false</c>.
+        /// </returns>
+        bool IsQuirks { get; }
+    }
 }
