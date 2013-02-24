@@ -35,7 +35,7 @@ namespace HtmlParserSharp
 	/// <summary>
 	/// The tree builder glue for building a tree through the public DOM APIs.
 	/// </summary>
-	public class DomTreeBuilder : CoalescingTreeBuilder<XmlElement>
+	class DomTreeBuilder : CoalescingTreeBuilder<XmlElement>
 	{
 		/// <summary>
 		/// The current doc.
@@ -150,7 +150,7 @@ namespace HtmlParserSharp
 		/// Returns the document.
 		/// </summary>
 		/// <returns>The document</returns>
-		public XmlDocument Document
+		internal XmlDocument Document
 		{
 			get
 			{
@@ -162,7 +162,7 @@ namespace HtmlParserSharp
 		/// Return the document fragment.
 		/// </summary>
 		/// <returns>The document fragment</returns>
-		public XmlDocumentFragment getDocumentFragment() {
+		internal XmlDocumentFragment getDocumentFragment() {
 			XmlDocumentFragment rv = document.CreateDocumentFragment();
 			XmlNode rootElt = document.FirstChild;
 			while (rootElt.HasChildNodes) {

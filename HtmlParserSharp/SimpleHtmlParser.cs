@@ -27,7 +27,7 @@ using System.IO;
 using System.Xml;
 using HtmlParserSharp.Core;
 
-namespace HtmlParserSharp.Console
+namespace HtmlParserSharp
 {
 	/// <summary>
 	/// This is a simple API for the parsing process.
@@ -94,7 +94,7 @@ namespace HtmlParserSharp.Console
 		{
 			if (reader == null)
 			{
-				throw new ArgumentNullException("reader was null.");
+			    throw new ArgumentNullException("reader");
 			}
 
 			tokenizer.Start();

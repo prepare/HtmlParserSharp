@@ -46,7 +46,6 @@
       </SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleHtmlParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
