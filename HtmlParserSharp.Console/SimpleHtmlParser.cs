@@ -27,7 +27,7 @@ using System.IO;
 using System.Xml;
 using HtmlParserSharp.Core;
 
-namespace HtmlParserSharp
+namespace HtmlParserSharp.Console
 {
 	/// <summary>
 	/// This is a simple API for the parsing process.

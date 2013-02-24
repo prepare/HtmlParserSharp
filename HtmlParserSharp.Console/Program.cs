@@ -27,7 +27,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace HtmlParserSharp
+namespace HtmlParserSharp.Console
 {
 	/// <summary>
 	/// This is contains a sample entry point for testing and benchmarks.
@@ -54,7 +54,7 @@ namespace HtmlParserSharp
 			Stopwatch sw = new Stopwatch();
 
 
-			Console.Write("Parsing ... ");
+			System.Console.Write("Parsing ... ");
 			var result = GetTestFiles().Select((file) =>
 				{
 					sw.Restart();
@@ -73,9 +73,9 @@ namespace HtmlParserSharp
 			TimeSpan total = result.Aggregate(new TimeSpan(), (passed, current) => passed + current.Time);
 			TimeSpan reparseTotal = result.Aggregate(new TimeSpan(), (passed, current) => passed + current.ReparseTime);
 
-			Console.WriteLine("done.");
-			Console.WriteLine("Found " + result.Count + " documents.");
-			Console.WriteLine();
+			System.Console.WriteLine("done.");
+			System.Console.WriteLine("Found " + result.Count + " documents.");
+			System.Console.WriteLine();
 			PrintTime("Total", total);
 			PrintTime("First", result.First().Time);
 			PrintTime("Average", TimeSpan.FromTicks(total.Ticks / result.Count));
@@ -83,8 +83,8 @@ namespace HtmlParserSharp
 			PrintTime("Min", result.Min(val => val.Time));
 			PrintTime("Max", result.Max(val => val.Time));
 
-			Console.WriteLine();
-			Console.WriteLine("=== Reparsing (XDocument) ===");
+			System.Console.WriteLine();
+			System.Console.WriteLine("=== Reparsing (XDocument) ===");
 
 			// note: reparsing using XmlDocument instead gives similar results
 
@@ -94,12 +94,12 @@ namespace HtmlParserSharp
 			PrintTime("Average (without first)", TimeSpan.FromTicks((reparseTotal.Ticks - result.First().ReparseTime.Ticks) / (result.Count - 1)));
 			PrintTime("Min", result.Min(val => val.ReparseTime));
 			PrintTime("Max", result.Max(val => val.ReparseTime));
-			Console.ReadKey();
+			System.Console.ReadKey();
 		}
 
 		private static void PrintTime(string caption, TimeSpan time)
 		{
-			Console.WriteLine("{0}:\n  {1} ({2} ms)", caption, time.ToString(), time.TotalMilliseconds);
+			System.Console.WriteLine("{0}:\n  {1} ({2} ms)", caption, time.ToString(), time.TotalMilliseconds);
 		}
 
 
