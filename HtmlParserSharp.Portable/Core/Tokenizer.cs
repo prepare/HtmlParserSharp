@@ -40,607 +40,596 @@ using HtmlParserSharp.Portable.Common;
 
 namespace HtmlParserSharp.Portable.Core
 {
-	/// <summary>
-	/// An implementation of
-	/// http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html
-	/// This class implements the <code>Locator</code> interface. This is not an
-	/// incidental implementation detail: Users of this class are encouraged to make
-	/// use of the <code>Locator</code> nature.
-	/// By default, the tokenizer may report data that XML 1.0 bans. The tokenizer
-	/// can be configured to treat these conditions as fatal or to coerce the infoset
-	/// to something that XML 1.0 allows.
-	/// </summary>
-	public class Tokenizer : ILocator
-	{
-		private const int DATA_AND_RCDATA_MASK = ~1;
+    /// <summary>
+    ///     An implementation of
+    ///     http://www.whatwg.org/specs/web-apps/current-work/multipage/tokenization.html
+    ///     This class implements the <code>Locator</code> interface. This is not an
+    ///     incidental implementation detail: Users of this class are encouraged to make
+    ///     use of the <code>Locator</code> nature.
+    ///     By default, the tokenizer may report data that XML 1.0 bans. The tokenizer
+    ///     can be configured to treat these conditions as fatal or to coerce the infoset
+    ///     to something that XML 1.0 allows.
+    /// </summary>
+    public class Tokenizer : ILocator
+    {
+        private const int DATA_AND_RCDATA_MASK = ~1;
 
-		public const int DATA = 0;
+        public const int DATA = 0;
 
-		public const int RCDATA = 1;
+        public const int RCDATA = 1;
 
-		public const int SCRIPT_DATA = 2;
+        public const int SCRIPT_DATA = 2;
 
-		public const int RAWTEXT = 3;
+        public const int RAWTEXT = 3;
 
-		public const int SCRIPT_DATA_ESCAPED = 4;
+        public const int SCRIPT_DATA_ESCAPED = 4;
 
-		public const int ATTRIBUTE_VALUE_DOUBLE_QUOTED = 5;
+        public const int ATTRIBUTE_VALUE_DOUBLE_QUOTED = 5;
 
-		public const int ATTRIBUTE_VALUE_SINGLE_QUOTED = 6;
+        public const int ATTRIBUTE_VALUE_SINGLE_QUOTED = 6;
 
-		public const int ATTRIBUTE_VALUE_UNQUOTED = 7;
+        public const int ATTRIBUTE_VALUE_UNQUOTED = 7;
 
-		public const int PLAINTEXT = 8;
+        public const int PLAINTEXT = 8;
 
-		public const int TAG_OPEN = 9;
+        public const int TAG_OPEN = 9;
 
-		public const int CLOSE_TAG_OPEN = 10;
+        public const int CLOSE_TAG_OPEN = 10;
 
-		public const int TAG_NAME = 11;
+        public const int TAG_NAME = 11;
 
-		public const int BEFORE_ATTRIBUTE_NAME = 12;
+        public const int BEFORE_ATTRIBUTE_NAME = 12;
 
-		public const int ATTRIBUTE_NAME = 13;
+        public const int ATTRIBUTE_NAME = 13;
 
-		public const int AFTER_ATTRIBUTE_NAME = 14;
+        public const int AFTER_ATTRIBUTE_NAME = 14;
 
-		public const int BEFORE_ATTRIBUTE_VALUE = 15;
+        public const int BEFORE_ATTRIBUTE_VALUE = 15;
 
-		public const int AFTER_ATTRIBUTE_VALUE_QUOTED = 16;
+        public const int AFTER_ATTRIBUTE_VALUE_QUOTED = 16;
 
-		public const int BOGUS_COMMENT = 17;
+        public const int BOGUS_COMMENT = 17;
 
-		public const int MARKUP_DECLARATION_OPEN = 18;
+        public const int MARKUP_DECLARATION_OPEN = 18;
 
-		public const int DOCTYPE = 19;
+        public const int DOCTYPE = 19;
 
-		public const int BEFORE_DOCTYPE_NAME = 20;
+        public const int BEFORE_DOCTYPE_NAME = 20;
 
-		public const int DOCTYPE_NAME = 21;
+        public const int DOCTYPE_NAME = 21;
 
-		public const int AFTER_DOCTYPE_NAME = 22;
+        public const int AFTER_DOCTYPE_NAME = 22;
 
-		public const int BEFORE_DOCTYPE_PUBLIC_IDENTIFIER = 23;
+        public const int BEFORE_DOCTYPE_PUBLIC_IDENTIFIER = 23;
 
-		public const int DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED = 24;
+        public const int DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED = 24;
 
-		public const int DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED = 25;
+        public const int DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED = 25;
 
-		public const int AFTER_DOCTYPE_PUBLIC_IDENTIFIER = 26;
+        public const int AFTER_DOCTYPE_PUBLIC_IDENTIFIER = 26;
 
-		public const int BEFORE_DOCTYPE_SYSTEM_IDENTIFIER = 27;
+        public const int BEFORE_DOCTYPE_SYSTEM_IDENTIFIER = 27;
 
-		public const int DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED = 28;
+        public const int DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED = 28;
 
-		public const int DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED = 29;
+        public const int DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED = 29;
 
-		public const int AFTER_DOCTYPE_SYSTEM_IDENTIFIER = 30;
+        public const int AFTER_DOCTYPE_SYSTEM_IDENTIFIER = 30;
 
-		public const int BOGUS_DOCTYPE = 31;
+        public const int BOGUS_DOCTYPE = 31;
 
-		public const int COMMENT_START = 32;
+        public const int COMMENT_START = 32;
 
-		public const int COMMENT_START_DASH = 33;
+        public const int COMMENT_START_DASH = 33;
 
-		public const int COMMENT = 34;
+        public const int COMMENT = 34;
 
-		public const int COMMENT_END_DASH = 35;
+        public const int COMMENT_END_DASH = 35;
 
-		public const int COMMENT_END = 36;
+        public const int COMMENT_END = 36;
 
-		public const int COMMENT_END_BANG = 37;
+        public const int COMMENT_END_BANG = 37;
 
-		public const int NON_DATA_END_TAG_NAME = 38;
+        public const int NON_DATA_END_TAG_NAME = 38;
 
-		public const int MARKUP_DECLARATION_HYPHEN = 39;
+        public const int MARKUP_DECLARATION_HYPHEN = 39;
 
-		public const int MARKUP_DECLARATION_OCTYPE = 40;
+        public const int MARKUP_DECLARATION_OCTYPE = 40;
 
-		public const int DOCTYPE_UBLIC = 41;
+        public const int DOCTYPE_UBLIC = 41;
 
-		public const int DOCTYPE_YSTEM = 42;
+        public const int DOCTYPE_YSTEM = 42;
 
-		public const int AFTER_DOCTYPE_PUBLIC_KEYWORD = 43;
+        public const int AFTER_DOCTYPE_PUBLIC_KEYWORD = 43;
 
-		public const int BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS = 44;
+        public const int BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS = 44;
 
-		public const int AFTER_DOCTYPE_SYSTEM_KEYWORD = 45;
+        public const int AFTER_DOCTYPE_SYSTEM_KEYWORD = 45;
 
-		public const int CONSUME_CHARACTER_REFERENCE = 46;
+        public const int CONSUME_CHARACTER_REFERENCE = 46;
 
-		public const int CONSUME_NCR = 47;
+        public const int CONSUME_NCR = 47;
 
-		public const int CHARACTER_REFERENCE_TAIL = 48;
+        public const int CHARACTER_REFERENCE_TAIL = 48;
 
-		public const int HEX_NCR_LOOP = 49;
+        public const int HEX_NCR_LOOP = 49;
 
-		public const int DECIMAL_NRC_LOOP = 50;
+        public const int DECIMAL_NRC_LOOP = 50;
 
-		public const int HANDLE_NCR_VALUE = 51;
+        public const int HANDLE_NCR_VALUE = 51;
 
-		public const int HANDLE_NCR_VALUE_RECONSUME = 52;
+        public const int HANDLE_NCR_VALUE_RECONSUME = 52;
 
-		public const int CHARACTER_REFERENCE_HILO_LOOKUP = 53;
+        public const int CHARACTER_REFERENCE_HILO_LOOKUP = 53;
 
-		public const int SELF_CLOSING_START_TAG = 54;
+        public const int SELF_CLOSING_START_TAG = 54;
 
-		public const int CDATA_START = 55;
+        public const int CDATA_START = 55;
 
-		public const int CDATA_SECTION = 56;
+        public const int CDATA_SECTION = 56;
 
-		public const int CDATA_RSQB = 57;
+        public const int CDATA_RSQB = 57;
 
-		public const int CDATA_RSQB_RSQB = 58;
+        public const int CDATA_RSQB_RSQB = 58;
 
-		public const int SCRIPT_DATA_LESS_THAN_SIGN = 59;
+        public const int SCRIPT_DATA_LESS_THAN_SIGN = 59;
 
-		public const int SCRIPT_DATA_ESCAPE_START = 60;
+        public const int SCRIPT_DATA_ESCAPE_START = 60;
 
-		public const int SCRIPT_DATA_ESCAPE_START_DASH = 61;
+        public const int SCRIPT_DATA_ESCAPE_START_DASH = 61;
 
-		public const int SCRIPT_DATA_ESCAPED_DASH = 62;
+        public const int SCRIPT_DATA_ESCAPED_DASH = 62;
 
-		public const int SCRIPT_DATA_ESCAPED_DASH_DASH = 63;
+        public const int SCRIPT_DATA_ESCAPED_DASH_DASH = 63;
 
-		public const int BOGUS_COMMENT_HYPHEN = 64;
+        public const int BOGUS_COMMENT_HYPHEN = 64;
 
-		public const int RAWTEXT_RCDATA_LESS_THAN_SIGN = 65;
+        public const int RAWTEXT_RCDATA_LESS_THAN_SIGN = 65;
 
-		public const int SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN = 66;
+        public const int SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN = 66;
 
-		public const int SCRIPT_DATA_DOUBLE_ESCAPE_START = 67;
+        public const int SCRIPT_DATA_DOUBLE_ESCAPE_START = 67;
 
-		public const int SCRIPT_DATA_DOUBLE_ESCAPED = 68;
+        public const int SCRIPT_DATA_DOUBLE_ESCAPED = 68;
 
-		public const int SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN = 69;
+        public const int SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN = 69;
 
-		public const int SCRIPT_DATA_DOUBLE_ESCAPED_DASH = 70;
+        public const int SCRIPT_DATA_DOUBLE_ESCAPED_DASH = 70;
 
-		public const int SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH = 71;
+        public const int SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH = 71;
 
-		public const int SCRIPT_DATA_DOUBLE_ESCAPE_END = 72;
+        public const int SCRIPT_DATA_DOUBLE_ESCAPE_END = 72;
 
-		/// <summary>
-		/// Magic value for UTF-16 operations.
-		/// </summary>
-		private const int LEAD_OFFSET = (0xD800 - (0x10000 >> 10));
+        /// <summary>
+        ///     Magic value for UTF-16 operations.
+        /// </summary>
+        private const int LEAD_OFFSET = (0xD800 - (0x10000 >> 10));
 
-		/// <summary>
-		/// UTF-16 code unit array containing less than and greater than for emitting
-		/// those characters on certain parse errors.
-		/// </summary>
-		private static readonly char[] LT_GT = { '<', '>' };
+        /// <summary>
+        ///     UTF-16 code unit array containing less than and greater than for emitting
+        ///     those characters on certain parse errors.
+        /// </summary>
+        private static readonly char[] LT_GT = {'<', '>'};
 
-		/// <summary>
-		/// UTF-16 code unit array containing less than and solidus for emitting
-		/// those characters on certain parse errors.
-		/// </summary>
-		private static readonly char[] LT_SOLIDUS = { '<', '/' };
+        /// <summary>
+        ///     UTF-16 code unit array containing less than and solidus for emitting
+        ///     those characters on certain parse errors.
+        /// </summary>
+        private static readonly char[] LT_SOLIDUS = {'<', '/'};
 
-		/// <summary>
-		/// UTF-16 code unit array containing ]] for emitting those characters on
-		/// state transitions.
-		/// </summary>
-		private static readonly char[] RSQB_RSQB = { ']', ']' };
+        /// <summary>
+        ///     UTF-16 code unit array containing ]] for emitting those characters on
+        ///     state transitions.
+        /// </summary>
+        private static readonly char[] RSQB_RSQB = {']', ']'};
 
-		/// <summary>
-		/// Array version of U+FFFD.
-		/// </summary>
-		private static readonly char[] REPLACEMENT_CHARACTER = { '\uFFFD' };
+        /// <summary>
+        ///     Array version of U+FFFD.
+        /// </summary>
+        private static readonly char[] REPLACEMENT_CHARACTER = {'\uFFFD'};
 
-		// [NOCPP[
+        // [NOCPP[
 
-		/// <summary>
-		/// Array version of space.
-		/// </summary>
-		private static readonly char[] SPACE = { ' ' };
+        /// <summary>
+        ///     Array version of space.
+        /// </summary>
+        private static readonly char[] SPACE = {' '};
 
-		// ]NOCPP]
+        // ]NOCPP]
 
-		/// <summary>
-		/// Array version of line feed.
-		/// </summary>
-		private static readonly char[] LF = { '\n' };
+        /// <summary>
+        ///     Array version of line feed.
+        /// </summary>
+        private static readonly char[] LF = {'\n'};
 
-		/// <summary>
-		/// Buffer growth parameter.
-		/// </summary>
-		private const int BUFFER_GROW_BY = 1024;
+        /// <summary>
+        ///     Buffer growth parameter.
+        /// </summary>
+        private const int BUFFER_GROW_BY = 1024;
 
-		/// <summary>
-		/// "CDATA[" as <code>char[]</code>
-		/// </summary>
-		private static readonly char[] CDATA_LSQB = "CDATA[".ToCharArray();
+        /// <summary>
+        ///     "CDATA[" as <code>char[]</code>
+        /// </summary>
+        private static readonly char[] CDATA_LSQB = "CDATA[".ToCharArray();
 
-		/// <summary>
-		/// "octype" as <code>char[]</code>
-		/// </summary>
-		private static readonly char[] OCTYPE = "octype".ToCharArray();
+        /// <summary>
+        ///     "octype" as <code>char[]</code>
+        /// </summary>
+        private static readonly char[] OCTYPE = "octype".ToCharArray();
 
-		/// <summary>
-		/// "ublic" as <code>char[]</code>
-		/// </summary>
-		private static readonly char[] UBLIC = "ublic".ToCharArray();
+        /// <summary>
+        ///     "ublic" as <code>char[]</code>
+        /// </summary>
+        private static readonly char[] UBLIC = "ublic".ToCharArray();
 
-		/// <summary>
-		/// "ystem" as  <code>char[]</code>
-		/// </summary>
-		private static readonly char[] YSTEM = "ystem".ToCharArray();
+        /// <summary>
+        ///     "ystem" as  <code>char[]</code>
+        /// </summary>
+        private static readonly char[] YSTEM = "ystem".ToCharArray();
 
-		private static readonly char[] TITLE_ARR = { 't', 'i', 't', 'l', 'e' };
+        private static readonly char[] TITLE_ARR = {'t', 'i', 't', 'l', 'e'};
 
-		private static readonly char[] SCRIPT_ARR = { 's', 'c', 'r', 'i', 'p', 't' };
+        private static readonly char[] SCRIPT_ARR = {'s', 'c', 'r', 'i', 'p', 't'};
 
-		private static readonly char[] STYLE_ARR = { 's', 't', 'y', 'l', 'e' };
+        private static readonly char[] STYLE_ARR = {'s', 't', 'y', 'l', 'e'};
 
-		private static readonly char[] PLAINTEXT_ARR = { 'p', 'l', 'a', 'i', 'n', 't',
-				'e', 'x', 't' };
+        private static readonly char[] PLAINTEXT_ARR =
+            {
+                'p', 'l', 'a', 'i', 'n', 't',
+                'e', 'x', 't'
+            };
 
-		private static readonly char[] XMP_ARR = { 'x', 'm', 'p' };
+        private static readonly char[] XMP_ARR = {'x', 'm', 'p'};
 
-		private static readonly char[] TEXTAREA_ARR = { 't', 'e', 'x', 't', 'a', 'r',
-				'e', 'a' };
+        private static readonly char[] TEXTAREA_ARR =
+            {
+                't', 'e', 'x', 't', 'a', 'r',
+                'e', 'a'
+            };
 
-		private static readonly char[] IFRAME_ARR = { 'i', 'f', 'r', 'a', 'm', 'e' };
+        private static readonly char[] IFRAME_ARR = {'i', 'f', 'r', 'a', 'm', 'e'};
 
-		private static readonly char[] NOEMBED_ARR = { 'n', 'o', 'e', 'm', 'b', 'e',
-				'd' };
+        private static readonly char[] NOEMBED_ARR =
+            {
+                'n', 'o', 'e', 'm', 'b', 'e',
+                'd'
+            };
 
-		private static readonly char[] NOSCRIPT_ARR = { 'n', 'o', 's', 'c', 'r', 'i',
-				'p', 't' };
+        private static readonly char[] NOSCRIPT_ARR =
+            {
+                'n', 'o', 's', 'c', 'r', 'i',
+                'p', 't'
+            };
 
-		private static readonly char[] NOFRAMES_ARR = { 'n', 'o', 'f', 'r', 'a', 'm',
-				'e', 's' };
+        private static readonly char[] NOFRAMES_ARR =
+            {
+                'n', 'o', 'f', 'r', 'a', 'm',
+                'e', 's'
+            };
 
-		public ITokenHandler TokenHandler { get; private set; }
+        public ITokenHandler TokenHandler { get; private set; }
 
-		//public IEncodingDeclarationHandler EncodingDeclarationHandler { get; set; }
-		public event EventHandler<EncodingDetectedEventArgs> EncodingDeclared;
+        //public IEncodingDeclarationHandler EncodingDeclarationHandler { get; set; }
+        public event EventHandler<EncodingDetectedEventArgs> EncodingDeclared;
 
-		// [NOCPP[
+        // [NOCPP[
 
-		public event EventHandler<ParserErrorEventArgs> ErrorEvent;
+        public event EventHandler<ParserErrorEventArgs> ErrorEvent;
 
-		// ]NOCPP]
+        // ]NOCPP]
 
-		/**
+        /**
 		 * Whether the previous char read was CR.
 		 */
-		protected bool _lastCR;
+        protected bool _lastCR;
 
-		protected int _stateSave;
+        protected int _stateSave;
 
-		private int _returnStateSave;
+        private int _returnStateSave;
 
-		protected int _index;
+        protected int _index;
 
-		private bool _forceQuirks;
+        private bool _forceQuirks;
 
-		private char _additional;
+        private char _additional;
 
-		private int _entCol;
+        private int _entCol;
 
-		private int _firstCharKey;
+        private int _firstCharKey;
 
-		private int _lo;
+        private int _lo;
 
-		private int _hi;
+        private int _hi;
 
-		private int _candidate;
+        private int _candidate;
 
-		private int _strBufMark;
+        private int _strBufMark;
 
-		private int _prevValue;
+        private int _prevValue;
 
-		protected int _value;
+        protected int _value;
 
-		private bool _seenDigits;
+        private bool _seenDigits;
 
-		protected int _cstart;
+        protected int _cstart;
 
-		/**
+        /**
 		 * Buffer for short identifiers.
 		 */
-		private char[] _strBuf;
+        private char[] _strBuf;
 
-		/**
+        /**
 		 * Number of significant <code>char</code>s in <code>strBuf</code>.
 		 */
-		private int _strBufLen;
+        private int _strBufLen;
 
-		/**
+        /**
 		 * <code>-1</code> to indicate that <code>strBuf</code> is used or otherwise
 		 * an offset to the main buffer.
 		 */
-		// private int strBufOffset = -1;
-		/**
+        // private int strBufOffset = -1;
+        /**
 		 * Buffer for long strings.
 		 */
-		private char[] _longStrBuf;
+        private char[] _longStrBuf;
 
-		/**
+        /**
 		 * Number of significant <code>char</code>s in <code>longStrBuf</code>.
 		 */
-		private int _longStrBufLen;
+        private int _longStrBufLen;
 
-		/**
+        /**
 		 * <code>-1</code> to indicate that <code>longStrBuf</code> is used or
 		 * otherwise an offset to the main buffer.
 		 */
-		// private int longStrBufOffset = -1;
+        // private int longStrBufOffset = -1;
 
-		/**
+        /**
 		 * Buffer for expanding NCRs falling into the Basic Multilingual Plane.
 		 */
-		private readonly char[] _bmpChar;
+        private readonly char[] _bmpChar;
 
-		/**
+        /**
 		 * Buffer for expanding astral NCRs.
 		 */
-		private readonly char[] _astralChar;
+        private readonly char[] _astralChar;
 
-		/**
+        /**
 		 * The element whose end tag closes the current CDATA or RCDATA element.
 		 */
-		protected ElementName _endTagExpectation = null;
+        protected ElementName _endTagExpectation = null;
 
-		private char[] _endTagExpectationAsArray; // not @Auto!
+        private char[] _endTagExpectationAsArray; // not @Auto!
 
-		/**
+        /**
 		 * <code>true</code> if tokenizing an end tag
 		 */
-		protected bool _endTag;
+        protected bool _endTag;
 
-		/**
+        /**
 		 * The current tag token name.
 		 */
-		private ElementName _tagName = null;
+        private ElementName _tagName = null;
 
-		/**
+        /**
 		 * The current attribute name.
 		 */
-		protected AttributeName _attributeName = null;
+        protected AttributeName _attributeName = null;
 
-		// [NOCPP[
+        // [NOCPP[
 
-		/**
+        /**
 		 * Whether comment tokens are emitted.
 		 */
-		private bool _wantsComments = false;
+        private bool _wantsComments = false;
 
-		/**
+        /**
 		 * <code>true</code> when HTML4-specific additional errors are requested.
 		 */
-		protected bool _html4;
+        protected bool _html4;
 
-		/**
+        /**
 		 * Whether the stream is past the first 512 bytes.
 		 */
-		private bool _metaBoundaryPassed;
+        private bool _metaBoundaryPassed;
 
-		// ]NOCPP]
+        // ]NOCPP]
 
-		/**
+        /**
 		 * The name of the current doctype token.
 		 */
-		[Local]
-		private string _doctypeName;
+        [Local] private string _doctypeName;
 
-		/**
+        /**
 		 * The public id of the current doctype token.
 		 */
-		private string _publicIdentifier;
+        private string _publicIdentifier;
 
-		/**
+        /**
 		 * The system id of the current doctype token.
 		 */
-		private string _systemIdentifier;
+        private string _systemIdentifier;
 
-		/**
+        /**
 		 * The attribute holder.
 		 */
-		private HtmlAttributes _attributes;
+        private HtmlAttributes _attributes;
 
-		// [NOCPP[
+        // [NOCPP[
 
-		/**
+        /**
 		 * The policy for vertical tab and form feed.
 		 */
-		private XmlViolationPolicy _contentSpacePolicy = XmlViolationPolicy.AlterInfoset;
+        private XmlViolationPolicy _contentSpacePolicy = XmlViolationPolicy.AlterInfoset;
 
-		/**
+        /**
 		 * The policy for comments.
 		 */
-		private XmlViolationPolicy _commentPolicy = XmlViolationPolicy.AlterInfoset;
+        private XmlViolationPolicy _commentPolicy = XmlViolationPolicy.AlterInfoset;
 
-		private XmlViolationPolicy _xmlnsPolicy = XmlViolationPolicy.AlterInfoset;
+        private XmlViolationPolicy _xmlnsPolicy = XmlViolationPolicy.AlterInfoset;
 
-		private XmlViolationPolicy _namePolicy = XmlViolationPolicy.AlterInfoset;
+        private XmlViolationPolicy _namePolicy = XmlViolationPolicy.AlterInfoset;
 
-		private bool _html4ModeCompatibleWithXhtml1Schemata;
+        private bool _html4ModeCompatibleWithXhtml1Schemata;
 
-		private readonly bool _newAttributesEachTime;
+        private readonly bool _newAttributesEachTime;
 
-		// ]NOCPP]
+        // ]NOCPP]
 
-		private int _mappingLangToXmlLang;
+        private int _mappingLangToXmlLang;
 
-		private bool _shouldSuspend;
+        private bool _shouldSuspend;
 
-		protected bool _confident;
+        protected bool _confident;
 
-		private int _line;
+        private int _line;
 
-		// [NOCPP[
+        // [NOCPP[
 
-		protected Locator _ampersandLocation;
+        protected Locator _ampersandLocation;
 
-		public Tokenizer(ITokenHandler tokenHandler, bool newAttributesEachTime)
-		{
-			this.TokenHandler = tokenHandler;
-			this._newAttributesEachTime = newAttributesEachTime;
-			this._bmpChar = new char[1];
-			this._astralChar = new char[2];
-			this._tagName = null;
-			this._attributeName = null;
-			this._doctypeName = null;
-			this._publicIdentifier = null;
-			this._systemIdentifier = null;
-			this._attributes = null;
-		}
+        public Tokenizer(ITokenHandler tokenHandler, bool newAttributesEachTime)
+        {
+            TokenHandler = tokenHandler;
+            _newAttributesEachTime = newAttributesEachTime;
+            _bmpChar = new char[1];
+            _astralChar = new char[2];
+            _tagName = null;
+            _attributeName = null;
+            _doctypeName = null;
+            _publicIdentifier = null;
+            _systemIdentifier = null;
+            _attributes = null;
+        }
 
-		// ]NOCPP]
+        // ]NOCPP]
 
-		/**
+        /**
 		 * The constructor.
 		 * 
 		 * @param tokenHandler
 		 *            the handler for receiving tokens
 		 */
-		public Tokenizer(ITokenHandler tokenHandler)
-		{
-			this.TokenHandler = tokenHandler;
-			// [NOCPP[
-			this._newAttributesEachTime = false;
-			// ]NOCPP]
-			this._bmpChar = new char[1];
-			this._astralChar = new char[2];
-			this._tagName = null;
-			this._attributeName = null;
-			this._doctypeName = null;
-			this._publicIdentifier = null;
-			this._systemIdentifier = null;
-			this._attributes = null;
-		}
 
-		// [NOCPP[
+        public Tokenizer(ITokenHandler tokenHandler)
+        {
+            TokenHandler = tokenHandler;
+            // [NOCPP[
+            _newAttributesEachTime = false;
+            // ]NOCPP]
+            _bmpChar = new char[1];
+            _astralChar = new char[2];
+            _tagName = null;
+            _attributeName = null;
+            _doctypeName = null;
+            _publicIdentifier = null;
+            _systemIdentifier = null;
+            _attributes = null;
+        }
 
-		/**
+        // [NOCPP[
+
+        /**
 		 * Returns the mappingLangToXmlLang.
 		 * 
 		 * @return the mappingLangToXmlLang
 		 */
-		public bool IsMappingLangToXmlLang
-		{
-			get
-			{
-				return _mappingLangToXmlLang == AttributeName.HTML_LANG;
-			}
-			set
-			{
-				this._mappingLangToXmlLang = value ? AttributeName.HTML_LANG	: AttributeName.HTML;
-			}
-		}
 
-		/**
+        public bool IsMappingLangToXmlLang
+        {
+            get { return _mappingLangToXmlLang == AttributeName.HTML_LANG; }
+            set { _mappingLangToXmlLang = value ? AttributeName.HTML_LANG : AttributeName.HTML; }
+        }
+
+        /**
 		 * Sets the commentPolicy.
 		 * 
 		 * @param commentPolicy
 		 *            the commentPolicy to set
 		 */
-		public XmlViolationPolicy CommentPolicy
-		{
-			get
-			{
-				return this._commentPolicy;
-			}
-			set
-			{
-				this._commentPolicy = value;
-			}
-		}
 
-		/**
+        public XmlViolationPolicy CommentPolicy
+        {
+            get { return _commentPolicy; }
+            set { _commentPolicy = value; }
+        }
+
+        /**
 		 * Sets the contentNonXmlCharPolicy.
 		 * 
 		 * @param contentNonXmlCharPolicy
 		 *            the contentNonXmlCharPolicy to set
 		 */
-		public XmlViolationPolicy ContentNonXmlCharPolicy
-		{
-			set
-			{
-				if (value != XmlViolationPolicy.Allow)
-				{
-					throw new ArgumentException("Must use ErrorReportingTokenizer to set contentNonXmlCharPolicy to non-ALLOW.");
-				}
-			}
-		}
 
-		/**
+        public XmlViolationPolicy ContentNonXmlCharPolicy
+        {
+            set
+            {
+                if (value != XmlViolationPolicy.Allow)
+                {
+                    throw new ArgumentException(
+                        "Must use ErrorReportingTokenizer to set contentNonXmlCharPolicy to non-ALLOW.");
+                }
+            }
+        }
+
+        /**
 		 * Sets the contentSpacePolicy.
 		 * 
 		 * @param contentSpacePolicy
 		 *            the contentSpacePolicy to set
 		 */
-		public XmlViolationPolicy ContentSpacePolicy
-		{
-			get
-			{
-				return this._contentSpacePolicy;
-			}
-			set
-			{
-				this._contentSpacePolicy = value;
-			}
-		}
 
-		/**
+        public XmlViolationPolicy ContentSpacePolicy
+        {
+            get { return _contentSpacePolicy; }
+            set { _contentSpacePolicy = value; }
+        }
+
+        /**
 		 * Sets the xmlnsPolicy.
 		 * 
 		 * @param xmlnsPolicy
 		 *            the xmlnsPolicy to set
 		 */
-		public XmlViolationPolicy XmlnsPolicy
-		{
-			get
-			{
-				return this._xmlnsPolicy;
-			}
-			set
-			{
-				if (value == XmlViolationPolicy.Fatal)
-				{
-					throw new ArgumentException("Can't use FATAL here.");
-				}
-				this._xmlnsPolicy = value;
-			}
-		}
 
-		public XmlViolationPolicy NamePolicy
-		{
-			get
-			{
-				return this._namePolicy;
-			}
-			set
-			{
-				this._namePolicy = value;
-			}
-		}
+        public XmlViolationPolicy XmlnsPolicy
+        {
+            get { return _xmlnsPolicy; }
+            set
+            {
+                if (value == XmlViolationPolicy.Fatal)
+                {
+                    throw new ArgumentException("Can't use FATAL here.");
+                }
+                _xmlnsPolicy = value;
+            }
+        }
 
-		/**
+        public XmlViolationPolicy NamePolicy
+        {
+            get { return _namePolicy; }
+            set { _namePolicy = value; }
+        }
+
+        /**
 		 * Sets the html4ModeCompatibleWithXhtml1Schemata.
 		 * 
 		 * @param html4ModeCompatibleWithXhtml1Schemata
 		 *            the html4ModeCompatibleWithXhtml1Schemata to set
 		 */
-		public bool Html4ModeCompatibleWithXhtml1Schemata
-		{
-			get
-			{
-				return this._html4ModeCompatibleWithXhtml1Schemata;
-			}
-			set
-			{
-				this._html4ModeCompatibleWithXhtml1Schemata = value;
-			}
-		}
 
-		// ]NOCPP]
+        public bool Html4ModeCompatibleWithXhtml1Schemata
+        {
+            get { return _html4ModeCompatibleWithXhtml1Schemata; }
+            set { _html4ModeCompatibleWithXhtml1Schemata = value; }
+        }
 
-		// For the token handler to call
-		/**
+        // ]NOCPP]
+
+        // For the token handler to call
+        /**
 		 * Sets the tokenizer state and the associated element name. This should 
 		 * only ever used to put the tokenizer into one of the states that have
 		 * a special end tag expectation.
@@ -650,20 +639,21 @@ namespace HtmlParserSharp.Portable.Core
 		 * @param endTagExpectation
 		 *            the expected end tag for transitioning back to normal
 		 */
-		public void SetStateAndEndTagExpectation(int specialTokenizerState,
-				[Local] String endTagExpectation)
-		{
-			this._stateSave = specialTokenizerState;
-			if (specialTokenizerState == Tokenizer.DATA)
-			{
-				return;
-			}
-			char[] asArray = endTagExpectation.ToCharArray();
-			this._endTagExpectation = ElementName.ElementNameByBuffer(asArray, 0, asArray.Length);
-			EndTagExpectationToArray();
-		}
 
-		/**
+        public void SetStateAndEndTagExpectation(int specialTokenizerState,
+                                                 [Local] String endTagExpectation)
+        {
+            _stateSave = specialTokenizerState;
+            if (specialTokenizerState == DATA)
+            {
+                return;
+            }
+            char[] asArray = endTagExpectation.ToCharArray();
+            _endTagExpectation = ElementName.ElementNameByBuffer(asArray, 0, asArray.Length);
+            EndTagExpectationToArray();
+        }
+
+        /**
 		 * Sets the tokenizer state and the associated element name. This should 
 		 * only ever used to put the tokenizer into one of the states that have
 		 * a special end tag expectation.
@@ -673,296 +663,301 @@ namespace HtmlParserSharp.Portable.Core
 		 * @param endTagExpectation
 		 *            the expected end tag for transitioning back to normal
 		 */
-		public void SetStateAndEndTagExpectation(int specialTokenizerState,
-				ElementName endTagExpectation)
-		{
-			this._stateSave = specialTokenizerState;
-			this._endTagExpectation = endTagExpectation;
-			EndTagExpectationToArray();
-		}
 
-		private void EndTagExpectationToArray()
-		{
-			switch (_endTagExpectation.Group)
-			{
-				case DispatchGroup.TITLE:
-					_endTagExpectationAsArray = TITLE_ARR;
-					return;
-				case DispatchGroup.SCRIPT:
-					_endTagExpectationAsArray = SCRIPT_ARR;
-					return;
-				case DispatchGroup.STYLE:
-					_endTagExpectationAsArray = STYLE_ARR;
-					return;
-				case DispatchGroup.PLAINTEXT:
-					_endTagExpectationAsArray = PLAINTEXT_ARR;
-					return;
-				case DispatchGroup.XMP:
-					_endTagExpectationAsArray = XMP_ARR;
-					return;
-				case DispatchGroup.TEXTAREA:
-					_endTagExpectationAsArray = TEXTAREA_ARR;
-					return;
-				case DispatchGroup.IFRAME:
-					_endTagExpectationAsArray = IFRAME_ARR;
-					return;
-				case DispatchGroup.NOEMBED:
-					_endTagExpectationAsArray = NOEMBED_ARR;
-					return;
-				case DispatchGroup.NOSCRIPT:
-					_endTagExpectationAsArray = NOSCRIPT_ARR;
-					return;
-				case DispatchGroup.NOFRAMES:
-					_endTagExpectationAsArray = NOFRAMES_ARR;
-					return;
-				default:
-					Debug.Assert(false, "Bad end tag expectation.");
-					return;
-			}
-		}
+        public void SetStateAndEndTagExpectation(int specialTokenizerState,
+                                                 ElementName endTagExpectation)
+        {
+            _stateSave = specialTokenizerState;
+            _endTagExpectation = endTagExpectation;
+            EndTagExpectationToArray();
+        }
 
-		#region Locator implementation
+        private void EndTagExpectationToArray()
+        {
+            switch (_endTagExpectation.Group)
+            {
+                case DispatchGroup.TITLE:
+                    _endTagExpectationAsArray = TITLE_ARR;
+                    return;
+                case DispatchGroup.SCRIPT:
+                    _endTagExpectationAsArray = SCRIPT_ARR;
+                    return;
+                case DispatchGroup.STYLE:
+                    _endTagExpectationAsArray = STYLE_ARR;
+                    return;
+                case DispatchGroup.PLAINTEXT:
+                    _endTagExpectationAsArray = PLAINTEXT_ARR;
+                    return;
+                case DispatchGroup.XMP:
+                    _endTagExpectationAsArray = XMP_ARR;
+                    return;
+                case DispatchGroup.TEXTAREA:
+                    _endTagExpectationAsArray = TEXTAREA_ARR;
+                    return;
+                case DispatchGroup.IFRAME:
+                    _endTagExpectationAsArray = IFRAME_ARR;
+                    return;
+                case DispatchGroup.NOEMBED:
+                    _endTagExpectationAsArray = NOEMBED_ARR;
+                    return;
+                case DispatchGroup.NOSCRIPT:
+                    _endTagExpectationAsArray = NOSCRIPT_ARR;
+                    return;
+                case DispatchGroup.NOFRAMES:
+                    _endTagExpectationAsArray = NOFRAMES_ARR;
+                    return;
+                default:
+                    Debug.Assert(false, "Bad end tag expectation.");
+                    return;
+            }
+        }
 
-		/**
+        #region Locator implementation
+
+        /**
 		 * @see org.xml.sax.Locator#getLineNumber()
 		 */
-		public int LineNumber
-		{
-			get
-			{
-				return _line;
-			}
-			set
-			{
-				this._line = value;
-			}
-		}
 
-		// [NOCPP[
+        public int LineNumber
+        {
+            get { return _line; }
+            set { _line = value; }
+        }
 
-		/**
+        // [NOCPP[
+
+        /**
 		 * @see org.xml.sax.Locator#getColumnNumber()
 		 */
-		public int ColumnNumber
-		{
-			get
-			{
-				return -1;
-			}
-		}
 
-		#endregion // locator implementation
+        public int ColumnNumber
+        {
+            get { return -1; }
+        }
 
-		// end of public API
+        #endregion // locator implementation
 
-		public void NotifyAboutMetaBoundary()
-		{
-			_metaBoundaryPassed = true;
-		}
+        // end of public API
 
-		internal void TurnOnAdditionalHtml4Errors()
-		{
-			_html4 = true;
-		}
+        public void NotifyAboutMetaBoundary()
+        {
+            _metaBoundaryPassed = true;
+        }
 
-		// ]NOCPP]
+        internal void TurnOnAdditionalHtml4Errors()
+        {
+            _html4 = true;
+        }
 
-		internal HtmlAttributes EmptyAttributes()
-		{
-			// [NOCPP[
-			if (_newAttributesEachTime)
-			{
-				return new HtmlAttributes(_mappingLangToXmlLang);
-			}
-			else
-			{
-				// ]NOCPP]
-				return HtmlAttributes.EMPTY_ATTRIBUTES;
-				// [NOCPP[
-			}
-			// ]NOCPP]
-		}
+        // ]NOCPP]
 
-		/*@Inline*/
-		private void ClearStrBufAndAppend(char c)
-		{
-			_strBuf[0] = c;
-			_strBufLen = 1;
-		}
+        internal HtmlAttributes EmptyAttributes()
+        {
+            // [NOCPP[
+            if (_newAttributesEachTime)
+            {
+                return new HtmlAttributes(_mappingLangToXmlLang);
+            }
+            else
+            {
+                // ]NOCPP]
+                return HtmlAttributes.EMPTY_ATTRIBUTES;
+                // [NOCPP[
+            }
+            // ]NOCPP]
+        }
 
-		/*@Inline*/
-		private void ClearStrBuf()
-		{
-			_strBufLen = 0;
-		}
+        /*@Inline*/
 
-		/**
+        private void ClearStrBufAndAppend(char c)
+        {
+            _strBuf[0] = c;
+            _strBufLen = 1;
+        }
+
+        /*@Inline*/
+
+        private void ClearStrBuf()
+        {
+            _strBufLen = 0;
+        }
+
+        /**
 		 * Appends to the smaller buffer.
 		 * 
 		 * @param c
 		 *            the UTF-16 code unit to append
 		 */
-		private void AppendStrBuf(char c)
-		{
-			if (_strBufLen == _strBuf.Length)
-			{
-				char[] newBuf = new char[_strBuf.Length + Tokenizer.BUFFER_GROW_BY];
-				Array.Copy(_strBuf, newBuf, _strBuf.Length);
-				_strBuf = newBuf;
-			}
-			_strBuf[_strBufLen++] = c;
-		}
 
-		/**
+        private void AppendStrBuf(char c)
+        {
+            if (_strBufLen == _strBuf.Length)
+            {
+                var newBuf = new char[_strBuf.Length + BUFFER_GROW_BY];
+                Array.Copy(_strBuf, newBuf, _strBuf.Length);
+                _strBuf = newBuf;
+            }
+            _strBuf[_strBufLen++] = c;
+        }
+
+        /**
 		 * Returns the short buffer as a local name. The return value is released in
 		 * emitDoctypeToken().
 		 * 
 		 * @return the smaller buffer as local name
 		 */
-		private void StrBufToDoctypeName()
-		{
-			_doctypeName = Portability.NewLocalNameFromBuffer(_strBuf, 0, _strBufLen);
-		}
 
-		/**
+        private void StrBufToDoctypeName()
+        {
+            _doctypeName = Portability.NewLocalNameFromBuffer(_strBuf, 0, _strBufLen);
+        }
+
+        /**
 		 * Emits the smaller buffer as character tokens.
 		 * 
 		 * @throws SAXException
 		 *             if the token handler threw
 		 */
-		private void EmitStrBuf()
-		{
-			if (_strBufLen > 0)
-			{
-				TokenHandler.Characters(_strBuf, 0, _strBufLen);
-			}
-		}
 
-		/*@Inline*/
-		private void ClearLongStrBuf()
-		{
-			_longStrBufLen = 0;
-		}
+        private void EmitStrBuf()
+        {
+            if (_strBufLen > 0)
+            {
+                TokenHandler.Characters(_strBuf, 0, _strBufLen);
+            }
+        }
 
-		/*@Inline*/
-		private void ClearLongStrBufAndAppend(char c)
-		{
-			_longStrBuf[0] = c;
-			_longStrBufLen = 1;
-		}
+        /*@Inline*/
 
-		/**
+        private void ClearLongStrBuf()
+        {
+            _longStrBufLen = 0;
+        }
+
+        /*@Inline*/
+
+        private void ClearLongStrBufAndAppend(char c)
+        {
+            _longStrBuf[0] = c;
+            _longStrBufLen = 1;
+        }
+
+        /**
 		 * Appends to the larger buffer.
 		 * 
 		 * @param c
 		 *            the UTF-16 code unit to append
 		 */
-		private void AppendLongStrBuf(char c)
-		{
-			if (_longStrBufLen == _longStrBuf.Length)
-			{
-				char[] newBuf = new char[_longStrBufLen + (_longStrBufLen >> 1)];
-				Array.Copy(_longStrBuf, newBuf, _longStrBuf.Length);
-				_longStrBuf = newBuf;
-			}
-			_longStrBuf[_longStrBufLen++] = c;
-		}
 
-		/*@Inline*/
-		private void AppendSecondHyphenToBogusComment()
-		{
-			// [NOCPP[
-			switch (_commentPolicy)
-			{
-				case XmlViolationPolicy.AlterInfoset:
-					// detachLongStrBuf();
-					AppendLongStrBuf(' ');
-					// FALLTHROUGH
-					goto case XmlViolationPolicy.Allow;
-				case XmlViolationPolicy.Allow:
-					Warn("The document is not mappable to XML 1.0 due to two consecutive hyphens in a comment.");
-					// ]NOCPP]
-					AppendLongStrBuf('-');
-					// [NOCPP[
-					break;
-				case XmlViolationPolicy.Fatal:
-					Fatal("The document is not mappable to XML 1.0 due to two consecutive hyphens in a comment.");
-					break;
-			}
-			// ]NOCPP]
-		}
+        private void AppendLongStrBuf(char c)
+        {
+            if (_longStrBufLen == _longStrBuf.Length)
+            {
+                var newBuf = new char[_longStrBufLen + (_longStrBufLen >> 1)];
+                Array.Copy(_longStrBuf, newBuf, _longStrBuf.Length);
+                _longStrBuf = newBuf;
+            }
+            _longStrBuf[_longStrBufLen++] = c;
+        }
 
-		// [NOCPP[
-		private void MaybeAppendSpaceToBogusComment()
-		{
-			switch (_commentPolicy)
-			{
-				case XmlViolationPolicy.AlterInfoset:
-					// detachLongStrBuf();
-					AppendLongStrBuf(' ');
-					// FALLTHROUGH
-					goto case XmlViolationPolicy.Allow;
-				case XmlViolationPolicy.Allow:
-					Warn("The document is not mappable to XML 1.0 due to a trailing hyphen in a comment.");
-					break;
-				case XmlViolationPolicy.Fatal:
-					Fatal("The document is not mappable to XML 1.0 due to a trailing hyphen in a comment.");
-					break;
-			}
-		}
+        /*@Inline*/
 
-		// ]NOCPP]
+        private void AppendSecondHyphenToBogusComment()
+        {
+            // [NOCPP[
+            switch (_commentPolicy)
+            {
+                case XmlViolationPolicy.AlterInfoset:
+                    // detachLongStrBuf();
+                    AppendLongStrBuf(' ');
+                    // FALLTHROUGH
+                    goto case XmlViolationPolicy.Allow;
+                case XmlViolationPolicy.Allow:
+                    Warn("The document is not mappable to XML 1.0 due to two consecutive hyphens in a comment.");
+                    // ]NOCPP]
+                    AppendLongStrBuf('-');
+                    // [NOCPP[
+                    break;
+                case XmlViolationPolicy.Fatal:
+                    Fatal("The document is not mappable to XML 1.0 due to two consecutive hyphens in a comment.");
+                    break;
+            }
+            // ]NOCPP]
+        }
 
-		/*@Inline*/
-		private void AdjustDoubleHyphenAndAppendToLongStrBufAndErr(char c)
-		{
-			ErrConsecutiveHyphens();
-			// [NOCPP[
-			switch (_commentPolicy)
-			{
-				case XmlViolationPolicy.AlterInfoset:
-					// detachLongStrBuf();
-					_longStrBufLen--;
-					AppendLongStrBuf(' ');
-					AppendLongStrBuf('-');
-					// FALLTHROUGH
-					goto case XmlViolationPolicy.Allow;
-				case XmlViolationPolicy.Allow:
-					Warn("The document is not mappable to XML 1.0 due to two consecutive hyphens in a comment.");
-					// ]NOCPP]
-					AppendLongStrBuf(c);
-					// [NOCPP[
-					break;
-				case XmlViolationPolicy.Fatal:
-					Fatal("The document is not mappable to XML 1.0 due to two consecutive hyphens in a comment.");
-					break;
-			}
-			// ]NOCPP]
-		}
+        // [NOCPP[
+        private void MaybeAppendSpaceToBogusComment()
+        {
+            switch (_commentPolicy)
+            {
+                case XmlViolationPolicy.AlterInfoset:
+                    // detachLongStrBuf();
+                    AppendLongStrBuf(' ');
+                    // FALLTHROUGH
+                    goto case XmlViolationPolicy.Allow;
+                case XmlViolationPolicy.Allow:
+                    Warn("The document is not mappable to XML 1.0 due to a trailing hyphen in a comment.");
+                    break;
+                case XmlViolationPolicy.Fatal:
+                    Fatal("The document is not mappable to XML 1.0 due to a trailing hyphen in a comment.");
+                    break;
+            }
+        }
 
-		private void AppendLongStrBuf(char[] buffer, int offset, int length)
-		{
-			int reqLen = _longStrBufLen + length;
-			if (_longStrBuf.Length < reqLen)
-			{
-				char[] newBuf = new char[reqLen + (reqLen >> 1)];
-				Array.Copy(_longStrBuf, newBuf, _longStrBuf.Length);
-				_longStrBuf = newBuf;
-			}
-			Array.Copy(buffer, offset, _longStrBuf, _longStrBufLen, length);
-			_longStrBufLen = reqLen;
-		}
+        // ]NOCPP]
 
-		/**
+        /*@Inline*/
+
+        private void AdjustDoubleHyphenAndAppendToLongStrBufAndErr(char c)
+        {
+            ErrConsecutiveHyphens();
+            // [NOCPP[
+            switch (_commentPolicy)
+            {
+                case XmlViolationPolicy.AlterInfoset:
+                    // detachLongStrBuf();
+                    _longStrBufLen--;
+                    AppendLongStrBuf(' ');
+                    AppendLongStrBuf('-');
+                    // FALLTHROUGH
+                    goto case XmlViolationPolicy.Allow;
+                case XmlViolationPolicy.Allow:
+                    Warn("The document is not mappable to XML 1.0 due to two consecutive hyphens in a comment.");
+                    // ]NOCPP]
+                    AppendLongStrBuf(c);
+                    // [NOCPP[
+                    break;
+                case XmlViolationPolicy.Fatal:
+                    Fatal("The document is not mappable to XML 1.0 due to two consecutive hyphens in a comment.");
+                    break;
+            }
+            // ]NOCPP]
+        }
+
+        private void AppendLongStrBuf(char[] buffer, int offset, int length)
+        {
+            int reqLen = _longStrBufLen + length;
+            if (_longStrBuf.Length < reqLen)
+            {
+                var newBuf = new char[reqLen + (reqLen >> 1)];
+                Array.Copy(_longStrBuf, newBuf, _longStrBuf.Length);
+                _longStrBuf = newBuf;
+            }
+            Array.Copy(buffer, offset, _longStrBuf, _longStrBufLen, length);
+            _longStrBufLen = reqLen;
+        }
+
+        /**
 		 * Append the contents of the smaller buffer to the larger one.
 		 */
-		/*@Inline*/
-		private void AppendStrBufToLongStrBuf()
-		{
-			AppendLongStrBuf(_strBuf, 0, _strBufLen);
-		}
+        /*@Inline*/
 
-		/**
+        private void AppendStrBufToLongStrBuf()
+        {
+            AppendLongStrBuf(_strBuf, 0, _strBufLen);
+        }
+
+        /**
 		 * The larger buffer as a string.
 		 * 
 		 * <p>
@@ -970,49 +965,50 @@ namespace HtmlParserSharp.Portable.Core
 		 * 
 		 * @return the larger buffer as a string
 		 */
-		private string LongStrBufToString()
-		{
-			return new String(_longStrBuf, 0, _longStrBufLen);
-		}
 
-		/// <summary>
-		/// Emits the current comment token.
-		/// </summary>
-		/// <param name="provisionalHyphens">The provisional hyphens.</param>
-		/// <param name="pos">The position.</param>
-		private void EmitComment(int provisionalHyphens, int pos)
-		{
-			// [NOCPP[
-			if (_wantsComments)
-			{
-				// ]NOCPP]
-				// if (longStrBufOffset != -1) {
-				// tokenHandler.comment(buf, longStrBufOffset, longStrBufLen
-				// - provisionalHyphens);
-				// } else {
-				TokenHandler.Comment(_longStrBuf, 0, _longStrBufLen - provisionalHyphens);
-				// }
-				// [NOCPP[
-			}
-			// ]NOCPP]
-			_cstart = pos + 1;
-		}
+        private string LongStrBufToString()
+        {
+            return new String(_longStrBuf, 0, _longStrBufLen);
+        }
 
-		/// <summary>
-		/// Flushes coalesced character tokens.
-		/// </summary>
-		/// <param name="buf">The buffer.</param>
-		/// <param name="pos">The position.</param>
-		protected void FlushChars(char[] buf, int pos)
-		{
-			if (pos > _cstart)
-			{
-				TokenHandler.Characters(buf, _cstart, pos - _cstart);
-			}
-			_cstart = int.MaxValue;
-		}
+        /// <summary>
+        ///     Emits the current comment token.
+        /// </summary>
+        /// <param name="provisionalHyphens">The provisional hyphens.</param>
+        /// <param name="pos">The position.</param>
+        private void EmitComment(int provisionalHyphens, int pos)
+        {
+            // [NOCPP[
+            if (_wantsComments)
+            {
+                // ]NOCPP]
+                // if (longStrBufOffset != -1) {
+                // tokenHandler.comment(buf, longStrBufOffset, longStrBufLen
+                // - provisionalHyphens);
+                // } else {
+                TokenHandler.Comment(_longStrBuf, 0, _longStrBufLen - provisionalHyphens);
+                // }
+                // [NOCPP[
+            }
+            // ]NOCPP]
+            _cstart = pos + 1;
+        }
 
-		/**
+        /// <summary>
+        ///     Flushes coalesced character tokens.
+        /// </summary>
+        /// <param name="buf">The buffer.</param>
+        /// <param name="pos">The position.</param>
+        protected void FlushChars(char[] buf, int pos)
+        {
+            if (pos > _cstart)
+            {
+                TokenHandler.Characters(buf, _cstart, pos - _cstart);
+            }
+            _cstart = int.MaxValue;
+        }
+
+        /**
 		 * Reports an condition that would make the infoset incompatible with XML
 		 * 1.0 as fatal.
 		 * 
@@ -1021,35 +1017,37 @@ namespace HtmlParserSharp.Portable.Core
 		 * @throws SAXException
 		 * @throws SAXParseException
 		 */
-		public void Fatal(string message)
-		{
-			/*SAXParseException spe = new SAXParseException(message, this);
+
+        public void Fatal(string message)
+        {
+            /*SAXParseException spe = new SAXParseException(message, this);
 			if (errorHandler != null) {
 				errorHandler.fatalError(spe);
 			}
 			throw spe;*/
-			throw new Exception(message); // TODO
-		}
+            throw new Exception(message); // TODO
+        }
 
-		/**
+        /**
 		 * Reports a Parse Error.
 		 * 
 		 * @param message
 		 *            the message
 		 * @throws SAXException
 		 */
-		public void Err(string message)
-		{
-			if (ErrorEvent == null)
-			{
-				return;
-			}
-			ErrorEvent(this, new ParserErrorEventArgs(message, false));
-		}
 
-		public void ErrTreeBuilder(string message)
-		{
-			/*ErrorHandler eh = null;
+        public void Err(string message)
+        {
+            if (ErrorEvent == null)
+            {
+                return;
+            }
+            ErrorEvent(this, new ParserErrorEventArgs(message, false));
+        }
+
+        public void ErrTreeBuilder(string message)
+        {
+            /*ErrorHandler eh = null;
 			if (tokenHandler is TreeBuilder<T>) {
 				TreeBuilder<?> treeBuilder = (TreeBuilder<?>) tokenHandler;
 				eh = treeBuilder.getErrorHandler();
@@ -1062,101 +1060,104 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			SAXParseException spe = new SAXParseException(message, this);
 			eh.error(spe);*/
-			Err(message); // TODO
-		}
+            Err(message); // TODO
+        }
 
-		/**
+        /**
 		 * Reports a warning
 		 * 
 		 * @param message
 		 *            the message
 		 * @throws SAXException
 		 */
-		public void Warn(string message)
-		{
-			if (ErrorEvent == null)
-			{
-				return;
-			}
-			ErrorEvent(this, new ParserErrorEventArgs(message, true));
-		}
 
-		/**
+        public void Warn(string message)
+        {
+            if (ErrorEvent == null)
+            {
+                return;
+            }
+            ErrorEvent(this, new ParserErrorEventArgs(message, true));
+        }
+
+        /**
 		 * 
 		 */
-		private void ResetAttributes()
-		{
-			// [NOCPP[
-			if (_newAttributesEachTime)
-			{
-				// ]NOCPP]
-				_attributes = null;
-				// [NOCPP[
-			}
-			else
-			{
-				_attributes.Clear(_mappingLangToXmlLang);
-			}
-			// ]NOCPP]
-		}
 
-		private void StrBufToElementNameString()
-		{
-			// if (strBufOffset != -1) {
-			// return ElementName.elementNameByBuffer(buf, strBufOffset, strBufLen);
-			// } else {
-			_tagName = ElementName.ElementNameByBuffer(_strBuf, 0, _strBufLen);
-			// }
-		}
+        private void ResetAttributes()
+        {
+            // [NOCPP[
+            if (_newAttributesEachTime)
+            {
+                // ]NOCPP]
+                _attributes = null;
+                // [NOCPP[
+            }
+            else
+            {
+                _attributes.Clear(_mappingLangToXmlLang);
+            }
+            // ]NOCPP]
+        }
 
-		private int EmitCurrentTagToken(bool selfClosing, int pos)
-		{
-			_cstart = pos + 1;
-			MaybeErrSlashInEndTag(selfClosing);
-			_stateSave = Tokenizer.DATA;
-			HtmlAttributes attrs = (_attributes == null ? HtmlAttributes.EMPTY_ATTRIBUTES
-					: _attributes);
-			if (_endTag)
-			{
-				/*
+        private void StrBufToElementNameString()
+        {
+            // if (strBufOffset != -1) {
+            // return ElementName.elementNameByBuffer(buf, strBufOffset, strBufLen);
+            // } else {
+            _tagName = ElementName.ElementNameByBuffer(_strBuf, 0, _strBufLen);
+            // }
+        }
+
+        private int EmitCurrentTagToken(bool selfClosing, int pos)
+        {
+            _cstart = pos + 1;
+            MaybeErrSlashInEndTag(selfClosing);
+            _stateSave = DATA;
+            HtmlAttributes attrs = (_attributes == null
+                                        ? HtmlAttributes.EMPTY_ATTRIBUTES
+                                        : _attributes);
+            if (_endTag)
+            {
+                /*
 				 * When an end tag token is emitted, the content model flag must be
 				 * switched to the PCDATA state.
 				 */
-				MaybeErrAttributesOnEndTag(attrs);
-				TokenHandler.EndTag(_tagName);
-			}
-			else
-			{
-				TokenHandler.StartTag(_tagName, attrs, selfClosing);
-			}
-			_tagName = null;
-			ResetAttributes();
-			/*
+                MaybeErrAttributesOnEndTag(attrs);
+                TokenHandler.EndTag(_tagName);
+            }
+            else
+            {
+                TokenHandler.StartTag(_tagName, attrs, selfClosing);
+            }
+            _tagName = null;
+            ResetAttributes();
+            /*
 			 * The token handler may have called setStateAndEndTagExpectation
 			 * and changed stateSave since the start of this method.
 			 */
-			return _stateSave;
-		}
+            return _stateSave;
+        }
 
-		private void AttributeNameComplete()
-		{
-			// if (strBufOffset != -1) {
-			// attributeName = AttributeName.nameByBuffer(buf, strBufOffset,
-			// strBufLen, namePolicy != XmlViolationPolicy.ALLOW);
-			// } else {
-			_attributeName = AttributeName.NameByBuffer(_strBuf, 0, _strBufLen
-				// [NOCPP[
-					, _namePolicy != XmlViolationPolicy.Allow
-				// ]NOCPP]
-					);
-			// }
+        private void AttributeNameComplete()
+        {
+            // if (strBufOffset != -1) {
+            // attributeName = AttributeName.nameByBuffer(buf, strBufOffset,
+            // strBufLen, namePolicy != XmlViolationPolicy.ALLOW);
+            // } else {
+            _attributeName = AttributeName.NameByBuffer(_strBuf, 0, _strBufLen
+                                                        // [NOCPP[
+                                                        , _namePolicy != XmlViolationPolicy.Allow
+                // ]NOCPP]
+                );
+            // }
 
-			if (_attributes == null)
-			{
-				_attributes = new HtmlAttributes(_mappingLangToXmlLang);
-			}
+            if (_attributes == null)
+            {
+                _attributes = new HtmlAttributes(_mappingLangToXmlLang);
+            }
 
-			/*
+            /*
 			 * When the user agent leaves the attribute name state (and before
 			 * emitting the tag token, if appropriate), the complete attribute's
 			 * name must be compared to the other attributes on the same token; if
@@ -1164,211 +1165,210 @@ namespace HtmlParserSharp.Portable.Core
 			 * then this is a parse error and the new attribute must be dropped,
 			 * along with the value that gets associated with it (if any).
 			 */
-			if (_attributes.Contains(_attributeName))
-			{
-				ErrDuplicateAttribute();
-				_attributeName = null;
-			}
-		}
+            if (_attributes.Contains(_attributeName))
+            {
+                ErrDuplicateAttribute();
+                _attributeName = null;
+            }
+        }
 
-		private void AddAttributeWithoutValue()
-		{
-			NoteAttributeWithoutValue();
+        private void AddAttributeWithoutValue()
+        {
+            NoteAttributeWithoutValue();
 
-			// [NOCPP[
-			if (_metaBoundaryPassed && AttributeName.CHARSET == _attributeName
-					&& ElementName.META == _tagName)
-			{
-				Err("A \u201Ccharset\u201D attribute on a \u201Cmeta\u201D element found after the first 512 bytes.");
-			}
-			// ]NOCPP]
-			if (_attributeName != null)
-			{
-				// [NOCPP[
-				if (_html4)
-				{
-					if (_attributeName.IsBoolean)
-					{
-						if (_html4ModeCompatibleWithXhtml1Schemata)
-						{
-							_attributes.AddAttribute(_attributeName,
-									_attributeName.GetLocal(AttributeName.HTML),
-									_xmlnsPolicy);
-						}
-						else
-						{
-							_attributes.AddAttribute(_attributeName, "", _xmlnsPolicy);
-						}
-					}
-					else
-					{
-						if (AttributeName.BORDER != _attributeName)
-						{
-							Err("Attribute value omitted for a non-bool attribute. (HTML4-only error.)");
-							_attributes.AddAttribute(_attributeName, "", _xmlnsPolicy);
-						}
-					}
-				}
-				else
-				{
-					if (AttributeName.SRC == _attributeName
-							|| AttributeName.HREF == _attributeName)
-					{
-						Warn("Attribute \u201C"
-								+ _attributeName.GetLocal(AttributeName.HTML)
-								+ "\u201D without an explicit value seen. The attribute may be dropped by IE7.");
-					}
-					// ]NOCPP]
-					_attributes.AddAttribute(_attributeName,
-							String.Empty
-						// [NOCPP[
-							, _xmlnsPolicy
-						// ]NOCPP]
-					);
-					// [NOCPP[
-				}
-				// ]NOCPP]
-				_attributeName = null; // attributeName has been adopted by the
-				// |attributes| object
-			}
-		}
+            // [NOCPP[
+            if (_metaBoundaryPassed && AttributeName.CHARSET == _attributeName
+                && ElementName.META == _tagName)
+            {
+                Err("A \u201Ccharset\u201D attribute on a \u201Cmeta\u201D element found after the first 512 bytes.");
+            }
+            // ]NOCPP]
+            if (_attributeName != null)
+            {
+                // [NOCPP[
+                if (_html4)
+                {
+                    if (_attributeName.IsBoolean)
+                    {
+                        if (_html4ModeCompatibleWithXhtml1Schemata)
+                        {
+                            _attributes.AddAttribute(_attributeName,
+                                                     _attributeName.GetLocal(AttributeName.HTML),
+                                                     _xmlnsPolicy);
+                        }
+                        else
+                        {
+                            _attributes.AddAttribute(_attributeName, "", _xmlnsPolicy);
+                        }
+                    }
+                    else
+                    {
+                        if (AttributeName.BORDER != _attributeName)
+                        {
+                            Err("Attribute value omitted for a non-bool attribute. (HTML4-only error.)");
+                            _attributes.AddAttribute(_attributeName, "", _xmlnsPolicy);
+                        }
+                    }
+                }
+                else
+                {
+                    if (AttributeName.SRC == _attributeName
+                        || AttributeName.HREF == _attributeName)
+                    {
+                        Warn("Attribute \u201C"
+                             + _attributeName.GetLocal(AttributeName.HTML)
+                             + "\u201D without an explicit value seen. The attribute may be dropped by IE7.");
+                    }
+                    // ]NOCPP]
+                    _attributes.AddAttribute(_attributeName,
+                                             String.Empty
+                                             // [NOCPP[
+                                             , _xmlnsPolicy
+                        // ]NOCPP]
+                        );
+                    // [NOCPP[
+                }
+                // ]NOCPP]
+                _attributeName = null; // attributeName has been adopted by the
+                // |attributes| object
+            }
+        }
 
-		private void AddAttributeWithValue()
-		{
-			// [NOCPP[
-			if (_metaBoundaryPassed && ElementName.META == _tagName
-					&& AttributeName.CHARSET == _attributeName)
-			{
-				Err("A \u201Ccharset\u201D attribute on a \u201Cmeta\u201D element found after the first 512 bytes.");
-			}
-			// ]NOCPP]
-			if (_attributeName != null)
-			{
-				String val = LongStrBufToString(); // Ownership transferred to
-				// HtmlAttributes
-				// [NOCPP[
-				if (!_endTag && _html4 && _html4ModeCompatibleWithXhtml1Schemata
-						&& _attributeName.IsCaseFolded)
-				{
-					val = NewAsciiLowerCaseStringFromString(val);
-				}
-				// ]NOCPP]
-				_attributes.AddAttribute(_attributeName, val
-					// [NOCPP[
-						, _xmlnsPolicy
-					// ]NOCPP]
-				);
-				_attributeName = null; // attributeName has been adopted by the
-				// |attributes| object
-			}
-		}
+        private void AddAttributeWithValue()
+        {
+            // [NOCPP[
+            if (_metaBoundaryPassed && ElementName.META == _tagName
+                && AttributeName.CHARSET == _attributeName)
+            {
+                Err("A \u201Ccharset\u201D attribute on a \u201Cmeta\u201D element found after the first 512 bytes.");
+            }
+            // ]NOCPP]
+            if (_attributeName != null)
+            {
+                String val = LongStrBufToString(); // Ownership transferred to
+                // HtmlAttributes
+                // [NOCPP[
+                if (!_endTag && _html4 && _html4ModeCompatibleWithXhtml1Schemata
+                    && _attributeName.IsCaseFolded)
+                {
+                    val = NewAsciiLowerCaseStringFromString(val);
+                }
+                // ]NOCPP]
+                _attributes.AddAttribute(_attributeName, val
+                                         // [NOCPP[
+                                         , _xmlnsPolicy
+                    // ]NOCPP]
+                    );
+                _attributeName = null; // attributeName has been adopted by the
+                // |attributes| object
+            }
+        }
 
-		// [NOCPP[
+        // [NOCPP[
 
-		private static String NewAsciiLowerCaseStringFromString(String str)
-		{
-			if (str == null)
-			{
-				return null;
-			}
-			char[] buf = new char[str.Length];
-			for (int i = 0; i < str.Length; i++)
-			{
-				char c = str[i];
-				if (c >= 'A' && c <= 'Z')
-				{
-					c += (char)0x20;
-				}
-				buf[i] = c;
-			}
-			return new String(buf);
-		}
+        private static String NewAsciiLowerCaseStringFromString(String str)
+        {
+            if (str == null)
+            {
+                return null;
+            }
+            var buf = new char[str.Length];
+            for (int i = 0; i < str.Length; i++)
+            {
+                char c = str[i];
+                if (c >= 'A' && c <= 'Z')
+                {
+                    c += (char) 0x20;
+                }
+                buf[i] = c;
+            }
+            return new String(buf);
+        }
 
-		protected void StartErrorReporting()
-		{
+        protected void StartErrorReporting()
+        {
+        }
 
-		}
+        // ]NOCPP]
 
-		// ]NOCPP]
+        public void Start()
+        {
+            InitializeWithoutStarting();
+            TokenHandler.StartTokenization(this);
+            // [NOCPP[
+            StartErrorReporting();
+            // ]NOCPP]
+        }
 
-		public void Start()
-		{
-			InitializeWithoutStarting();
-			TokenHandler.StartTokenization(this);
-			// [NOCPP[
-			StartErrorReporting();
-			// ]NOCPP]
-		}
+        public bool TokenizeBuffer(UTF16Buffer buffer)
+        {
+            int state = _stateSave;
+            int returnState = _returnStateSave;
+            char c = '\u0000';
+            _shouldSuspend = false;
+            _lastCR = false;
 
-		public bool TokenizeBuffer(UTF16Buffer buffer)
-		{
-			int state = _stateSave;
-			int returnState = _returnStateSave;
-			char c = '\u0000';
-			_shouldSuspend = false;
-			_lastCR = false;
-
-			int start = buffer.Start;
-			/**
+            int start = buffer.Start;
+            /**
 			 * The index of the last <code>char</code> read from <code>buf</code>.
 			 */
-			int pos = start - 1;
+            int pos = start - 1;
 
-			/**
+            /**
 			 * The index of the first <code>char</code> in <code>buf</code> that is
 			 * part of a coalesced run of character tokens or
 			 * <code>Integer.MAX_VALUE</code> if there is not a current run being
 			 * coalesced.
 			 */
-			switch (state)
-			{
-				case DATA:
-				case RCDATA:
-				case SCRIPT_DATA:
-				case PLAINTEXT:
-				case RAWTEXT:
-				case CDATA_SECTION:
-				case SCRIPT_DATA_ESCAPED:
-				case SCRIPT_DATA_ESCAPE_START:
-				case SCRIPT_DATA_ESCAPE_START_DASH:
-				case SCRIPT_DATA_ESCAPED_DASH:
-				case SCRIPT_DATA_ESCAPED_DASH_DASH:
-				case SCRIPT_DATA_DOUBLE_ESCAPE_START:
-				case SCRIPT_DATA_DOUBLE_ESCAPED:
-				case SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN:
-				case SCRIPT_DATA_DOUBLE_ESCAPED_DASH:
-				case SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH:
-				case SCRIPT_DATA_DOUBLE_ESCAPE_END:
-					_cstart = start;
-					break;
-				default:
-					_cstart = int.MaxValue;
-					break;
-			}
+            switch (state)
+            {
+                case DATA:
+                case RCDATA:
+                case SCRIPT_DATA:
+                case PLAINTEXT:
+                case RAWTEXT:
+                case CDATA_SECTION:
+                case SCRIPT_DATA_ESCAPED:
+                case SCRIPT_DATA_ESCAPE_START:
+                case SCRIPT_DATA_ESCAPE_START_DASH:
+                case SCRIPT_DATA_ESCAPED_DASH:
+                case SCRIPT_DATA_ESCAPED_DASH_DASH:
+                case SCRIPT_DATA_DOUBLE_ESCAPE_START:
+                case SCRIPT_DATA_DOUBLE_ESCAPED:
+                case SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN:
+                case SCRIPT_DATA_DOUBLE_ESCAPED_DASH:
+                case SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH:
+                case SCRIPT_DATA_DOUBLE_ESCAPE_END:
+                    _cstart = start;
+                    break;
+                default:
+                    _cstart = int.MaxValue;
+                    break;
+            }
 
-			/**
+            /**
 			 * The number of <code>char</code>s in <code>buf</code> that have
 			 * meaning. (The rest of the array is garbage and should not be
 			 * examined.)
 			 */
-			pos = StateLoop(state, c, pos, buffer.Buffer, false, returnState, buffer.End);
-			if (pos == buffer.End)
-			{
-				// exiting due to end of buffer
-				buffer.Start = pos;
-			}
-			else
-			{
-				buffer.Start = pos + 1;
-			}
-			return _lastCR;
-		}
+            pos = StateLoop(state, c, pos, buffer.Buffer, false, returnState, buffer.End);
+            if (pos == buffer.End)
+            {
+                // exiting due to end of buffer
+                buffer.Start = pos;
+            }
+            else
+            {
+                buffer.Start = pos + 1;
+            }
+            return _lastCR;
+        }
 
-		private int StateLoop(int state, char c,
-				int pos, char[] buf, bool reconsume, int returnState,
-				int endPos)
-		{
-			/*
+        private int StateLoop(int state, char c,
+                              int pos, char[] buf, bool reconsume, int returnState,
+                              int endPos)
+        {
+            /*
 			 * Idioms used in this code:
 			 * 
 			 * 
@@ -1437,271 +1437,271 @@ namespace HtmlParserSharp.Portable.Core
 			 * character if it is an LF to coalesce CRLF.
 			 */
 
-			/*
+            /*
 			 * As there is no support for labeled loops in C#, instead of break <loop>;
 			 * the port uses goto break<loop>; and a label after the loop.
 			 * Instead of continue <loop>; it uses goto continue<loop>; and a label
 			 * at the beginning or end of the loop (which doesn't matter in for(;;) loops)
 			 */
 
-			/*stateloop:*/
-			for (; ; )
-			{
-			continueStateloop:
+            /*stateloop:*/
+            for (;;)
+            {
+                continueStateloop:
 
-				switch (state)
-				{
-					case DATA:
-						/*dataloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							switch (c)
-							{
-								case '&':
-									/*
+                switch (state)
+                {
+                    case DATA:
+                        /*dataloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            switch (c)
+                            {
+                                case '&':
+                                    /*
 									 * U+0026 AMPERSAND (&) Switch to the character
 									 * reference in data state.
 									 */
-									FlushChars(buf, pos);
-									ClearStrBufAndAppend(c);
-									SetAdditionalAndRememberAmpersandLocation('\u0000');
-									returnState = state;
-									state = Transition(state, Tokenizer.CONSUME_CHARACTER_REFERENCE, reconsume, pos);
-									goto continueStateloop;
-								case '<':
-									/*
+                                    FlushChars(buf, pos);
+                                    ClearStrBufAndAppend(c);
+                                    SetAdditionalAndRememberAmpersandLocation('\u0000');
+                                    returnState = state;
+                                    state = Transition(state, CONSUME_CHARACTER_REFERENCE, reconsume, pos);
+                                    goto continueStateloop;
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Switch to the tag
 									 * open state.
 									 */
-									FlushChars(buf, pos);
+                                    FlushChars(buf, pos);
 
-									state = Transition(state, Tokenizer.TAG_OPEN, reconsume, pos);
-									goto breakDataloop; // FALL THROUGH continue
-								// stateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									continue;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, TAG_OPEN, reconsume, pos);
+                                    goto breakDataloop; // FALL THROUGH continue
+                                    // stateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    continue;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Emit the input character as a
 									 * character token.
 									 * 
 									 * Stay in the data state.
 									 */
-									continue;
-							}
-						}
-					breakDataloop:
-						goto case TAG_OPEN;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case TAG_OPEN:
-						/*tagopenloop:*/
-						for (; ; )
-						{
-							/*
+                                    continue;
+                            }
+                        }
+                        breakDataloop:
+                        goto case TAG_OPEN;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case TAG_OPEN:
+                        /*tagopenloop:*/
+                        for (;;)
+                        {
+                            /*
 							 * The behavior of this state depends on the content
 							 * model flag.
 							 */
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * If the content model flag is set to the PCDATA state
 							 * Consume the next input character:
 							 */
-							if (c >= 'A' && c <= 'Z')
-							{
-								/*
+                            if (c >= 'A' && c <= 'Z')
+                            {
+                                /*
 								 * U+0041 LATIN CAPITAL LETTER A through to U+005A
 								 * LATIN CAPITAL LETTER Z Create a new start tag
 								 * token,
 								 */
-								_endTag = false;
-								/*
+                                _endTag = false;
+                                /*
 								 * set its tag name to the lowercase version of the
 								 * input character (add 0x0020 to the character's
 								 * code point),
 								 */
-								ClearStrBufAndAppend((char)(c + 0x20));
-								/* then switch to the tag name state. */
-								state = Transition(state, Tokenizer.TAG_NAME, reconsume, pos);
-								/*
+                                ClearStrBufAndAppend((char) (c + 0x20));
+                                /* then switch to the tag name state. */
+                                state = Transition(state, TAG_NAME, reconsume, pos);
+                                /*
 								 * (Don't emit the token yet; further details will
 								 * be filled in before it is emitted.)
 								 */
-								goto breakTagopenloop;
-								// goto continueStateloop;
-							}
-							else if (c >= 'a' && c <= 'z')
-							{
-								/*
+                                goto breakTagopenloop;
+                                // goto continueStateloop;
+                            }
+                            else if (c >= 'a' && c <= 'z')
+                            {
+                                /*
 								 * U+0061 LATIN SMALL LETTER A through to U+007A
 								 * LATIN SMALL LETTER Z Create a new start tag
 								 * token,
 								 */
-								_endTag = false;
-								/*
+                                _endTag = false;
+                                /*
 								 * set its tag name to the input character,
 								 */
-								ClearStrBufAndAppend(c);
-								/* then switch to the tag name state. */
-								state = Transition(state, Tokenizer.TAG_NAME, reconsume, pos);
-								/*
+                                ClearStrBufAndAppend(c);
+                                /* then switch to the tag name state. */
+                                state = Transition(state, TAG_NAME, reconsume, pos);
+                                /*
 								 * (Don't emit the token yet; further details will
 								 * be filled in before it is emitted.)
 								 */
-								goto breakTagopenloop;
-								// goto continueStateloop;
-							}
-							switch (c)
-							{
-								case '!':
-									/*
+                                goto breakTagopenloop;
+                                // goto continueStateloop;
+                            }
+                            switch (c)
+                            {
+                                case '!':
+                                    /*
 									 * U+0021 EXCLAMATION MARK (!) Switch to the
 									 * markup declaration open state.
 									 */
-									state = Transition(state, Tokenizer.MARKUP_DECLARATION_OPEN, reconsume, pos);
-									goto continueStateloop;
-								case '/':
-									/*
+                                    state = Transition(state, MARKUP_DECLARATION_OPEN, reconsume, pos);
+                                    goto continueStateloop;
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Switch to the close tag
 									 * open state.
 									 */
-									state = Transition(state, Tokenizer.CLOSE_TAG_OPEN, reconsume, pos);
-									goto continueStateloop;
-								case '?':
-									/*
+                                    state = Transition(state, CLOSE_TAG_OPEN, reconsume, pos);
+                                    goto continueStateloop;
+                                case '?':
+                                    /*
 									 * U+003F QUESTION MARK (?) Parse error.
 									 */
-									ErrProcessingInstruction();
-									/*
+                                    ErrProcessingInstruction();
+                                    /*
 									 * Switch to the bogus comment state.
 									 */
-									ClearLongStrBufAndAppend(c);
-									state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/*
+                                    ClearLongStrBufAndAppend(c);
+                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Parse error.
 									 */
-									ErrLtGt();
-									/*
+                                    ErrLtGt();
+                                    /*
 									 * Emit a U+003C LESS-THAN SIGN character token
 									 * and a U+003E GREATER-THAN SIGN character
 									 * token.
 									 */
-									TokenHandler.Characters(Tokenizer.LT_GT, 0, 2);
-									/* Switch to the data state. */
-									_cstart = pos + 1;
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								default:
-									/*
+                                    TokenHandler.Characters(LT_GT, 0, 2);
+                                    /* Switch to the data state. */
+                                    _cstart = pos + 1;
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    /*
 									 * Anything else Parse error.
 									 */
-									ErrBadCharAfterLt(c);
-									/*
+                                    ErrBadCharAfterLt(c);
+                                    /*
 									 * Emit a U+003C LESS-THAN SIGN character token
 									 */
-									TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-									/*
+                                    TokenHandler.Characters(LT_GT, 0, 1);
+                                    /*
 									 * and reconsume the current input character in
 									 * the data state.
 									 */
-									_cstart = pos;
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-							}
-						}
-					breakTagopenloop:
-						goto case TAG_NAME;
-					// FALL THROUGH DON'T REORDER
-					case TAG_NAME:
-						/*tagnameloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    _cstart = pos;
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakTagopenloop:
+                        goto case TAG_NAME;
+                        // FALL THROUGH DON'T REORDER
+                    case TAG_NAME:
+                        /*tagnameloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									StrBufToElementNameString();
-									state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    StrBufToElementNameString();
+                                    state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * Switch to the before attribute name state.
 									 */
-									StrBufToElementNameString();
-									state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-									goto breakTagnameloop;
-								// goto continueStateloop;
-								case '/':
-									/*
+                                    StrBufToElementNameString();
+                                    state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                    goto breakTagnameloop;
+                                    // goto continueStateloop;
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Switch to the self-closing
 									 * start tag state.
 									 */
-									StrBufToElementNameString();
-									state = Transition(state, Tokenizer.SELF_CLOSING_START_TAG, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/*
+                                    StrBufToElementNameString();
+                                    state = Transition(state, SELF_CLOSING_START_TAG, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * tag token.
 									 */
-									StrBufToElementNameString();
-									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (_shouldSuspend)
-									{
-										goto breakStateloop;
-									}
-									/*
+                                    StrBufToElementNameString();
+                                    state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
+                                    if (_shouldSuspend)
+                                    {
+                                        goto breakStateloop;
+                                    }
+                                    /*
 									 * Switch to the data state.
 									 */
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									goto default;
-								// fall thru
-								default:
-									if (c >= 'A' && c <= 'Z')
-									{
-										/*
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    goto default;
+                                    // fall thru
+                                default:
+                                    if (c >= 'A' && c <= 'Z')
+                                    {
+                                        /*
 										 * U+0041 LATIN CAPITAL LETTER A through to
 										 * U+005A LATIN CAPITAL LETTER Z Append the
 										 * lowercase version of the current input
@@ -1709,225 +1709,225 @@ namespace HtmlParserSharp.Portable.Core
 										 * code point) to the current tag token's
 										 * tag name.
 										 */
-										c += (char)0x20;
-									}
-									/*
+                                        c += (char) 0x20;
+                                    }
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current tag token's tag
 									 * name.
 									 */
-									AppendStrBuf(c);
-									/*
+                                    AppendStrBuf(c);
+                                    /*
 									 * Stay in the tag name state.
 									 */
-									continue;
-							}
-						}
-					breakTagnameloop:
-						goto case BEFORE_ATTRIBUTE_NAME;
-					// FALLTHRU DON'T REORDER
-					case BEFORE_ATTRIBUTE_NAME:
-						/*beforeattributenameloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                                    continue;
+                            }
+                        }
+                        breakTagnameloop:
+                        goto case BEFORE_ATTRIBUTE_NAME;
+                        // FALLTHRU DON'T REORDER
+                    case BEFORE_ATTRIBUTE_NAME:
+                        /*beforeattributenameloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE Stay
 									 * in the before attribute name state.
 									 */
-									continue;
-								case '/':
-									/*
+                                    continue;
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Switch to the self-closing
 									 * start tag state.
 									 */
-									state = Transition(state, Tokenizer.SELF_CLOSING_START_TAG, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/*
+                                    state = Transition(state, SELF_CLOSING_START_TAG, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * tag token.
 									 */
-									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (_shouldSuspend)
-									{
-										goto breakStateloop;
-									}
-									/*
+                                    state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
+                                    if (_shouldSuspend)
+                                    {
+                                        goto breakStateloop;
+                                    }
+                                    /*
 									 * Switch to the data state.
 									 */
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto case '\"';
-								case '\"':
-								case '\'':
-								case '<':
-								case '=':
-									/*
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto case '\"';
+                                case '\"':
+                                case '\'':
+                                case '<':
+                                case '=':
+                                    /*
 									 * U+0022 QUOTATION MARK (") U+0027 APOSTROPHE
 									 * (') U+003C LESS-THAN SIGN (<) U+003D EQUALS
 									 * SIGN (=) Parse error.
 									 */
-									ErrBadCharBeforeAttributeNameOrNull(c);
-									/*
+                                    ErrBadCharBeforeAttributeNameOrNull(c);
+                                    /*
 									 * Treat it as per the "anything else" entry
 									 * below.
 									 */
-									goto default;
-								default:
-									/*
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Start a new attribute in the
 									 * current tag token.
 									 */
-									if (c >= 'A' && c <= 'Z')
-									{
-										/*
+                                    if (c >= 'A' && c <= 'Z')
+                                    {
+                                        /*
 										 * U+0041 LATIN CAPITAL LETTER A through to
 										 * U+005A LATIN CAPITAL LETTER Z Set that
 										 * attribute's name to the lowercase version
 										 * of the current input character (add
 										 * 0x0020 to the character's code point)
 										 */
-										c += (char)0x20;
-									}
-									/*
+                                        c += (char) 0x20;
+                                    }
+                                    /*
 									 * Set that attribute's name to the current
 									 * input character,
 									 */
-									ClearStrBufAndAppend(c);
-									/*
+                                    ClearStrBufAndAppend(c);
+                                    /*
 									 * and its value to the empty string.
 									 */
-									// Will do later.
-									/*
+                                    // Will do later.
+                                    /*
 									 * Switch to the attribute name state.
 									 */
-									state = Transition(state, Tokenizer.ATTRIBUTE_NAME, reconsume, pos);
-									goto breakBeforeattributenameloop;
-								// goto continueStateloop;
-							}
-						}
-					breakBeforeattributenameloop:
-						goto case ATTRIBUTE_NAME;
-					// FALLTHRU DON'T REORDER
-					case ATTRIBUTE_NAME:
-						/*attributenameloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, ATTRIBUTE_NAME, reconsume, pos);
+                                    goto breakBeforeattributenameloop;
+                                    // goto continueStateloop;
+                            }
+                        }
+                        breakBeforeattributenameloop:
+                        goto case ATTRIBUTE_NAME;
+                        // FALLTHRU DON'T REORDER
+                    case ATTRIBUTE_NAME:
+                        /*attributenameloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									AttributeNameComplete();
-									state = Transition(state, Tokenizer.AFTER_ATTRIBUTE_NAME, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto case ' ';
-								// fall thru
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    AttributeNameComplete();
+                                    state = Transition(state, AFTER_ATTRIBUTE_NAME, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto case ' ';
+                                    // fall thru
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * Switch to the after attribute name state.
 									 */
-									AttributeNameComplete();
-									state = Transition(state, Tokenizer.AFTER_ATTRIBUTE_NAME, reconsume, pos);
-									goto continueStateloop;
-								case '/':
-									/*
+                                    AttributeNameComplete();
+                                    state = Transition(state, AFTER_ATTRIBUTE_NAME, reconsume, pos);
+                                    goto continueStateloop;
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Switch to the self-closing
 									 * start tag state.
 									 */
-									AttributeNameComplete();
-									AddAttributeWithoutValue();
-									state = Transition(state, Tokenizer.SELF_CLOSING_START_TAG, reconsume, pos);
-									goto continueStateloop;
-								case '=':
-									/*
+                                    AttributeNameComplete();
+                                    AddAttributeWithoutValue();
+                                    state = Transition(state, SELF_CLOSING_START_TAG, reconsume, pos);
+                                    goto continueStateloop;
+                                case '=':
+                                    /*
 									 * U+003D EQUALS SIGN (=) Switch to the before
 									 * attribute value state.
 									 */
-									AttributeNameComplete();
-									state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_VALUE, reconsume, pos);
-									goto breakAttributenameloop;
-								// goto continueStateloop;
-								case '>':
-									/*
+                                    AttributeNameComplete();
+                                    state = Transition(state, BEFORE_ATTRIBUTE_VALUE, reconsume, pos);
+                                    goto breakAttributenameloop;
+                                    // goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * tag token.
 									 */
-									AttributeNameComplete();
-									AddAttributeWithoutValue();
-									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (_shouldSuspend)
-									{
-										goto breakStateloop;
-									}
-									/*
+                                    AttributeNameComplete();
+                                    AddAttributeWithoutValue();
+                                    state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
+                                    if (_shouldSuspend)
+                                    {
+                                        goto breakStateloop;
+                                    }
+                                    /*
 									 * Switch to the data state.
 									 */
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto case '\"';
-								case '\"':
-								case '\'':
-								case '<':
-									/*
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto case '\"';
+                                case '\"':
+                                case '\'':
+                                case '<':
+                                    /*
 									 * U+0022 QUOTATION MARK (") U+0027 APOSTROPHE
 									 * (') U+003C LESS-THAN SIGN (<) Parse error.
 									 */
-									ErrQuoteOrLtInAttributeNameOrNull(c);
-									/*
+                                    ErrQuoteOrLtInAttributeNameOrNull(c);
+                                    /*
 									 * Treat it as per the "anything else" entry
 									 * below.
 									 */
-									goto default;
-								default:
-									if (c >= 'A' && c <= 'Z')
-									{
-										/*
+                                    goto default;
+                                default:
+                                    if (c >= 'A' && c <= 'Z')
+                                    {
+                                        /*
 										 * U+0041 LATIN CAPITAL LETTER A through to
 										 * U+005A LATIN CAPITAL LETTER Z Append the
 										 * lowercase version of the current input
@@ -1935,538 +1935,538 @@ namespace HtmlParserSharp.Portable.Core
 										 * code point) to the current attribute's
 										 * name.
 										 */
-										c += (char)0x20;
-									}
-									/*
+                                        c += (char) 0x20;
+                                    }
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current attribute's name.
 									 */
-									AppendStrBuf(c);
-									/*
+                                    AppendStrBuf(c);
+                                    /*
 									 * Stay in the attribute name state.
 									 */
-									continue;
-							}
-						}
-					breakAttributenameloop:
-						goto case BEFORE_ATTRIBUTE_VALUE;
-					// FALLTHRU DON'T REORDER
-					case BEFORE_ATTRIBUTE_VALUE:
-						/*beforeattributevalueloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        breakAttributenameloop:
+                        goto case BEFORE_ATTRIBUTE_VALUE;
+                        // FALLTHRU DON'T REORDER
+                    case BEFORE_ATTRIBUTE_VALUE:
+                        /*beforeattributevalueloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto case ' ';
-								// fall thru
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto case ' ';
+                                    // fall thru
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE Stay
 									 * in the before attribute value state.
 									 */
-									continue;
-								case '"':
-									/*
+                                    continue;
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Switch to the
 									 * attribute value (double-quoted) state.
 									 */
-									ClearLongStrBuf();
-									state = Transition(state, Tokenizer.ATTRIBUTE_VALUE_DOUBLE_QUOTED, reconsume, pos);
-									goto breakBeforeattributevalueloop;
-								// goto continueStateloop;
-								case '&':
-									/*
+                                    ClearLongStrBuf();
+                                    state = Transition(state, ATTRIBUTE_VALUE_DOUBLE_QUOTED, reconsume, pos);
+                                    goto breakBeforeattributevalueloop;
+                                    // goto continueStateloop;
+                                case '&':
+                                    /*
 									 * U+0026 AMPERSAND (&) Switch to the attribute
 									 * value (unquoted) state and reconsume this
 									 * input character.
 									 */
-									ClearLongStrBuf();
-									state = Transition(state, Tokenizer.ATTRIBUTE_VALUE_UNQUOTED, reconsume, pos);
-									NoteUnquotedAttributeValue();
-									reconsume = true;
-									goto continueStateloop;
-								case '\'':
-									/*
+                                    ClearLongStrBuf();
+                                    state = Transition(state, ATTRIBUTE_VALUE_UNQUOTED, reconsume, pos);
+                                    NoteUnquotedAttributeValue();
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Switch to the attribute
 									 * value (single-quoted) state.
 									 */
-									ClearLongStrBuf();
-									state = Transition(state, Tokenizer.ATTRIBUTE_VALUE_SINGLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/*
+                                    ClearLongStrBuf();
+                                    state = Transition(state, ATTRIBUTE_VALUE_SINGLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Parse error.
 									 */
-									ErrAttributeValueMissing();
-									/*
+                                    ErrAttributeValueMissing();
+                                    /*
 									 * Emit the current tag token.
 									 */
-									AddAttributeWithoutValue();
-									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (_shouldSuspend)
-									{
-										goto breakStateloop;
-									}
-									/*
+                                    AddAttributeWithoutValue();
+                                    state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
+                                    if (_shouldSuspend)
+                                    {
+                                        goto breakStateloop;
+                                    }
+                                    /*
 									 * Switch to the data state.
 									 */
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto case '<';
-								case '<':
-								case '=':
-								case '`':
-									/*
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto case '<';
+                                case '<':
+                                case '=':
+                                case '`':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) U+003D EQUALS SIGN
 									 * (=) U+0060 GRAVE ACCENT (`)
 									 */
-									ErrLtOrEqualsOrGraveInUnquotedAttributeOrNull(c);
-									/*
+                                    ErrLtOrEqualsOrGraveInUnquotedAttributeOrNull(c);
+                                    /*
 									 * Treat it as per the "anything else" entry
 									 * below.
 									 */
-									goto default;
-								default:
-									// [NOCPP[
-									ErrHtml4NonNameInUnquotedAttribute(c);
-									// ]NOCPP]
-									/*
+                                    goto default;
+                                default:
+                                    // [NOCPP[
+                                    ErrHtml4NonNameInUnquotedAttribute(c);
+                                    // ]NOCPP]
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current attribute's value.
 									 */
-									ClearLongStrBufAndAppend(c);
-									/*
+                                    ClearLongStrBufAndAppend(c);
+                                    /*
 									 * Switch to the attribute value (unquoted)
 									 * state.
 									 */
 
-									state = Transition(state, Tokenizer.ATTRIBUTE_VALUE_UNQUOTED, reconsume, pos);
-									NoteUnquotedAttributeValue();
-									goto continueStateloop;
-							}
-						}
-					breakBeforeattributevalueloop:
-						goto case ATTRIBUTE_VALUE_DOUBLE_QUOTED;
-					// FALLTHRU DON'T REORDER
-					case ATTRIBUTE_VALUE_DOUBLE_QUOTED:
-						/*attributevaluedoublequotedloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                                    state = Transition(state, ATTRIBUTE_VALUE_UNQUOTED, reconsume, pos);
+                                    NoteUnquotedAttributeValue();
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakBeforeattributevalueloop:
+                        goto case ATTRIBUTE_VALUE_DOUBLE_QUOTED;
+                        // FALLTHRU DON'T REORDER
+                    case ATTRIBUTE_VALUE_DOUBLE_QUOTED:
+                        /*attributevaluedoublequotedloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '"':
-									/*
+                            switch (c)
+                            {
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Switch to the after
 									 * attribute value (quoted) state.
 									 */
-									AddAttributeWithValue();
+                                    AddAttributeWithValue();
 
-									state = Transition(state, Tokenizer.AFTER_ATTRIBUTE_VALUE_QUOTED, reconsume, pos);
-									goto breakAttributevaluedoublequotedloop;
-								// goto continueStateloop;
-								case '&':
-									/*
+                                    state = Transition(state, AFTER_ATTRIBUTE_VALUE_QUOTED, reconsume, pos);
+                                    goto breakAttributevaluedoublequotedloop;
+                                    // goto continueStateloop;
+                                case '&':
+                                    /*
 									 * U+0026 AMPERSAND (&) Switch to the character
 									 * reference in attribute value state, with the
 									 * additional allowed character being U+0022
 									 * QUOTATION MARK (").
 									 */
-									ClearStrBufAndAppend(c);
-									SetAdditionalAndRememberAmpersandLocation('\"');
-									returnState = state;
-									state = Transition(state, Tokenizer.CONSUME_CHARACTER_REFERENCE, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									continue;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    ClearStrBufAndAppend(c);
+                                    SetAdditionalAndRememberAmpersandLocation('\"');
+                                    returnState = state;
+                                    state = Transition(state, CONSUME_CHARACTER_REFERENCE, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    continue;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current attribute's value.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Stay in the attribute value (double-quoted)
 									 * state.
 									 */
-									continue;
-							}
-						}
-					breakAttributevaluedoublequotedloop:
-						goto case AFTER_ATTRIBUTE_VALUE_QUOTED;
-					// FALLTHRU DON'T REORDER
-					case AFTER_ATTRIBUTE_VALUE_QUOTED:
-						/*afterattributevaluequotedloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        breakAttributevaluedoublequotedloop:
+                        goto case AFTER_ATTRIBUTE_VALUE_QUOTED;
+                        // FALLTHRU DON'T REORDER
+                    case AFTER_ATTRIBUTE_VALUE_QUOTED:
+                        /*afterattributevaluequotedloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * Switch to the before attribute name state.
 									 */
-									state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-									goto continueStateloop;
-								case '/':
-									/*
+                                    state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                    goto continueStateloop;
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Switch to the self-closing
 									 * start tag state.
 									 */
-									state = Transition(state, Tokenizer.SELF_CLOSING_START_TAG, reconsume, pos);
-									goto breakAfterattributevaluequotedloop;
-								// goto continueStateloop;
-								case '>':
-									/*
+                                    state = Transition(state, SELF_CLOSING_START_TAG, reconsume, pos);
+                                    goto breakAfterattributevaluequotedloop;
+                                    // goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * tag token.
 									 */
-									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (_shouldSuspend)
-									{
-										goto breakStateloop;
-									}
-									/*
+                                    state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
+                                    if (_shouldSuspend)
+                                    {
+                                        goto breakStateloop;
+                                    }
+                                    /*
 									 * Switch to the data state.
 									 */
-									goto continueStateloop;
-								default:
-									/*
+                                    goto continueStateloop;
+                                default:
+                                    /*
 									 * Anything else Parse error.
 									 */
-									ErrNoSpaceBetweenAttributes();
-									/*
+                                    ErrNoSpaceBetweenAttributes();
+                                    /*
 									 * Reconsume the character in the before
 									 * attribute name state.
 									 */
-									state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-							}
-						}
-					breakAfterattributevaluequotedloop:
-						goto case SELF_CLOSING_START_TAG;
-					// FALLTHRU DON'T REORDER
-					case SELF_CLOSING_START_TAG:
-						if (++pos == endPos)
-						{
-							goto breakStateloop;
-						}
-						c = CheckChar(buf, pos);
-						/*
+                                    state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakAfterattributevaluequotedloop:
+                        goto case SELF_CLOSING_START_TAG;
+                        // FALLTHRU DON'T REORDER
+                    case SELF_CLOSING_START_TAG:
+                        if (++pos == endPos)
+                        {
+                            goto breakStateloop;
+                        }
+                        c = CheckChar(buf, pos);
+                        /*
 						 * Consume the next input character:
 						 */
-						switch (c)
-						{
-							case '>':
-								/*
+                        switch (c)
+                        {
+                            case '>':
+                                /*
 								 * U+003E GREATER-THAN SIGN (>) Set the self-closing
 								 * flag of the current tag token. Emit the current
 								 * tag token.
 								 */
-								// [NOCPP[
-								ErrHtml4XmlVoidSyntax();
-								// ]NOCPP]
-								state = Transition(state, EmitCurrentTagToken(true, pos), reconsume, pos);
-								if (_shouldSuspend)
-								{
-									goto breakStateloop;
-								}
-								/*
+                                // [NOCPP[
+                                ErrHtml4XmlVoidSyntax();
+                                // ]NOCPP]
+                                state = Transition(state, EmitCurrentTagToken(true, pos), reconsume, pos);
+                                if (_shouldSuspend)
+                                {
+                                    goto breakStateloop;
+                                }
+                                /*
 								 * Switch to the data state.
 								 */
-								goto continueStateloop;
-							default:
-								/* Anything else Parse error. */
-								ErrSlashNotFollowedByGt();
-								/*
+                                goto continueStateloop;
+                            default:
+                                /* Anything else Parse error. */
+                                ErrSlashNotFollowedByGt();
+                                /*
 								 * Reconsume the character in the before attribute
 								 * name state.
 								 */
-								state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-								reconsume = true;
-								goto continueStateloop;
-						}
-					// XXX reorder point
-					case ATTRIBUTE_VALUE_UNQUOTED:
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                                state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                reconsume = true;
+                                goto continueStateloop;
+                        }
+                        // XXX reorder point
+                    case ATTRIBUTE_VALUE_UNQUOTED:
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									AddAttributeWithValue();
-									state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    AddAttributeWithValue();
+                                    state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * Switch to the before attribute name state.
 									 */
-									AddAttributeWithValue();
-									state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-									goto continueStateloop;
-								case '&':
-									/*
+                                    AddAttributeWithValue();
+                                    state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                    goto continueStateloop;
+                                case '&':
+                                    /*
 									 * U+0026 AMPERSAND (&) Switch to the character
 									 * reference in attribute value state, with the
 									 * additional allowed character being U+003E
 									 * GREATER-THAN SIGN (>)
 									 */
-									ClearStrBufAndAppend(c);
-									SetAdditionalAndRememberAmpersandLocation('>');
-									returnState = state;
-									state = Transition(state, Tokenizer.CONSUME_CHARACTER_REFERENCE, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/*
+                                    ClearStrBufAndAppend(c);
+                                    SetAdditionalAndRememberAmpersandLocation('>');
+                                    returnState = state;
+                                    state = Transition(state, CONSUME_CHARACTER_REFERENCE, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * tag token.
 									 */
-									AddAttributeWithValue();
-									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (_shouldSuspend)
-									{
-										goto breakStateloop;
-									}
-									/*
+                                    AddAttributeWithValue();
+                                    state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
+                                    if (_shouldSuspend)
+                                    {
+                                        goto breakStateloop;
+                                    }
+                                    /*
 									 * Switch to the data state.
 									 */
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									goto case '<';
-								// fall thru
-								case '<':
-								case '\"':
-								case '\'':
-								case '=':
-								case '`':
-									/*
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    goto case '<';
+                                    // fall thru
+                                case '<':
+                                case '\"':
+                                case '\'':
+                                case '=':
+                                case '`':
+                                    /*
 									 * U+0022 QUOTATION MARK (") U+0027 APOSTROPHE
 									 * (') U+003C LESS-THAN SIGN (<) U+003D EQUALS
 									 * SIGN (=) U+0060 GRAVE ACCENT (`) Parse error.
 									 */
-									ErrUnquotedAttributeValOrNull(c);
-									/*
+                                    ErrUnquotedAttributeValOrNull(c);
+                                    /*
 									 * Treat it as per the "anything else" entry
 									 * below.
 									 */
-									// fall through
-									goto default;
-								default:
-									// [NOCPP]
-									ErrHtml4NonNameInUnquotedAttribute(c);
-									// ]NOCPP]
-									/*
+                                    // fall through
+                                    goto default;
+                                default:
+                                    // [NOCPP]
+                                    ErrHtml4NonNameInUnquotedAttribute(c);
+                                    // ]NOCPP]
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current attribute's value.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Stay in the attribute value (unquoted) state.
 									 */
-									continue;
-							}
-						}
-					// XXX reorder point
-					case AFTER_ATTRIBUTE_NAME:
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        // XXX reorder point
+                    case AFTER_ATTRIBUTE_NAME:
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE Stay
 									 * in the after attribute name state.
 									 */
-									continue;
-								case '/':
-									/*
+                                    continue;
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Switch to the self-closing
 									 * start tag state.
 									 */
-									AddAttributeWithoutValue();
-									state = Transition(state, Tokenizer.SELF_CLOSING_START_TAG, reconsume, pos);
-									goto continueStateloop;
-								case '=':
-									/*
+                                    AddAttributeWithoutValue();
+                                    state = Transition(state, SELF_CLOSING_START_TAG, reconsume, pos);
+                                    goto continueStateloop;
+                                case '=':
+                                    /*
 									 * U+003D EQUALS SIGN (=) Switch to the before
 									 * attribute value state.
 									 */
-									state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_VALUE, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/*
+                                    state = Transition(state, BEFORE_ATTRIBUTE_VALUE, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * tag token.
 									 */
-									AddAttributeWithoutValue();
-									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (_shouldSuspend)
-									{
-										goto breakStateloop;
-									}
-									/*
+                                    AddAttributeWithoutValue();
+                                    state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
+                                    if (_shouldSuspend)
+                                    {
+                                        goto breakStateloop;
+                                    }
+                                    /*
 									 * Switch to the data state.
 									 */
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									goto case '\"';
-								// fall thru
-								case '\"':
-								case '\'':
-								case '<':
-									ErrQuoteOrLtInAttributeNameOrNull(c);
-									/*
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    goto case '\"';
+                                    // fall thru
+                                case '\"':
+                                case '\'':
+                                case '<':
+                                    ErrQuoteOrLtInAttributeNameOrNull(c);
+                                    /*
 									 * Treat it as per the "anything else" entry
 									 * below.
 									 */
-									goto default;
-								default:
-									AddAttributeWithoutValue();
-									/*
+                                    goto default;
+                                default:
+                                    AddAttributeWithoutValue();
+                                    /*
 									 * Anything else Start a new attribute in the
 									 * current tag token.
 									 */
-									if (c >= 'A' && c <= 'Z')
-									{
-										/*
+                                    if (c >= 'A' && c <= 'Z')
+                                    {
+                                        /*
 										 * U+0041 LATIN CAPITAL LETTER A through to
 										 * U+005A LATIN CAPITAL LETTER Z Set that
 										 * attribute's name to the lowercase version
 										 * of the current input character (add
 										 * 0x0020 to the character's code point)
 										 */
-										c += (char)0x20;
-									}
-									/*
+                                        c += (char) 0x20;
+                                    }
+                                    /*
 									 * Set that attribute's name to the current
 									 * input character,
 									 */
-									ClearStrBufAndAppend(c);
-									/*
+                                    ClearStrBufAndAppend(c);
+                                    /*
 									 * and its value to the empty string.
 									 */
-									// Will do later.
-									/*
+                                    // Will do later.
+                                    /*
 									 * Switch to the attribute name state.
 									 */
-									state = Transition(state, Tokenizer.ATTRIBUTE_NAME, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					// XXX reorder point
-					case MARKUP_DECLARATION_OPEN:
-						/*markupdeclarationopenloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, ATTRIBUTE_NAME, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        // XXX reorder point
+                    case MARKUP_DECLARATION_OPEN:
+                        /*markupdeclarationopenloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * If the next two characters are both U+002D
 							 * HYPHEN-MINUS characters (-), consume those two
 							 * characters, create a comment token whose data is the
@@ -2491,628 +2491,628 @@ namespace HtmlParserSharp.Portable.Core
 							 * if any, is the first character that will be in the
 							 * comment.
 							 */
-							switch (c)
-							{
-								case '-':
-									ClearLongStrBufAndAppend(c);
-									state = Transition(state, Tokenizer.MARKUP_DECLARATION_HYPHEN, reconsume, pos);
-									goto breakMarkupdeclarationopenloop;
-								// goto continueStateloop;
-								case 'd':
-								case 'D':
-									ClearLongStrBufAndAppend(c);
-									_index = 0;
-									state = Transition(state, Tokenizer.MARKUP_DECLARATION_OCTYPE, reconsume, pos);
-									goto continueStateloop;
-								case '[':
-									if (TokenHandler.IsCDataSectionAllowed)
-									{
-										ClearLongStrBufAndAppend(c);
-										_index = 0;
-										state = Transition(state, Tokenizer.CDATA_START, reconsume, pos);
-										goto continueStateloop;
-									}
-									else
-									{
-										// else fall through
-										goto default;
-									}
-								default:
-									ErrBogusComment();
-									ClearLongStrBuf();
-									state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-							}
-						}
-					breakMarkupdeclarationopenloop:
-						goto case MARKUP_DECLARATION_HYPHEN;
-					// FALLTHRU DON'T REORDER
-					case MARKUP_DECLARATION_HYPHEN:
-						/*markupdeclarationhyphenloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							switch (c)
-							{
-								case '\u0000':
-									goto breakStateloop;
-								case '-':
-									ClearLongStrBuf();
-									state = Transition(state, Tokenizer.COMMENT_START, reconsume, pos);
-									goto breakMarkupdeclarationhyphenloop;
-								// goto continueStateloop;
-								default:
-									ErrBogusComment();
-									state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-							}
-						}
-					breakMarkupdeclarationhyphenloop:
-						goto case COMMENT_START;
-					// FALLTHRU DON'T REORDER
-					case COMMENT_START:
-						/*commentstartloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                            switch (c)
+                            {
+                                case '-':
+                                    ClearLongStrBufAndAppend(c);
+                                    state = Transition(state, MARKUP_DECLARATION_HYPHEN, reconsume, pos);
+                                    goto breakMarkupdeclarationopenloop;
+                                    // goto continueStateloop;
+                                case 'd':
+                                case 'D':
+                                    ClearLongStrBufAndAppend(c);
+                                    _index = 0;
+                                    state = Transition(state, MARKUP_DECLARATION_OCTYPE, reconsume, pos);
+                                    goto continueStateloop;
+                                case '[':
+                                    if (TokenHandler.IsCDataSectionAllowed)
+                                    {
+                                        ClearLongStrBufAndAppend(c);
+                                        _index = 0;
+                                        state = Transition(state, CDATA_START, reconsume, pos);
+                                        goto continueStateloop;
+                                    }
+                                    else
+                                    {
+                                        // else fall through
+                                        goto default;
+                                    }
+                                default:
+                                    ErrBogusComment();
+                                    ClearLongStrBuf();
+                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakMarkupdeclarationopenloop:
+                        goto case MARKUP_DECLARATION_HYPHEN;
+                        // FALLTHRU DON'T REORDER
+                    case MARKUP_DECLARATION_HYPHEN:
+                        /*markupdeclarationhyphenloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            switch (c)
+                            {
+                                case '\u0000':
+                                    goto breakStateloop;
+                                case '-':
+                                    ClearLongStrBuf();
+                                    state = Transition(state, COMMENT_START, reconsume, pos);
+                                    goto breakMarkupdeclarationhyphenloop;
+                                    // goto continueStateloop;
+                                default:
+                                    ErrBogusComment();
+                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakMarkupdeclarationhyphenloop:
+                        goto case COMMENT_START;
+                        // FALLTHRU DON'T REORDER
+                    case COMMENT_START:
+                        /*commentstartloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Comment start state
 							 * 
 							 * 
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Switch to the comment
 									 * start dash state.
 									 */
-									AppendLongStrBuf(c);
-									state = Transition(state, Tokenizer.COMMENT_START_DASH, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/*
+                                    AppendLongStrBuf(c);
+                                    state = Transition(state, COMMENT_START_DASH, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Parse error.
 									 */
-									ErrPrematureEndOfComment();
-									/* Emit the comment token. */
-									EmitComment(0, pos);
-									/*
+                                    ErrPrematureEndOfComment();
+                                    /* Emit the comment token. */
+                                    EmitComment(0, pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto breakCommentstartloop;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto breakCommentstartloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Append the input character to
 									 * the comment token's data.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Switch to the comment state.
 									 */
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto breakCommentstartloop;
-								// goto continueStateloop;
-							}
-						}
-					breakCommentstartloop:
-						goto case COMMENT;
-					// FALLTHRU DON'T REORDER
-					case COMMENT:
-						/*commentloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto breakCommentstartloop;
+                                    // goto continueStateloop;
+                            }
+                        }
+                        breakCommentstartloop:
+                        goto case COMMENT;
+                        // FALLTHRU DON'T REORDER
+                    case COMMENT:
+                        /*commentloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Comment state Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Switch to the comment
 									 * end dash state
 									 */
-									AppendLongStrBuf(c);
-									state = Transition(state, Tokenizer.COMMENT_END_DASH, reconsume, pos);
-									goto breakCommentloop;
-								// goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									continue;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    AppendLongStrBuf(c);
+                                    state = Transition(state, COMMENT_END_DASH, reconsume, pos);
+                                    goto breakCommentloop;
+                                    // goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    continue;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Append the input character to
 									 * the comment token's data.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Stay in the comment state.
 									 */
-									continue;
-							}
-						}
-					breakCommentloop:
-						goto case COMMENT_END_DASH;
-					// FALLTHRU DON'T REORDER
-					case COMMENT_END_DASH:
-						/*commentenddashloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        breakCommentloop:
+                        goto case COMMENT_END_DASH;
+                        // FALLTHRU DON'T REORDER
+                    case COMMENT_END_DASH:
+                        /*commentenddashloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Comment end dash state Consume the next input
 							 * character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Switch to the comment
 									 * end state
 									 */
-									AppendLongStrBuf(c);
-									state = Transition(state, Tokenizer.COMMENT_END, reconsume, pos);
-									goto breakCommentenddashloop;
-								// goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									goto default;
-								// fall thru
-								default:
-									/*
+                                    AppendLongStrBuf(c);
+                                    state = Transition(state, COMMENT_END, reconsume, pos);
+                                    goto breakCommentenddashloop;
+                                    // goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    goto default;
+                                    // fall thru
+                                default:
+                                    /*
 									 * Anything else Append a U+002D HYPHEN-MINUS
 									 * (-) character and the input character to the
 									 * comment token's data.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Switch to the comment state.
 									 */
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakCommentenddashloop:
-						goto case COMMENT_END;
-					// FALLTHRU DON'T REORDER
-					case COMMENT_END:
-						/*commentendloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakCommentenddashloop:
+                        goto case COMMENT_END;
+                        // FALLTHRU DON'T REORDER
+                    case COMMENT_END:
+                        /*commentendloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Comment end dash state Consume the next input
 							 * character:
 							 */
-							switch (c)
-							{
-								case '>':
-									/*
+                            switch (c)
+                            {
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the comment
 									 * token.
 									 */
-									EmitComment(2, pos);
-									/*
+                                    EmitComment(2, pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '-':
-									/* U+002D HYPHEN-MINUS (-) Parse error. */
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '-':
+                                    /* U+002D HYPHEN-MINUS (-) Parse error. */
+                                    /*
 									 * Append a U+002D HYPHEN-MINUS (-) character to
 									 * the comment token's data.
 									 */
-									AdjustDoubleHyphenAndAppendToLongStrBufAndErr(c);
-									/*
+                                    AdjustDoubleHyphenAndAppendToLongStrBufAndErr(c);
+                                    /*
 									 * Stay in the comment end state.
 									 */
-									continue;
-								case '\r':
-									AdjustDoubleHyphenAndAppendToLongStrBufCarriageReturn();
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									AdjustDoubleHyphenAndAppendToLongStrBufLineFeed();
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto continueStateloop;
-								case '!':
-									ErrHyphenHyphenBang();
-									AppendLongStrBuf(c);
-									state = Transition(state, Tokenizer.COMMENT_END_BANG, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    continue;
+                                case '\r':
+                                    AdjustDoubleHyphenAndAppendToLongStrBufCarriageReturn();
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    AdjustDoubleHyphenAndAppendToLongStrBufLineFeed();
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto continueStateloop;
+                                case '!':
+                                    ErrHyphenHyphenBang();
+                                    AppendLongStrBuf(c);
+                                    state = Transition(state, COMMENT_END_BANG, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Append two U+002D HYPHEN-MINUS (-) characters
 									 * and the input character to the comment
 									 * token's data.
 									 */
-									AdjustDoubleHyphenAndAppendToLongStrBufAndErr(c);
-									/*
+                                    AdjustDoubleHyphenAndAppendToLongStrBufAndErr(c);
+                                    /*
 									 * Switch to the comment state.
 									 */
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					// XXX reorder point
-					case COMMENT_END_BANG:
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        // XXX reorder point
+                    case COMMENT_END_BANG:
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Comment end bang state
 							 * 
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '>':
-									/*
+                            switch (c)
+                            {
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the comment
 									 * token.
 									 */
-									EmitComment(3, pos);
-									/*
+                                    EmitComment(3, pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '-':
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '-':
+                                    /*
 									 * Append two U+002D HYPHEN-MINUS (-) characters
 									 * and a U+0021 EXCLAMATION MARK (!) character
 									 * to the comment token's data.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Switch to the comment end dash state.
 									 */
-									state = Transition(state, Tokenizer.COMMENT_END_DASH, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									continue;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, COMMENT_END_DASH, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    continue;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Append two U+002D HYPHEN-MINUS
 									 * (-) characters, a U+0021 EXCLAMATION MARK (!)
 									 * character, and the input character to the
 									 * comment token's data. Switch to the comment
 									 * state.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Switch to the comment state.
 									 */
-									state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					// XXX reorder point
-					case COMMENT_START_DASH:
-						if (++pos == endPos)
-						{
-							goto breakStateloop;
-						}
-						c = CheckChar(buf, pos);
-						/*
+                                    state = Transition(state, COMMENT, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        // XXX reorder point
+                    case COMMENT_START_DASH:
+                        if (++pos == endPos)
+                        {
+                            goto breakStateloop;
+                        }
+                        c = CheckChar(buf, pos);
+                        /*
 						 * Comment start dash state
 						 * 
 						 * Consume the next input character:
 						 */
-						switch (c)
-						{
-							case '-':
-								/*
+                        switch (c)
+                        {
+                            case '-':
+                                /*
 								 * U+002D HYPHEN-MINUS (-) Switch to the comment end
 								 * state
 								 */
-								AppendLongStrBuf(c);
-								state = Transition(state, Tokenizer.COMMENT_END, reconsume, pos);
-								goto continueStateloop;
-							case '>':
-								ErrPrematureEndOfComment();
-								/* Emit the comment token. */
-								EmitComment(1, pos);
-								/*
+                                AppendLongStrBuf(c);
+                                state = Transition(state, COMMENT_END, reconsume, pos);
+                                goto continueStateloop;
+                            case '>':
+                                ErrPrematureEndOfComment();
+                                /* Emit the comment token. */
+                                EmitComment(1, pos);
+                                /*
 								 * Switch to the data state.
 								 */
-								state = Transition(state, Tokenizer.DATA, reconsume, pos);
-								goto continueStateloop;
-							case '\r':
-								AppendLongStrBufCarriageReturn();
-								state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-								goto breakStateloop;
-							case '\n':
-								AppendLongStrBufLineFeed();
-								state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-								goto continueStateloop;
-							case '\u0000':
-								c = '\uFFFD';
-								// fall thru
-								goto default;
-							default:
-								/*
+                                state = Transition(state, DATA, reconsume, pos);
+                                goto continueStateloop;
+                            case '\r':
+                                AppendLongStrBufCarriageReturn();
+                                state = Transition(state, COMMENT, reconsume, pos);
+                                goto breakStateloop;
+                            case '\n':
+                                AppendLongStrBufLineFeed();
+                                state = Transition(state, COMMENT, reconsume, pos);
+                                goto continueStateloop;
+                            case '\u0000':
+                                c = '\uFFFD';
+                                // fall thru
+                                goto default;
+                            default:
+                                /*
 								 * Append a U+002D HYPHEN-MINUS character (-) and
 								 * the current input character to the comment
 								 * token's data.
 								 */
-								AppendLongStrBuf(c);
-								/*
+                                AppendLongStrBuf(c);
+                                /*
 								 * Switch to the comment state.
 								 */
-								state = Transition(state, Tokenizer.COMMENT, reconsume, pos);
-								goto continueStateloop;
-						}
-					// XXX reorder point
-					case CDATA_START:
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							if (_index < 6)
-							{ // CDATA_LSQB.Length
-								if (c == Tokenizer.CDATA_LSQB[_index])
-								{
-									AppendLongStrBuf(c);
-								}
-								else
-								{
-									ErrBogusComment();
-									state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-								_index++;
-								continue;
-							}
-							else
-							{
-								_cstart = pos; // start coalescing
-								state = Transition(state, Tokenizer.CDATA_SECTION, reconsume, pos);
-								reconsume = true;
-								break; // FALL THROUGH goto continueStateloop;
-							}
-						}
-						goto case CDATA_SECTION;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case CDATA_SECTION:
-						/*cdatasectionloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							switch (c)
-							{
-								case ']':
-									FlushChars(buf, pos);
-									state = Transition(state, Tokenizer.CDATA_RSQB, reconsume, pos);
-									goto breakCdatasectionloop; // FALL THROUGH
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									continue;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								// fall thru
-								default:
-									continue;
-							}
-						}
-					breakCdatasectionloop:
-						goto case CDATA_RSQB;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case CDATA_RSQB:
-						/*cdatarsqb:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							switch (c)
-							{
-								case ']':
-									state = Transition(state, Tokenizer.CDATA_RSQB_RSQB, reconsume, pos);
-									goto breakCdatarsqb;
-								default:
-									TokenHandler.Characters(Tokenizer.RSQB_RSQB, 0,
-											1);
-									_cstart = pos;
-									state = Transition(state, Tokenizer.CDATA_SECTION, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-							}
-						}
-					breakCdatarsqb:
-						goto case CDATA_RSQB_RSQB;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case CDATA_RSQB_RSQB:
-						if (++pos == endPos)
-						{
-							goto breakStateloop;
-						}
-						c = CheckChar(buf, pos);
-						switch (c)
-						{
-							case '>':
-								_cstart = pos + 1;
-								state = Transition(state, Tokenizer.DATA, reconsume, pos);
-								goto continueStateloop;
-							default:
-								TokenHandler.Characters(Tokenizer.RSQB_RSQB, 0, 2);
-								_cstart = pos;
-								state = Transition(state, Tokenizer.CDATA_SECTION, reconsume, pos);
-								reconsume = true;
-								goto continueStateloop;
-
-						}
-					// XXX reorder point
-					case ATTRIBUTE_VALUE_SINGLE_QUOTED:
-						/*attributevaluesinglequotedloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                                state = Transition(state, COMMENT, reconsume, pos);
+                                goto continueStateloop;
+                        }
+                        // XXX reorder point
+                    case CDATA_START:
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            if (_index < 6)
+                            {
+                                // CDATA_LSQB.Length
+                                if (c == CDATA_LSQB[_index])
+                                {
+                                    AppendLongStrBuf(c);
+                                }
+                                else
+                                {
+                                    ErrBogusComment();
+                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                                _index++;
+                                continue;
+                            }
+                            else
+                            {
+                                _cstart = pos; // start coalescing
+                                state = Transition(state, CDATA_SECTION, reconsume, pos);
+                                reconsume = true;
+                                break; // FALL THROUGH goto continueStateloop;
+                            }
+                        }
+                        goto case CDATA_SECTION;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case CDATA_SECTION:
+                        /*cdatasectionloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            switch (c)
+                            {
+                                case ']':
+                                    FlushChars(buf, pos);
+                                    state = Transition(state, CDATA_RSQB, reconsume, pos);
+                                    goto breakCdatasectionloop; // FALL THROUGH
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    continue;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                    // fall thru
+                                default:
+                                    continue;
+                            }
+                        }
+                        breakCdatasectionloop:
+                        goto case CDATA_RSQB;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case CDATA_RSQB:
+                        /*cdatarsqb:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            switch (c)
+                            {
+                                case ']':
+                                    state = Transition(state, CDATA_RSQB_RSQB, reconsume, pos);
+                                    goto breakCdatarsqb;
+                                default:
+                                    TokenHandler.Characters(RSQB_RSQB, 0,
+                                                            1);
+                                    _cstart = pos;
+                                    state = Transition(state, CDATA_SECTION, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakCdatarsqb:
+                        goto case CDATA_RSQB_RSQB;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case CDATA_RSQB_RSQB:
+                        if (++pos == endPos)
+                        {
+                            goto breakStateloop;
+                        }
+                        c = CheckChar(buf, pos);
+                        switch (c)
+                        {
+                            case '>':
+                                _cstart = pos + 1;
+                                state = Transition(state, DATA, reconsume, pos);
+                                goto continueStateloop;
+                            default:
+                                TokenHandler.Characters(RSQB_RSQB, 0, 2);
+                                _cstart = pos;
+                                state = Transition(state, CDATA_SECTION, reconsume, pos);
+                                reconsume = true;
+                                goto continueStateloop;
+                        }
+                        // XXX reorder point
+                    case ATTRIBUTE_VALUE_SINGLE_QUOTED:
+                        /*attributevaluesinglequotedloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\'':
-									/*
+                            switch (c)
+                            {
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Switch to the after
 									 * attribute value (quoted) state.
 									 */
-									AddAttributeWithValue();
+                                    AddAttributeWithValue();
 
-									state = Transition(state, Tokenizer.AFTER_ATTRIBUTE_VALUE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								case '&':
-									/*
+                                    state = Transition(state, AFTER_ATTRIBUTE_VALUE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '&':
+                                    /*
 									 * U+0026 AMPERSAND (&) Switch to the character
 									 * reference in attribute value state, with the
 									 * + additional allowed character being U+0027
 									 * APOSTROPHE (').
 									 */
-									ClearStrBufAndAppend(c);
-									SetAdditionalAndRememberAmpersandLocation('\'');
-									returnState = state;
-									state = Transition(state, Tokenizer.CONSUME_CHARACTER_REFERENCE, reconsume, pos);
-									goto breakAttributevaluesinglequotedloop;
-								// goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									continue;
-								case '\u0000':
-									c = '\uFFFD';
-									goto default;
-								// fall thru
-								default:
-									/*
+                                    ClearStrBufAndAppend(c);
+                                    SetAdditionalAndRememberAmpersandLocation('\'');
+                                    returnState = state;
+                                    state = Transition(state, CONSUME_CHARACTER_REFERENCE, reconsume, pos);
+                                    goto breakAttributevaluesinglequotedloop;
+                                    // goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    continue;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    goto default;
+                                    // fall thru
+                                default:
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current attribute's value.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Stay in the attribute value (double-quoted)
 									 * state.
 									 */
-									continue;
-							}
-						}
-					breakAttributevaluesinglequotedloop:
-						goto case CONSUME_CHARACTER_REFERENCE;
-					// FALLTHRU DON'T REORDER
-					case CONSUME_CHARACTER_REFERENCE:
-						if (++pos == endPos)
-						{
-							goto breakStateloop;
-						}
-						c = CheckChar(buf, pos);
-						if (c == '\u0000')
-						{
-							goto breakStateloop;
-						}
-						/*
+                                    continue;
+                            }
+                        }
+                        breakAttributevaluesinglequotedloop:
+                        goto case CONSUME_CHARACTER_REFERENCE;
+                        // FALLTHRU DON'T REORDER
+                    case CONSUME_CHARACTER_REFERENCE:
+                        if (++pos == endPos)
+                        {
+                            goto breakStateloop;
+                        }
+                        c = CheckChar(buf, pos);
+                        if (c == '\u0000')
+                        {
+                            goto breakStateloop;
+                        }
+                        /*
 						 * Unlike the definition is the spec, this state does not
 						 * return a value and never requires the caller to
 						 * backtrack. This state takes care of emitting characters
@@ -3120,7 +3120,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * takes care of that in the case when consuming the
 						 * character reference fails.
 						 */
-						/*
+                        /*
 						 * This section defines how to consume a character
 						 * reference. This definition is used when parsing character
 						 * references in text and in attributes.
@@ -3129,84 +3129,84 @@ namespace HtmlParserSharp.Portable.Core
 						 * character (the one immediately after the U+0026 AMPERSAND
 						 * character):
 						 */
-						switch (c)
-						{
-							case ' ':
-							case '\t':
-							case '\n':
-							case '\r': // we'll reconsume!
-							case '\u000C':
-							case '<':
-							case '&':
-								EmitOrAppendStrBuf(returnState);
-								if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-								{
-									_cstart = pos;
-								}
-								state = Transition(state, returnState, reconsume, pos);
-								reconsume = true;
-								goto continueStateloop;
-							case '#':
-								/*
+                        switch (c)
+                        {
+                            case ' ':
+                            case '\t':
+                            case '\n':
+                            case '\r': // we'll reconsume!
+                            case '\u000C':
+                            case '<':
+                            case '&':
+                                EmitOrAppendStrBuf(returnState);
+                                if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                {
+                                    _cstart = pos;
+                                }
+                                state = Transition(state, returnState, reconsume, pos);
+                                reconsume = true;
+                                goto continueStateloop;
+                            case '#':
+                                /*
 								 * U+0023 NUMBER SIGN (#) Consume the U+0023 NUMBER
 								 * SIGN.
 								 */
-								AppendStrBuf('#');
-								state = Transition(state, Tokenizer.CONSUME_NCR, reconsume, pos);
-								goto continueStateloop;
-							default:
-								if (c == _additional)
-								{
-									EmitOrAppendStrBuf(returnState);
-									state = Transition(state, returnState, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-								if (c >= 'a' && c <= 'z')
-								{
-									_firstCharKey = c - 'a' + 26;
-								}
-								else if (c >= 'A' && c <= 'Z')
-								{
-									_firstCharKey = c - 'A';
-								}
-								else
-								{
-									// No match
-									/*
+                                AppendStrBuf('#');
+                                state = Transition(state, CONSUME_NCR, reconsume, pos);
+                                goto continueStateloop;
+                            default:
+                                if (c == _additional)
+                                {
+                                    EmitOrAppendStrBuf(returnState);
+                                    state = Transition(state, returnState, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                                if (c >= 'a' && c <= 'z')
+                                {
+                                    _firstCharKey = c - 'a' + 26;
+                                }
+                                else if (c >= 'A' && c <= 'Z')
+                                {
+                                    _firstCharKey = c - 'A';
+                                }
+                                else
+                                {
+                                    // No match
+                                    /*
 									 * If no match can be made, then this is a parse
 									 * error.
 									 */
-									ErrNoNamedCharacterMatch();
-									EmitOrAppendStrBuf(returnState);
-									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-									{
-										_cstart = pos;
-									}
-									state = Transition(state, returnState, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-								// Didn't fail yet
-								AppendStrBuf(c);
-								state = Transition(state, Tokenizer.CHARACTER_REFERENCE_HILO_LOOKUP, reconsume, pos);
-								// FALL THROUGH goto continueStateloop;
-								break;
-						}
-						goto case CHARACTER_REFERENCE_HILO_LOOKUP;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case CHARACTER_REFERENCE_HILO_LOOKUP:
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							if (c == '\u0000')
-							{
-								goto breakStateloop;
-							}
-							/*
+                                    ErrNoNamedCharacterMatch();
+                                    EmitOrAppendStrBuf(returnState);
+                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                    {
+                                        _cstart = pos;
+                                    }
+                                    state = Transition(state, returnState, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                                // Didn't fail yet
+                                AppendStrBuf(c);
+                                state = Transition(state, CHARACTER_REFERENCE_HILO_LOOKUP, reconsume, pos);
+                                // FALL THROUGH goto continueStateloop;
+                                break;
+                        }
+                        goto case CHARACTER_REFERENCE_HILO_LOOKUP;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case CHARACTER_REFERENCE_HILO_LOOKUP:
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            if (c == '\u0000')
+                            {
+                                goto breakStateloop;
+                            }
+                            /*
 							 * The data structure is as follows:
 							 * 
 							 * HILO_ACCEL is a two-dimensional int array whose major
@@ -3244,181 +3244,181 @@ namespace HtmlParserSharp.Portable.Core
 							 * two UTF-16 code units (either the character and
 							 * U+0000 or a suggogate pair).
 							 */
-							int hilo = 0;
-							if (c <= 'z')
-							{
-								int[] row = NamedCharactersAccel.HILO_ACCEL[c];
-								if (row != null)
-								{
-									hilo = row[_firstCharKey];
-								}
-							}
-							if (hilo == 0)
-							{
-								/*
+                            int hilo = 0;
+                            if (c <= 'z')
+                            {
+                                int[] row = NamedCharactersAccel.HILO_ACCEL[c];
+                                if (row != null)
+                                {
+                                    hilo = row[_firstCharKey];
+                                }
+                            }
+                            if (hilo == 0)
+                            {
+                                /*
 								 * If no match can be made, then this is a parse
 								 * error.
 								 */
-								ErrNoNamedCharacterMatch();
-								EmitOrAppendStrBuf(returnState);
-								if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-								{
-									_cstart = pos;
-								}
-								state = Transition(state, returnState, reconsume, pos);
-								reconsume = true;
-								goto continueStateloop;
-							}
-							// Didn't fail yet
-							AppendStrBuf(c);
-							_lo = hilo & 0xFFFF;
-							_hi = hilo >> 16;
-							_entCol = -1;
-							_candidate = -1;
-							_strBufMark = 0;
-							state = Transition(state, Tokenizer.CHARACTER_REFERENCE_TAIL, reconsume, pos);
-							// FALL THROUGH goto continueStateloop;
-							goto case CHARACTER_REFERENCE_TAIL;
-						}
-					case CHARACTER_REFERENCE_TAIL:
-						/*outer:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							if (c == '\u0000')
-							{
-								goto breakStateloop;
-							}
-							_entCol++;
-							/*
+                                ErrNoNamedCharacterMatch();
+                                EmitOrAppendStrBuf(returnState);
+                                if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                {
+                                    _cstart = pos;
+                                }
+                                state = Transition(state, returnState, reconsume, pos);
+                                reconsume = true;
+                                goto continueStateloop;
+                            }
+                            // Didn't fail yet
+                            AppendStrBuf(c);
+                            _lo = hilo & 0xFFFF;
+                            _hi = hilo >> 16;
+                            _entCol = -1;
+                            _candidate = -1;
+                            _strBufMark = 0;
+                            state = Transition(state, CHARACTER_REFERENCE_TAIL, reconsume, pos);
+                            // FALL THROUGH goto continueStateloop;
+                            goto case CHARACTER_REFERENCE_TAIL;
+                        }
+                    case CHARACTER_REFERENCE_TAIL:
+                        /*outer:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            if (c == '\u0000')
+                            {
+                                goto breakStateloop;
+                            }
+                            _entCol++;
+                            /*
 							 * Consume the maximum number of characters possible,
 							 * with the consumed characters matching one of the
 							 * identifiers in the first column of the named
 							 * character references table (in a case-sensitive
 							 * manner).
 							 */
-							/*loloop:*/
-							for (; ; )
-							{
-								if (_hi < _lo)
-								{
-									goto breakOuter;
-								}
-								if (_entCol == NamedCharacters.NAMES[_lo].Length)
-								{
-									_candidate = _lo;
-									_strBufMark = _strBufLen;
-									_lo++;
-								}
-								else if (_entCol > NamedCharacters.NAMES[_lo].Length)
-								{
-									goto breakOuter;
-								}
-								else if (c > NamedCharacters.NAMES[_lo][_entCol])
-								{
-									_lo++;
-								}
-								else
-								{
-									goto breakLoloop;
-								}
-							}
+                            /*loloop:*/
+                            for (;;)
+                            {
+                                if (_hi < _lo)
+                                {
+                                    goto breakOuter;
+                                }
+                                if (_entCol == NamedCharacters.NAMES[_lo].Length)
+                                {
+                                    _candidate = _lo;
+                                    _strBufMark = _strBufLen;
+                                    _lo++;
+                                }
+                                else if (_entCol > NamedCharacters.NAMES[_lo].Length)
+                                {
+                                    goto breakOuter;
+                                }
+                                else if (c > NamedCharacters.NAMES[_lo][_entCol])
+                                {
+                                    _lo++;
+                                }
+                                else
+                                {
+                                    goto breakLoloop;
+                                }
+                            }
 
-						breakLoloop:
+                            breakLoloop:
 
-							/*hiloop:*/
-							for (; ; )
-							{
-								if (_hi < _lo)
-								{
-									goto breakOuter;
-								}
-								if (_entCol == NamedCharacters.NAMES[_hi].Length)
-								{
-									goto breakHiloop;
-								}
-								if (_entCol > NamedCharacters.NAMES[_hi].Length)
-								{
-									goto breakOuter;
-								}
-								else if (c < NamedCharacters.NAMES[_hi][_entCol])
-								{
-									_hi--;
-								}
-								else
-								{
-									goto breakHiloop;
-								}
-							}
+                            /*hiloop:*/
+                            for (;;)
+                            {
+                                if (_hi < _lo)
+                                {
+                                    goto breakOuter;
+                                }
+                                if (_entCol == NamedCharacters.NAMES[_hi].Length)
+                                {
+                                    goto breakHiloop;
+                                }
+                                if (_entCol > NamedCharacters.NAMES[_hi].Length)
+                                {
+                                    goto breakOuter;
+                                }
+                                else if (c < NamedCharacters.NAMES[_hi][_entCol])
+                                {
+                                    _hi--;
+                                }
+                                else
+                                {
+                                    goto breakHiloop;
+                                }
+                            }
 
-						breakHiloop:
+                            breakHiloop:
 
-							if (_hi < _lo)
-							{
-								goto breakOuter;
-							}
-							AppendStrBuf(c);
-							continue;
-						}
+                            if (_hi < _lo)
+                            {
+                                goto breakOuter;
+                            }
+                            AppendStrBuf(c);
+                            continue;
+                        }
 
-					breakOuter:
+                        breakOuter:
 
-						if (_candidate == -1)
-						{
-							// reconsume deals with CR, LF or nul
-							/*
+                        if (_candidate == -1)
+                        {
+                            // reconsume deals with CR, LF or nul
+                            /*
 							 * If no match can be made, then this is a parse error.
 							 */
-							ErrNoNamedCharacterMatch();
-							EmitOrAppendStrBuf(returnState);
-							if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-							{
-								_cstart = pos;
-							}
-							state = Transition(state, returnState, reconsume, pos);
-							reconsume = true;
-							goto continueStateloop;
-						}
-						else
-						{
-							// c can't be CR, LF or nul if we got here
-							string candidateName = NamedCharacters.NAMES[_candidate];
-							if (candidateName.Length == 0
-									|| candidateName[candidateName.Length - 1] != ';')
-							{
-								/*
+                            ErrNoNamedCharacterMatch();
+                            EmitOrAppendStrBuf(returnState);
+                            if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                            {
+                                _cstart = pos;
+                            }
+                            state = Transition(state, returnState, reconsume, pos);
+                            reconsume = true;
+                            goto continueStateloop;
+                        }
+                        else
+                        {
+                            // c can't be CR, LF or nul if we got here
+                            string candidateName = NamedCharacters.NAMES[_candidate];
+                            if (candidateName.Length == 0
+                                || candidateName[candidateName.Length - 1] != ';')
+                            {
+                                /*
 								 * If the last character matched is not a U+003B
 								 * SEMICOLON (;), there is a parse error.
 								 */
-								if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-								{
-									/*
+                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                                {
+                                    /*
 									 * If the entity is being consumed as part of an
 									 * attribute, and the last character matched is
 									 * not a U+003B SEMICOLON (;),
 									 */
-									char ch;
-									if (_strBufMark == _strBufLen)
-									{
-										ch = c;
-									}
-									else
-									{
-										// if (strBufOffset != -1) {
-										// ch = buf[strBufOffset + strBufMark];
-										// } else {
-										ch = _strBuf[_strBufMark];
-										// }
-									}
-									if (ch == '=' || (ch >= '0' && ch <= '9')
-											|| (ch >= 'A' && ch <= 'Z')
-											|| (ch >= 'a' && ch <= 'z'))
-									{
-										/*
+                                    char ch;
+                                    if (_strBufMark == _strBufLen)
+                                    {
+                                        ch = c;
+                                    }
+                                    else
+                                    {
+                                        // if (strBufOffset != -1) {
+                                        // ch = buf[strBufOffset + strBufMark];
+                                        // } else {
+                                        ch = _strBuf[_strBufMark];
+                                        // }
+                                    }
+                                    if (ch == '=' || (ch >= '0' && ch <= '9')
+                                        || (ch >= 'A' && ch <= 'Z')
+                                        || (ch >= 'a' && ch <= 'z'))
+                                    {
+                                        /*
 										 * and the next character is either a U+003D
 										 * EQUALS SIGN character (=) or in the range
 										 * U+0030 DIGIT ZERO to U+0039 DIGIT NINE,
@@ -3430,106 +3430,106 @@ namespace HtmlParserSharp.Portable.Core
 										 * after the U+0026 AMPERSAND (&) must be
 										 * unconsumed, and nothing is returned.
 										 */
-										ErrNoNamedCharacterMatch();
-										AppendStrBufToLongStrBuf();
-										state = Transition(state, returnState, reconsume, pos);
-										reconsume = true;
-										goto continueStateloop;
-									}
-								}
-								if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-								{
-									ErrUnescapedAmpersandInterpretedAsCharacterReference();
-								}
-								else
-								{
-									ErrNotSemicolonTerminated();
-								}
-							}
+                                        ErrNoNamedCharacterMatch();
+                                        AppendStrBufToLongStrBuf();
+                                        state = Transition(state, returnState, reconsume, pos);
+                                        reconsume = true;
+                                        goto continueStateloop;
+                                    }
+                                }
+                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                                {
+                                    ErrUnescapedAmpersandInterpretedAsCharacterReference();
+                                }
+                                else
+                                {
+                                    ErrNotSemicolonTerminated();
+                                }
+                            }
 
-							/*
+                            /*
 							 * Otherwise, return a character token for the character
 							 * corresponding to the entity name (as given by the
 							 * second column of the named character references
 							 * table).
 							 */
-							char[] val = NamedCharacters.VALUES[_candidate];
-							if (
-								// [NOCPP[
-							val.Length == 1
-								// ]NOCPP]
-								// CPPONLY: val[1] == 0
-							)
-							{
-								EmitOrAppendOne(val, returnState);
-							}
-							else
-							{
-								EmitOrAppendTwo(val, returnState);
-							}
-							// this is so complicated!
-							if (_strBufMark < _strBufLen)
-							{
-								// if (strBufOffset != -1) {
-								// if ((returnState & (~1)) != 0) {
-								// for (int i = strBufMark; i < strBufLen; i++) {
-								// appendLongStrBuf(buf[strBufOffset + i]);
-								// }
-								// } else {
-								// tokenHandler.Characters(buf, strBufOffset
-								// + strBufMark, strBufLen
-								// - strBufMark);
-								// }
-								// } else {
-								if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-								{
-									for (int i = _strBufMark; i < _strBufLen; i++)
-									{
-										AppendLongStrBuf(_strBuf[i]);
-									}
-								}
-								else
-								{
-									TokenHandler.Characters(_strBuf, _strBufMark,
-											_strBufLen - _strBufMark);
-								}
-								// }
-							}
-							if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-							{
-								_cstart = pos;
-							}
-							state = Transition(state, returnState, reconsume, pos);
-							reconsume = true;
-							goto continueStateloop;
-							/*
+                            char[] val = NamedCharacters.VALUES[_candidate];
+                            if (
+                                // [NOCPP[
+                                val.Length == 1
+                                // ]NOCPP]
+                                // CPPONLY: val[1] == 0
+                                )
+                            {
+                                EmitOrAppendOne(val, returnState);
+                            }
+                            else
+                            {
+                                EmitOrAppendTwo(val, returnState);
+                            }
+                            // this is so complicated!
+                            if (_strBufMark < _strBufLen)
+                            {
+                                // if (strBufOffset != -1) {
+                                // if ((returnState & (~1)) != 0) {
+                                // for (int i = strBufMark; i < strBufLen; i++) {
+                                // appendLongStrBuf(buf[strBufOffset + i]);
+                                // }
+                                // } else {
+                                // tokenHandler.Characters(buf, strBufOffset
+                                // + strBufMark, strBufLen
+                                // - strBufMark);
+                                // }
+                                // } else {
+                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                                {
+                                    for (int i = _strBufMark; i < _strBufLen; i++)
+                                    {
+                                        AppendLongStrBuf(_strBuf[i]);
+                                    }
+                                }
+                                else
+                                {
+                                    TokenHandler.Characters(_strBuf, _strBufMark,
+                                                            _strBufLen - _strBufMark);
+                                }
+                                // }
+                            }
+                            if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                            {
+                                _cstart = pos;
+                            }
+                            state = Transition(state, returnState, reconsume, pos);
+                            reconsume = true;
+                            goto continueStateloop;
+                            /*
 							 * If the markup contains I'm &notit; I tell you, the
 							 * entity is parsed as "not", as in, I'm Â¬it; I tell
 							 * you. But if the markup was I'm &notin; I tell you,
 							 * the entity would be parsed as "notin;", resulting in
 							 * I'm âˆ‰ I tell you.
 							 */
-						}
-					// XXX reorder point
-					case CONSUME_NCR:
-						if (++pos == endPos)
-						{
-							goto breakStateloop;
-						}
-						c = CheckChar(buf, pos);
-						_prevValue = -1;
-						_value = 0;
-						_seenDigits = false;
-						/*
+                        }
+                        // XXX reorder point
+                    case CONSUME_NCR:
+                        if (++pos == endPos)
+                        {
+                            goto breakStateloop;
+                        }
+                        c = CheckChar(buf, pos);
+                        _prevValue = -1;
+                        _value = 0;
+                        _seenDigits = false;
+                        /*
 						 * The behavior further depends on the character after the
 						 * U+0023 NUMBER SIGN:
 						 */
-						switch (c)
-						{
-							case 'x':
-							case 'X':
+                        switch (c)
+                        {
+                            case 'x':
+                            case 'X':
 
-								/*
+                                /*
 								 * U+0078 LATIN SMALL LETTER X U+0058 LATIN CAPITAL
 								 * LETTER X Consume the X.
 								 * 
@@ -3543,11 +3543,11 @@ namespace HtmlParserSharp.Portable.Core
 								 * When it comes to interpreting the number,
 								 * interpret it as a hexadecimal number.
 								 */
-								AppendStrBuf(c);
-								state = Transition(state, Tokenizer.HEX_NCR_LOOP, reconsume, pos);
-								goto continueStateloop;
-							default:
-								/*
+                                AppendStrBuf(c);
+                                state = Transition(state, HEX_NCR_LOOP, reconsume, pos);
+                                goto continueStateloop;
+                            default:
+                                /*
 								 * Anything else Follow the steps below, but using
 								 * the range of characters U+0030 DIGIT ZERO through
 								 * to U+0039 DIGIT NINE (i.e. just 0-9).
@@ -3555,76 +3555,76 @@ namespace HtmlParserSharp.Portable.Core
 								 * When it comes to interpreting the number,
 								 * interpret it as a decimal number.
 								 */
-								state = Transition(state, Tokenizer.DECIMAL_NRC_LOOP, reconsume, pos);
-								reconsume = true;
-								// FALL THROUGH goto continueStateloop;
-								break;
-						}
-						// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-						goto case DECIMAL_NRC_LOOP;
-					case DECIMAL_NRC_LOOP:
-						/*decimalloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							// Deal with overflow gracefully
-							if (_value < _prevValue)
-							{
-								_value = 0x110000; // Value above Unicode range but
-								// within int
-								// range
-							}
-							_prevValue = _value;
-							/*
+                                state = Transition(state, DECIMAL_NRC_LOOP, reconsume, pos);
+                                reconsume = true;
+                                // FALL THROUGH goto continueStateloop;
+                                break;
+                        }
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                        goto case DECIMAL_NRC_LOOP;
+                    case DECIMAL_NRC_LOOP:
+                        /*decimalloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            // Deal with overflow gracefully
+                            if (_value < _prevValue)
+                            {
+                                _value = 0x110000; // Value above Unicode range but
+                                // within int
+                                // range
+                            }
+                            _prevValue = _value;
+                            /*
 							 * Consume as many characters as match the range of
 							 * characters given above.
 							 */
-							if (c >= '0' && c <= '9')
-							{
-								_seenDigits = true;
-								_value *= 10;
-								_value += c - '0';
-								continue;
-							}
-							else if (c == ';')
-							{
-								if (_seenDigits)
-								{
-									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-									{
-										_cstart = pos + 1;
-									}
-									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
-									// FALL THROUGH goto continueStateloop;
-									goto breakDecimalloop;
-								}
-								else
-								{
-									ErrNoDigitsInNCR();
-									AppendStrBuf(';');
-									EmitOrAppendStrBuf(returnState);
-									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-									{
-										_cstart = pos + 1;
-									}
-									state = Transition(state, returnState, reconsume, pos);
-									goto continueStateloop;
-								}
-							}
-							else
-							{
-								/*
+                            if (c >= '0' && c <= '9')
+                            {
+                                _seenDigits = true;
+                                _value *= 10;
+                                _value += c - '0';
+                                continue;
+                            }
+                            else if (c == ';')
+                            {
+                                if (_seenDigits)
+                                {
+                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                    {
+                                        _cstart = pos + 1;
+                                    }
+                                    state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
+                                    // FALL THROUGH goto continueStateloop;
+                                    goto breakDecimalloop;
+                                }
+                                else
+                                {
+                                    ErrNoDigitsInNCR();
+                                    AppendStrBuf(';');
+                                    EmitOrAppendStrBuf(returnState);
+                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                    {
+                                        _cstart = pos + 1;
+                                    }
+                                    state = Transition(state, returnState, reconsume, pos);
+                                    goto continueStateloop;
+                                }
+                            }
+                            else
+                            {
+                                /*
 								 * If no characters match the range, then don't
 								 * consume any characters (and unconsume the U+0023
 								 * NUMBER SIGN character and, if appropriate, the X
@@ -3635,110 +3635,110 @@ namespace HtmlParserSharp.Portable.Core
 								 * SEMICOLON, consume that too. If it isn't, there
 								 * is a parse error.
 								 */
-								if (!_seenDigits)
-								{
-									ErrNoDigitsInNCR();
-									EmitOrAppendStrBuf(returnState);
-									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-									{
-										_cstart = pos;
-									}
-									state = Transition(state, returnState, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-								else
-								{
-									ErrCharRefLacksSemicolon();
-									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-									{
-										_cstart = pos;
-									}
-									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
-									reconsume = true;
-									// FALL THROUGH goto continueStateloop;
-									goto breakDecimalloop;
-								}
-							}
-						}
-					breakDecimalloop:
-						goto case HANDLE_NCR_VALUE;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case HANDLE_NCR_VALUE:
-						// WARNING previous state sets reconsume
-						// XXX inline this case if the method size can take it
-						HandleNcrValue(returnState);
-						state = Transition(state, returnState, reconsume, pos);
-						goto continueStateloop;
-					// XXX reorder point
-					case HEX_NCR_LOOP:
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							// Deal with overflow gracefully
-							if (_value < _prevValue)
-							{
-								_value = 0x110000; // Value above Unicode range but
-								// within int
-								// range
-							}
-							_prevValue = _value;
-							/*
+                                if (!_seenDigits)
+                                {
+                                    ErrNoDigitsInNCR();
+                                    EmitOrAppendStrBuf(returnState);
+                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                    {
+                                        _cstart = pos;
+                                    }
+                                    state = Transition(state, returnState, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                                else
+                                {
+                                    ErrCharRefLacksSemicolon();
+                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                    {
+                                        _cstart = pos;
+                                    }
+                                    state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
+                                    reconsume = true;
+                                    // FALL THROUGH goto continueStateloop;
+                                    goto breakDecimalloop;
+                                }
+                            }
+                        }
+                        breakDecimalloop:
+                        goto case HANDLE_NCR_VALUE;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case HANDLE_NCR_VALUE:
+                        // WARNING previous state sets reconsume
+                        // XXX inline this case if the method size can take it
+                        HandleNcrValue(returnState);
+                        state = Transition(state, returnState, reconsume, pos);
+                        goto continueStateloop;
+                        // XXX reorder point
+                    case HEX_NCR_LOOP:
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            // Deal with overflow gracefully
+                            if (_value < _prevValue)
+                            {
+                                _value = 0x110000; // Value above Unicode range but
+                                // within int
+                                // range
+                            }
+                            _prevValue = _value;
+                            /*
 							 * Consume as many characters as match the range of
 							 * characters given above.
 							 */
-							if (c >= '0' && c <= '9')
-							{
-								_seenDigits = true;
-								_value *= 16;
-								_value += c - '0';
-								continue;
-							}
-							else if (c >= 'A' && c <= 'F')
-							{
-								_seenDigits = true;
-								_value *= 16;
-								_value += c - 'A' + 10;
-								continue;
-							}
-							else if (c >= 'a' && c <= 'f')
-							{
-								_seenDigits = true;
-								_value *= 16;
-								_value += c - 'a' + 10;
-								continue;
-							}
-							else if (c == ';')
-							{
-								if (_seenDigits)
-								{
-									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-									{
-										_cstart = pos + 1;
-									}
-									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
-									goto continueStateloop;
-								}
-								else
-								{
-									ErrNoDigitsInNCR();
-									AppendStrBuf(';');
-									EmitOrAppendStrBuf(returnState);
-									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-									{
-										_cstart = pos + 1;
-									}
-									state = Transition(state, returnState, reconsume, pos);
-									goto continueStateloop;
-								}
-							}
-							else
-							{
-								/*
+                            if (c >= '0' && c <= '9')
+                            {
+                                _seenDigits = true;
+                                _value *= 16;
+                                _value += c - '0';
+                                continue;
+                            }
+                            else if (c >= 'A' && c <= 'F')
+                            {
+                                _seenDigits = true;
+                                _value *= 16;
+                                _value += c - 'A' + 10;
+                                continue;
+                            }
+                            else if (c >= 'a' && c <= 'f')
+                            {
+                                _seenDigits = true;
+                                _value *= 16;
+                                _value += c - 'a' + 10;
+                                continue;
+                            }
+                            else if (c == ';')
+                            {
+                                if (_seenDigits)
+                                {
+                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                    {
+                                        _cstart = pos + 1;
+                                    }
+                                    state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
+                                    goto continueStateloop;
+                                }
+                                else
+                                {
+                                    ErrNoDigitsInNCR();
+                                    AppendStrBuf(';');
+                                    EmitOrAppendStrBuf(returnState);
+                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                    {
+                                        _cstart = pos + 1;
+                                    }
+                                    state = Transition(state, returnState, reconsume, pos);
+                                    goto continueStateloop;
+                                }
+                            }
+                            else
+                            {
+                                /*
 								 * If no characters match the range, then don't
 								 * consume any characters (and unconsume the U+0023
 								 * NUMBER SIGN character and, if appropriate, the X
@@ -3749,391 +3749,391 @@ namespace HtmlParserSharp.Portable.Core
 								 * SEMICOLON, consume that too. If it isn't, there
 								 * is a parse error.
 								 */
-								if (!_seenDigits)
-								{
-									ErrNoDigitsInNCR();
-									EmitOrAppendStrBuf(returnState);
-									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-									{
-										_cstart = pos;
-									}
-									state = Transition(state, returnState, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-								else
-								{
-									ErrCharRefLacksSemicolon();
-									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-									{
-										_cstart = pos;
-									}
-									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-							}
-						}
-					// XXX reorder point
-					case PLAINTEXT:
-						/*plaintextloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							switch (c)
-							{
-								case '\u0000':
-									EmitPlaintextReplacementCharacter(buf, pos);
-									continue;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                if (!_seenDigits)
+                                {
+                                    ErrNoDigitsInNCR();
+                                    EmitOrAppendStrBuf(returnState);
+                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                    {
+                                        _cstart = pos;
+                                    }
+                                    state = Transition(state, returnState, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                                else
+                                {
+                                    ErrCharRefLacksSemicolon();
+                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+                                    {
+                                        _cstart = pos;
+                                    }
+                                    state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                            }
+                        }
+                        // XXX reorder point
+                    case PLAINTEXT:
+                        /*plaintextloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            switch (c)
+                            {
+                                case '\u0000':
+                                    EmitPlaintextReplacementCharacter(buf, pos);
+                                    continue;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Emit the current input
 									 * character as a character token. Stay in the
 									 * RAWTEXT state.
 									 */
-									continue;
-							}
-						}
-					// XXX reorder point
-					case CLOSE_TAG_OPEN:
-						if (++pos == endPos)
-						{
-							goto breakStateloop;
-						}
-						c = CheckChar(buf, pos);
-						/*
+                                    continue;
+                            }
+                        }
+                        // XXX reorder point
+                    case CLOSE_TAG_OPEN:
+                        if (++pos == endPos)
+                        {
+                            goto breakStateloop;
+                        }
+                        c = CheckChar(buf, pos);
+                        /*
 						 * Otherwise, if the content model flag is set to the PCDATA
 						 * state, or if the next few characters do match that tag
 						 * name, consume the next input character:
 						 */
-						switch (c)
-						{
-							case '>':
-								/* U+003E GREATER-THAN SIGN (>) Parse error. */
-								ErrLtSlashGt();
-								/*
+                        switch (c)
+                        {
+                            case '>':
+                                /* U+003E GREATER-THAN SIGN (>) Parse error. */
+                                ErrLtSlashGt();
+                                /*
 								 * Switch to the data state.
 								 */
-								_cstart = pos + 1;
-								state = Transition(state, Tokenizer.DATA, reconsume, pos);
-								goto continueStateloop;
-							case '\r':
-								SilentCarriageReturn();
-								/* Anything else Parse error. */
-								ErrGarbageAfterLtSlash();
-								/*
+                                _cstart = pos + 1;
+                                state = Transition(state, DATA, reconsume, pos);
+                                goto continueStateloop;
+                            case '\r':
+                                SilentCarriageReturn();
+                                /* Anything else Parse error. */
+                                ErrGarbageAfterLtSlash();
+                                /*
 								 * Switch to the bogus comment state.
 								 */
-								ClearLongStrBufAndAppend('\n');
-								state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-								goto breakStateloop;
-							case '\n':
-								SilentLineFeed();
-								/* Anything else Parse error. */
-								ErrGarbageAfterLtSlash();
-								/*
+                                ClearLongStrBufAndAppend('\n');
+                                state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                goto breakStateloop;
+                            case '\n':
+                                SilentLineFeed();
+                                /* Anything else Parse error. */
+                                ErrGarbageAfterLtSlash();
+                                /*
 								 * Switch to the bogus comment state.
 								 */
-								ClearLongStrBufAndAppend('\n');
-								state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-								goto continueStateloop;
-							case '\u0000':
-								c = '\uFFFD';
-								// fall thru
-								goto default;
-							default:
-								if (c >= 'A' && c <= 'Z')
-								{
-									c += (char)0x20;
-								}
-								if (c >= 'a' && c <= 'z')
-								{
-									/*
+                                ClearLongStrBufAndAppend('\n');
+                                state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                goto continueStateloop;
+                            case '\u0000':
+                                c = '\uFFFD';
+                                // fall thru
+                                goto default;
+                            default:
+                                if (c >= 'A' && c <= 'Z')
+                                {
+                                    c += (char) 0x20;
+                                }
+                                if (c >= 'a' && c <= 'z')
+                                {
+                                    /*
 									 * U+0061 LATIN SMALL LETTER A through to U+007A
 									 * LATIN SMALL LETTER Z Create a new end tag
 									 * token,
 									 */
-									_endTag = true;
-									/*
+                                    _endTag = true;
+                                    /*
 									 * set its tag name to the input character,
 									 */
-									ClearStrBufAndAppend(c);
-									/*
+                                    ClearStrBufAndAppend(c);
+                                    /*
 									 * then switch to the tag name state. (Don't
 									 * emit the token yet; further details will be
 									 * filled in before it is emitted.)
 									 */
-									state = Transition(state, Tokenizer.TAG_NAME, reconsume, pos);
-									goto continueStateloop;
-								}
-								else
-								{
-									/* Anything else Parse error. */
-									ErrGarbageAfterLtSlash();
-									/*
+                                    state = Transition(state, TAG_NAME, reconsume, pos);
+                                    goto continueStateloop;
+                                }
+                                else
+                                {
+                                    /* Anything else Parse error. */
+                                    ErrGarbageAfterLtSlash();
+                                    /*
 									 * Switch to the bogus comment state.
 									 */
-									ClearLongStrBufAndAppend(c);
-									state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-									goto continueStateloop;
-								}
-						}
-					// XXX reorder point
-					case RCDATA:
-						/*rcdataloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							switch (c)
-							{
-								case '&':
-									/*
+                                    ClearLongStrBufAndAppend(c);
+                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                    goto continueStateloop;
+                                }
+                        }
+                        // XXX reorder point
+                    case RCDATA:
+                        /*rcdataloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            switch (c)
+                            {
+                                case '&':
+                                    /*
 									 * U+0026 AMPERSAND (&) Switch to the character
 									 * reference in RCDATA state.
 									 */
-									FlushChars(buf, pos);
-									ClearStrBufAndAppend(c);
-									_additional = '\u0000';
-									returnState = state;
-									state = Transition(state, Tokenizer.CONSUME_CHARACTER_REFERENCE, reconsume, pos);
-									goto continueStateloop;
-								case '<':
-									/*
+                                    FlushChars(buf, pos);
+                                    ClearStrBufAndAppend(c);
+                                    _additional = '\u0000';
+                                    returnState = state;
+                                    state = Transition(state, CONSUME_CHARACTER_REFERENCE, reconsume, pos);
+                                    goto continueStateloop;
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Switch to the
 									 * RCDATA less-than sign state.
 									 */
-									FlushChars(buf, pos);
+                                    FlushChars(buf, pos);
 
-									returnState = state;
-									state = Transition(state, Tokenizer.RAWTEXT_RCDATA_LESS_THAN_SIGN, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									continue;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    returnState = state;
+                                    state = Transition(state, RAWTEXT_RCDATA_LESS_THAN_SIGN, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    continue;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Emit the current input character as a
 									 * character token. Stay in the RCDATA state.
 									 */
-									continue;
-							}
-						}
-					// XXX reorder point
-					case RAWTEXT:
-						/*rawtextloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							switch (c)
-							{
-								case '<':
-									/*
+                                    continue;
+                            }
+                        }
+                        // XXX reorder point
+                    case RAWTEXT:
+                        /*rawtextloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            switch (c)
+                            {
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Switch to the
 									 * RAWTEXT less-than sign state.
 									 */
-									FlushChars(buf, pos);
+                                    FlushChars(buf, pos);
 
-									returnState = state;
-									state = Transition(state, Tokenizer.RAWTEXT_RCDATA_LESS_THAN_SIGN, reconsume, pos);
-									goto breakRawtextloop;
-								// FALL THRU goto continueStateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									continue;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    returnState = state;
+                                    state = Transition(state, RAWTEXT_RCDATA_LESS_THAN_SIGN, reconsume, pos);
+                                    goto breakRawtextloop;
+                                    // FALL THRU goto continueStateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    continue;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Emit the current input character as a
 									 * character token. Stay in the RAWTEXT state.
 									 */
-									continue;
-							}
-						}
-					breakRawtextloop:
-						goto case RAWTEXT_RCDATA_LESS_THAN_SIGN;
-					// XXX fallthru don't reorder
-					case RAWTEXT_RCDATA_LESS_THAN_SIGN:
-						/*rawtextrcdatalessthansignloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							switch (c)
-							{
-								case '/':
-									/*
+                                    continue;
+                            }
+                        }
+                        breakRawtextloop:
+                        goto case RAWTEXT_RCDATA_LESS_THAN_SIGN;
+                        // XXX fallthru don't reorder
+                    case RAWTEXT_RCDATA_LESS_THAN_SIGN:
+                        /*rawtextrcdatalessthansignloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            switch (c)
+                            {
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Set the temporary buffer
 									 * to the empty string. Switch to the script
 									 * data end tag open state.
 									 */
-									_index = 0;
-									ClearStrBuf();
-									state = Transition(state, Tokenizer.NON_DATA_END_TAG_NAME, reconsume, pos);
-									goto breakRawtextrcdatalessthansignloop;
-								// FALL THRU goto continueStateloop;
-								default:
-									/*
+                                    _index = 0;
+                                    ClearStrBuf();
+                                    state = Transition(state, NON_DATA_END_TAG_NAME, reconsume, pos);
+                                    goto breakRawtextrcdatalessthansignloop;
+                                    // FALL THRU goto continueStateloop;
+                                default:
+                                    /*
 									 * Otherwise, emit a U+003C LESS-THAN SIGN
 									 * character token
 									 */
-									TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-									/*
+                                    TokenHandler.Characters(LT_GT, 0, 1);
+                                    /*
 									 * and reconsume the current input character in
 									 * the data state.
 									 */
-									_cstart = pos;
-									state = Transition(state, returnState, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-							}
-						}
-					breakRawtextrcdatalessthansignloop:
-						goto case NON_DATA_END_TAG_NAME;
-					// XXX fall thru. don't reorder.
-					case NON_DATA_END_TAG_NAME:
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    _cstart = pos;
+                                    state = Transition(state, returnState, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakRawtextrcdatalessthansignloop:
+                        goto case NON_DATA_END_TAG_NAME;
+                        // XXX fall thru. don't reorder.
+                    case NON_DATA_END_TAG_NAME:
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * ASSERT! when entering this state, set index to 0 and
 							 * call clearStrBuf() assert (contentModelElement !=
 							 * null); Let's implement the above without lookahead.
 							 * strBuf is the 'temporary buffer'.
 							 */
-							if (_index < _endTagExpectationAsArray.Length)
-							{
-								char e = _endTagExpectationAsArray[_index];
-								char folded = c;
-								if (c >= 'A' && c <= 'Z')
-								{
-									folded += (char)0x20;
-								}
-								if (folded != e)
-								{
-									// [NOCPP[
-									ErrHtml4LtSlashInRcdata(folded);
-									// ]NOCPP]
-									TokenHandler.Characters(Tokenizer.LT_SOLIDUS,
-											0, 2);
-									EmitStrBuf();
-									_cstart = pos;
-									state = Transition(state, returnState, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-								AppendStrBuf(c);
-								_index++;
-								continue;
-							}
-							else
-							{
-								_endTag = true;
-								// XXX replace contentModelElement with different
-								// type
-								_tagName = _endTagExpectation;
-								switch (c)
-								{
-									case '\r':
-										SilentCarriageReturn();
-										state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-										goto breakStateloop;
-									case '\n':
-										SilentLineFeed();
-										goto case ' ';
-									// fall thru
-									case ' ':
-									case '\t':
-									case '\u000C':
-										/*
+                            if (_index < _endTagExpectationAsArray.Length)
+                            {
+                                char e = _endTagExpectationAsArray[_index];
+                                char folded = c;
+                                if (c >= 'A' && c <= 'Z')
+                                {
+                                    folded += (char) 0x20;
+                                }
+                                if (folded != e)
+                                {
+                                    // [NOCPP[
+                                    ErrHtml4LtSlashInRcdata(folded);
+                                    // ]NOCPP]
+                                    TokenHandler.Characters(LT_SOLIDUS,
+                                                            0, 2);
+                                    EmitStrBuf();
+                                    _cstart = pos;
+                                    state = Transition(state, returnState, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                                AppendStrBuf(c);
+                                _index++;
+                                continue;
+                            }
+                            else
+                            {
+                                _endTag = true;
+                                // XXX replace contentModelElement with different
+                                // type
+                                _tagName = _endTagExpectation;
+                                switch (c)
+                                {
+                                    case '\r':
+                                        SilentCarriageReturn();
+                                        state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                        goto breakStateloop;
+                                    case '\n':
+                                        SilentLineFeed();
+                                        goto case ' ';
+                                        // fall thru
+                                    case ' ':
+                                    case '\t':
+                                    case '\u000C':
+                                        /*
 										 * U+0009 CHARACTER TABULATION U+000A LINE
 										 * FEED (LF) U+000C FORM FEED (FF) U+0020
 										 * SPACE If the current end tag token is an
 										 * appropriate end tag token, then switch to
 										 * the before attribute name state.
 										 */
-										state = Transition(state, Tokenizer.BEFORE_ATTRIBUTE_NAME, reconsume, pos);
-										goto continueStateloop;
-									case '/':
-										/*
+                                        state = Transition(state, BEFORE_ATTRIBUTE_NAME, reconsume, pos);
+                                        goto continueStateloop;
+                                    case '/':
+                                        /*
 										 * U+002F SOLIDUS (/) If the current end tag
 										 * token is an appropriate end tag token,
 										 * then switch to the self-closing start tag
 										 * state.
 										 */
-										state = Transition(state, Tokenizer.SELF_CLOSING_START_TAG, reconsume, pos);
-										goto continueStateloop;
-									case '>':
-										/*
+                                        state = Transition(state, SELF_CLOSING_START_TAG, reconsume, pos);
+                                        goto continueStateloop;
+                                    case '>':
+                                        /*
 										 * U+003E GREATER-THAN SIGN (>) If the
 										 * current end tag token is an appropriate
 										 * end tag token, then emit the current tag
 										 * token and switch to the data state.
 										 */
-										state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-										if (_shouldSuspend)
-										{
-											goto breakStateloop;
-										}
-										goto continueStateloop;
-									default:
-										/*
+                                        state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
+                                        if (_shouldSuspend)
+                                        {
+                                            goto breakStateloop;
+                                        }
+                                        goto continueStateloop;
+                                    default:
+                                        /*
 										 * Emit a U+003C LESS-THAN SIGN character
 										 * token, a U+002F SOLIDUS character token,
 										 * a character token for each of the
@@ -4142,45 +4142,45 @@ namespace HtmlParserSharp.Portable.Core
 										 * and reconsume the current input character
 										 * in the RAWTEXT state.
 										 */
-										// [NOCPP[
-										ErrWarnLtSlashInRcdata();
-										// ]NOCPP]
-										TokenHandler.Characters(
-												Tokenizer.LT_SOLIDUS, 0, 2);
-										EmitStrBuf();
-										if (c == '\u0000')
-										{
-											EmitReplacementCharacter(buf, pos);
-										}
-										else
-										{
-											_cstart = pos; // don't drop the
-											// character
-										}
-										state = Transition(state, returnState, reconsume, pos);
-										goto continueStateloop;
-								}
-							}
-						}
-					// XXX reorder point
-					// BEGIN HOTSPOT WORKAROUND
-					case BOGUS_COMMENT:
-						/*boguscommentloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                                        // [NOCPP[
+                                        ErrWarnLtSlashInRcdata();
+                                        // ]NOCPP]
+                                        TokenHandler.Characters(
+                                            LT_SOLIDUS, 0, 2);
+                                        EmitStrBuf();
+                                        if (c == '\u0000')
+                                        {
+                                            EmitReplacementCharacter(buf, pos);
+                                        }
+                                        else
+                                        {
+                                            _cstart = pos; // don't drop the
+                                            // character
+                                        }
+                                        state = Transition(state, returnState, reconsume, pos);
+                                        goto continueStateloop;
+                                }
+                            }
+                        }
+                        // XXX reorder point
+                        // BEGIN HOTSPOT WORKAROUND
+                    case BOGUS_COMMENT:
+                        /*boguscommentloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume every character up to and including the first
 							 * U+003E GREATER-THAN SIGN character (>) or the end of
 							 * the file (EOF), whichever comes first. Emit a comment
@@ -4198,460 +4198,460 @@ namespace HtmlParserSharp.Portable.Core
 							 * If the end of the file was reached, reconsume the EOF
 							 * character.
 							 */
-							switch (c)
-							{
-								case '>':
-									EmitComment(0, pos);
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '-':
-									AppendLongStrBuf(c);
-									state = Transition(state, Tokenizer.BOGUS_COMMENT_HYPHEN, reconsume, pos);
-									goto breakBoguscommentloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									continue;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									AppendLongStrBuf(c);
-									continue;
-							}
-						}
-					breakBoguscommentloop:
-						goto case BOGUS_COMMENT_HYPHEN;
-					// FALLTHRU DON'T REORDER
-					case BOGUS_COMMENT_HYPHEN:
-						/*boguscommenthyphenloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							switch (c)
-							{
-								case '>':
-									// [NOCPP[
-									MaybeAppendSpaceToBogusComment();
-									// ]NOCPP]
-									EmitComment(0, pos);
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '-':
-									AppendSecondHyphenToBogusComment();
-									goto continueBoguscommenthyphenloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									AppendLongStrBuf(c);
-									state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-									goto continueStateloop;
-							}
-						continueBoguscommenthyphenloop:
-							continue;
-						}
+                            switch (c)
+                            {
+                                case '>':
+                                    EmitComment(0, pos);
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '-':
+                                    AppendLongStrBuf(c);
+                                    state = Transition(state, BOGUS_COMMENT_HYPHEN, reconsume, pos);
+                                    goto breakBoguscommentloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    continue;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    AppendLongStrBuf(c);
+                                    continue;
+                            }
+                        }
+                        breakBoguscommentloop:
+                        goto case BOGUS_COMMENT_HYPHEN;
+                        // FALLTHRU DON'T REORDER
+                    case BOGUS_COMMENT_HYPHEN:
+                        /*boguscommenthyphenloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            switch (c)
+                            {
+                                case '>':
+                                    // [NOCPP[
+                                    MaybeAppendSpaceToBogusComment();
+                                    // ]NOCPP]
+                                    EmitComment(0, pos);
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '-':
+                                    AppendSecondHyphenToBogusComment();
+                                    goto continueBoguscommenthyphenloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    AppendLongStrBuf(c);
+                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                            continueBoguscommenthyphenloop:
+                            continue;
+                        }
 
-					// XXX reorder point
-					case SCRIPT_DATA:
-						/*scriptdataloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							switch (c)
-							{
-								case '<':
-									/*
+                        // XXX reorder point
+                    case SCRIPT_DATA:
+                        /*scriptdataloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            switch (c)
+                            {
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Switch to the
 									 * script data less-than sign state.
 									 */
-									FlushChars(buf, pos);
-									returnState = state;
-									state = Transition(state, Tokenizer.SCRIPT_DATA_LESS_THAN_SIGN, reconsume, pos);
-									goto breakScriptdataloop; // FALL THRU continue
-								// stateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									continue;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    FlushChars(buf, pos);
+                                    returnState = state;
+                                    state = Transition(state, SCRIPT_DATA_LESS_THAN_SIGN, reconsume, pos);
+                                    goto breakScriptdataloop; // FALL THRU continue
+                                    // stateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    continue;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Emit the current input
 									 * character as a character token. Stay in the
 									 * script data state.
 									 */
-									continue;
-							}
-						}
-					breakScriptdataloop:
-						goto case SCRIPT_DATA_LESS_THAN_SIGN;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_LESS_THAN_SIGN:
-						/*scriptdatalessthansignloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							switch (c)
-							{
-								case '/':
-									/*
+                                    continue;
+                            }
+                        }
+                        breakScriptdataloop:
+                        goto case SCRIPT_DATA_LESS_THAN_SIGN;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_LESS_THAN_SIGN:
+                        /*scriptdatalessthansignloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            switch (c)
+                            {
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Set the temporary buffer
 									 * to the empty string. Switch to the script
 									 * data end tag open state.
 									 */
-									_index = 0;
-									ClearStrBuf();
-									state = Transition(state, Tokenizer.NON_DATA_END_TAG_NAME, reconsume, pos);
-									goto continueStateloop;
-								case '!':
-									TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-									_cstart = pos;
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPE_START, reconsume, pos);
-									goto breakScriptdatalessthansignloop; // FALL THRU
-								// continue
-								// stateloop;
-								default:
-									/*
+                                    _index = 0;
+                                    ClearStrBuf();
+                                    state = Transition(state, NON_DATA_END_TAG_NAME, reconsume, pos);
+                                    goto continueStateloop;
+                                case '!':
+                                    TokenHandler.Characters(LT_GT, 0, 1);
+                                    _cstart = pos;
+                                    state = Transition(state, SCRIPT_DATA_ESCAPE_START, reconsume, pos);
+                                    goto breakScriptdatalessthansignloop; // FALL THRU
+                                    // continue
+                                    // stateloop;
+                                default:
+                                    /*
 									 * Otherwise, emit a U+003C LESS-THAN SIGN
 									 * character token
 									 */
-									TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-									/*
+                                    TokenHandler.Characters(LT_GT, 0, 1);
+                                    /*
 									 * and reconsume the current input character in
 									 * the data state.
 									 */
-									_cstart = pos;
-									state = Transition(state, Tokenizer.SCRIPT_DATA, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-							}
-						}
-					breakScriptdatalessthansignloop:
-						goto case SCRIPT_DATA_ESCAPE_START;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_ESCAPE_START:
-						/*scriptdataescapestartloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    _cstart = pos;
+                                    state = Transition(state, SCRIPT_DATA, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakScriptdatalessthansignloop:
+                        goto case SCRIPT_DATA_ESCAPE_START;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_ESCAPE_START:
+                        /*scriptdataescapestartloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Emit a U+002D
 									 * HYPHEN-MINUS character token. Switch to the
 									 * script data escape start dash state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPE_START_DASH, reconsume, pos);
-									goto breakScriptdataescapestartloop; // FALL THRU
-								// continue
-								// stateloop;
-								default:
-									/*
+                                    state = Transition(state, SCRIPT_DATA_ESCAPE_START_DASH, reconsume, pos);
+                                    goto breakScriptdataescapestartloop; // FALL THRU
+                                    // continue
+                                    // stateloop;
+                                default:
+                                    /*
 									 * Anything else Reconsume the current input
 									 * character in the script data state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-							}
-						}
-					breakScriptdataescapestartloop:
-						goto case SCRIPT_DATA_ESCAPE_START_DASH;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_ESCAPE_START_DASH:
-						/*scriptdataescapestartdashloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, SCRIPT_DATA, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakScriptdataescapestartloop:
+                        goto case SCRIPT_DATA_ESCAPE_START_DASH;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_ESCAPE_START_DASH:
+                        /*scriptdataescapestartdashloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Emit a U+002D
 									 * HYPHEN-MINUS character token. Switch to the
 									 * script data escaped dash dash state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED_DASH_DASH, reconsume, pos);
-									goto breakScriptdataescapestartdashloop;
-								// goto continueStateloop;
-								default:
-									/*
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED_DASH_DASH, reconsume, pos);
+                                    goto breakScriptdataescapestartdashloop;
+                                    // goto continueStateloop;
+                                default:
+                                    /*
 									 * Anything else Reconsume the current input
 									 * character in the script data state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-							}
-						}
-					breakScriptdataescapestartdashloop:
-						goto case SCRIPT_DATA_ESCAPED_DASH_DASH;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_ESCAPED_DASH_DASH:
-						/*scriptdataescapeddashdashloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, SCRIPT_DATA, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakScriptdataescapestartdashloop:
+                        goto case SCRIPT_DATA_ESCAPED_DASH_DASH;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_ESCAPED_DASH_DASH:
+                        /*scriptdataescapeddashdashloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Emit a U+002D
 									 * HYPHEN-MINUS character token. Stay in the
 									 * script data escaped dash dash state.
 									 */
-									continue;
-								case '<':
-									/*
+                                    continue;
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Switch to the
 									 * script data escaped less-than sign state.
 									 */
-									FlushChars(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/*
+                                    FlushChars(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit a U+003E
 									 * GREATER-THAN SIGN character token. Switch to
 									 * the script data state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto breakScriptdataescapeddashdashloop;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, SCRIPT_DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto breakScriptdataescapeddashdashloop;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Emit the current input
 									 * character as a character token. Switch to the
 									 * script data escaped state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto breakScriptdataescapeddashdashloop;
-								// goto continueStateloop;
-							}
-						}
-					breakScriptdataescapeddashdashloop:
-						goto case SCRIPT_DATA_ESCAPED;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_ESCAPED:
-						/*scriptdataescapedloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto breakScriptdataescapeddashdashloop;
+                                    // goto continueStateloop;
+                            }
+                        }
+                        breakScriptdataescapeddashdashloop:
+                        goto case SCRIPT_DATA_ESCAPED;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_ESCAPED:
+                        /*scriptdataescapedloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Emit a U+002D
 									 * HYPHEN-MINUS character token. Switch to the
 									 * script data escaped dash state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED_DASH, reconsume, pos);
-									goto breakScriptdataescapedloop; // FALL THRU
-								// continue
-								// stateloop;
-								case '<':
-									/*
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED_DASH, reconsume, pos);
+                                    goto breakScriptdataescapedloop; // FALL THRU
+                                    // continue
+                                    // stateloop;
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Switch to the
 									 * script data escaped less-than sign state.
 									 */
-									FlushChars(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									continue;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    FlushChars(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    continue;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Emit the current input
 									 * character as a character token. Stay in the
 									 * script data escaped state.
 									 */
-									continue;
-							}
-						}
-					breakScriptdataescapedloop:
-						goto case SCRIPT_DATA_ESCAPED_DASH;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_ESCAPED_DASH:
-						/*scriptdataescapeddashloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        breakScriptdataescapedloop:
+                        goto case SCRIPT_DATA_ESCAPED_DASH;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_ESCAPED_DASH:
+                        /*scriptdataescapeddashloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Emit a U+002D
 									 * HYPHEN-MINUS character token. Switch to the
 									 * script data escaped dash dash state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED_DASH_DASH, reconsume, pos);
-									goto continueStateloop;
-								case '<':
-									/*
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED_DASH_DASH, reconsume, pos);
+                                    goto continueStateloop;
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Switch to the
 									 * script data escaped less-than sign state.
 									 */
-									FlushChars(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
-									goto breakScriptdataescapeddashloop;
-								// goto continueStateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    FlushChars(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
+                                    goto breakScriptdataescapeddashloop;
+                                    // goto continueStateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Emit the current input
 									 * character as a character token. Switch to the
 									 * script data escaped state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakScriptdataescapeddashloop:
-						goto case SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN:
-						/*scriptdataescapedlessthanloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakScriptdataescapeddashloop:
+                        goto case SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN:
+                        /*scriptdataescapedlessthanloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '/':
-									/*
+                            switch (c)
+                            {
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Set the temporary buffer
 									 * to the empty string. Switch to the script
 									 * data escaped end tag open state.
 									 */
-									_index = 0;
-									ClearStrBuf();
-									returnState = Tokenizer.SCRIPT_DATA_ESCAPED;
-									state = Transition(state, Tokenizer.NON_DATA_END_TAG_NAME, reconsume, pos);
-									goto continueStateloop;
-								case 'S':
-								case 's':
-									/*
+                                    _index = 0;
+                                    ClearStrBuf();
+                                    returnState = SCRIPT_DATA_ESCAPED;
+                                    state = Transition(state, NON_DATA_END_TAG_NAME, reconsume, pos);
+                                    goto continueStateloop;
+                                case 'S':
+                                case 's':
+                                    /*
 									 * U+0041 LATIN CAPITAL LETTER A through to
 									 * U+005A LATIN CAPITAL LETTER Z Emit a U+003C
 									 * LESS-THAN SIGN character token and the
 									 * current input character as a character token.
 									 */
-									TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-									_cstart = pos;
-									_index = 1;
-									/*
+                                    TokenHandler.Characters(LT_GT, 0, 1);
+                                    _cstart = pos;
+                                    _index = 1;
+                                    /*
 									 * Set the temporary buffer to the empty string.
 									 * Append the lowercase version of the current
 									 * input character (add 0x0020 to the
@@ -4659,67 +4659,68 @@ namespace HtmlParserSharp.Portable.Core
 									 * buffer. Switch to the script data double
 									 * escape start state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPE_START, reconsume, pos);
-									goto breakScriptdataescapedlessthanloop;
-								// goto continueStateloop;
-								default:
-									/*
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPE_START, reconsume, pos);
+                                    goto breakScriptdataescapedlessthanloop;
+                                    // goto continueStateloop;
+                                default:
+                                    /*
 									 * Anything else Emit a U+003C LESS-THAN SIGN
 									 * character token and reconsume the current
 									 * input character in the script data escaped
 									 * state.
 									 */
-									TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-									_cstart = pos;
-									reconsume = true;
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakScriptdataescapedlessthanloop:
-						goto case SCRIPT_DATA_DOUBLE_ESCAPE_START;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_DOUBLE_ESCAPE_START:
-						/*scriptdatadoubleescapestartloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							Debug.Assert(_index > 0);
-							if (_index < 6)
-							{ // SCRIPT_ARR.Length
-								char folded = c;
-								if (c >= 'A' && c <= 'Z')
-								{
-									folded += (char)0x20;
-								}
-								if (folded != Tokenizer.SCRIPT_ARR[_index])
-								{
-									reconsume = true;
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-								}
-								_index++;
-								continue;
-							}
-							switch (c)
-							{
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-								case '/':
-								case '>':
-									/*
+                                    TokenHandler.Characters(LT_GT, 0, 1);
+                                    _cstart = pos;
+                                    reconsume = true;
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakScriptdataescapedlessthanloop:
+                        goto case SCRIPT_DATA_DOUBLE_ESCAPE_START;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_DOUBLE_ESCAPE_START:
+                        /*scriptdatadoubleescapestartloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            Debug.Assert(_index > 0);
+                            if (_index < 6)
+                            {
+                                // SCRIPT_ARR.Length
+                                char folded = c;
+                                if (c >= 'A' && c <= 'Z')
+                                {
+                                    folded += (char) 0x20;
+                                }
+                                if (folded != SCRIPT_ARR[_index])
+                                {
+                                    reconsume = true;
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                                }
+                                _index++;
+                                continue;
+                            }
+                            switch (c)
+                            {
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                case '/':
+                                case '>':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * U+002F SOLIDUS (/) U+003E GREATER-THAN SIGN
@@ -4728,279 +4729,280 @@ namespace HtmlParserSharp.Portable.Core
 									 * the string "script", then switch to the
 									 * script data double escaped state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto breakScriptdatadoubleescapestartloop;
-								// goto continueStateloop;
-								default:
-									/*
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto breakScriptdatadoubleescapestartloop;
+                                    // goto continueStateloop;
+                                default:
+                                    /*
 									 * Anything else Reconsume the current input
 									 * character in the script data escaped state.
 									 */
-									reconsume = true;
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakScriptdatadoubleescapestartloop:
-						goto case SCRIPT_DATA_DOUBLE_ESCAPED;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_DOUBLE_ESCAPED:
-						/*scriptdatadoubleescapedloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                                    reconsume = true;
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakScriptdatadoubleescapestartloop:
+                        goto case SCRIPT_DATA_DOUBLE_ESCAPED;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_DOUBLE_ESCAPED:
+                        /*scriptdatadoubleescapedloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Emit a U+002D
 									 * HYPHEN-MINUS character token. Switch to the
 									 * script data double escaped dash state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED_DASH, reconsume, pos);
-									goto breakScriptdatadoubleescapedloop; // FALL THRU
-								// continue
-								// stateloop;
-								case '<':
-									/*
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED_DASH, reconsume, pos);
+                                    goto breakScriptdatadoubleescapedloop; // FALL THRU
+                                    // continue
+                                    // stateloop;
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Emit a U+003C
 									 * LESS-THAN SIGN character token. Switch to the
 									 * script data double escaped less-than sign
 									 * state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									continue;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    continue;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Emit the current input
 									 * character as a character token. Stay in the
 									 * script data double escaped state.
 									 */
-									continue;
-							}
-						}
-					breakScriptdatadoubleescapedloop:
-						goto case SCRIPT_DATA_DOUBLE_ESCAPED_DASH;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_DOUBLE_ESCAPED_DASH:
-						/*scriptdatadoubleescapeddashloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        breakScriptdatadoubleescapedloop:
+                        goto case SCRIPT_DATA_DOUBLE_ESCAPED_DASH;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_DOUBLE_ESCAPED_DASH:
+                        /*scriptdatadoubleescapeddashloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Emit a U+002D
 									 * HYPHEN-MINUS character token. Switch to the
 									 * script data double escaped dash dash state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH, reconsume, pos);
-									goto breakScriptdatadoubleescapeddashloop;
-								// goto continueStateloop;
-								case '<':
-									/*
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH, reconsume, pos);
+                                    goto breakScriptdatadoubleescapeddashloop;
+                                    // goto continueStateloop;
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Emit a U+003C
 									 * LESS-THAN SIGN character token. Switch to the
 									 * script data double escaped less-than sign
 									 * state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Emit the current input
 									 * character as a character token. Switch to the
 									 * script data double escaped state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakScriptdatadoubleescapeddashloop:
-						goto case SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH:
-						/*scriptdatadoubleescapeddashdashloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakScriptdatadoubleescapeddashloop:
+                        goto case SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH:
+                        /*scriptdatadoubleescapeddashdashloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '-':
-									/*
+                            switch (c)
+                            {
+                                case '-':
+                                    /*
 									 * U+002D HYPHEN-MINUS (-) Emit a U+002D
 									 * HYPHEN-MINUS character token. Stay in the
 									 * script data double escaped dash dash state.
 									 */
-									continue;
-								case '<':
-									/*
+                                    continue;
+                                case '<':
+                                    /*
 									 * U+003C LESS-THAN SIGN (<) Emit a U+003C
 									 * LESS-THAN SIGN character token. Switch to the
 									 * script data double escaped less-than sign
 									 * state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
-									goto breakScriptdatadoubleescapeddashdashloop;
-								case '>':
-									/*
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN, reconsume, pos);
+                                    goto breakScriptdatadoubleescapeddashdashloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit a U+003E
 									 * GREATER-THAN SIGN character token. Switch to
 									 * the script data state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									EmitReplacementCharacter(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, SCRIPT_DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    EmitReplacementCharacter(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Emit the current input
 									 * character as a character token. Switch to the
 									 * script data double escaped state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakScriptdatadoubleescapeddashdashloop:
-						goto case SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN:
-						/*scriptdatadoubleescapedlessthanloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakScriptdatadoubleescapeddashdashloop:
+                        goto case SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_DOUBLE_ESCAPED_LESS_THAN_SIGN:
+                        /*scriptdatadoubleescapedlessthanloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '/':
-									/*
+                            switch (c)
+                            {
+                                case '/':
+                                    /*
 									 * U+002F SOLIDUS (/) Emit a U+002F SOLIDUS
 									 * character token. Set the temporary buffer to
 									 * the empty string. Switch to the script data
 									 * double escape end state.
 									 */
-									_index = 0;
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPE_END, reconsume, pos);
-									goto breakScriptdatadoubleescapedlessthanloop;
-								default:
-									/*
+                                    _index = 0;
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPE_END, reconsume, pos);
+                                    goto breakScriptdatadoubleescapedlessthanloop;
+                                default:
+                                    /*
 									 * Anything else Reconsume the current input
 									 * character in the script data double escaped
 									 * state.
 									 */
-									reconsume = true;
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakScriptdatadoubleescapedlessthanloop:
-						goto case SCRIPT_DATA_DOUBLE_ESCAPE_END;
-					// WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
-					case SCRIPT_DATA_DOUBLE_ESCAPE_END:
-						/*scriptdatadoubleescapeendloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							if (_index < 6)
-							{ // SCRIPT_ARR.Length
-								char folded = c;
-								if (c >= 'A' && c <= 'Z')
-								{
-									folded += (char)0x20;
-								}
-								if (folded != Tokenizer.SCRIPT_ARR[_index])
-								{
-									reconsume = true;
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-								}
-								_index++;
-								continue;
-							}
-							switch (c)
-							{
-								case '\r':
-									EmitCarriageReturn(buf, pos);
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-								case '/':
-								case '>':
-									/*
+                                    reconsume = true;
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakScriptdatadoubleescapedlessthanloop:
+                        goto case SCRIPT_DATA_DOUBLE_ESCAPE_END;
+                        // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
+                    case SCRIPT_DATA_DOUBLE_ESCAPE_END:
+                        /*scriptdatadoubleescapeendloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            if (_index < 6)
+                            {
+                                // SCRIPT_ARR.Length
+                                char folded = c;
+                                if (c >= 'A' && c <= 'Z')
+                                {
+                                    folded += (char) 0x20;
+                                }
+                                if (folded != SCRIPT_ARR[_index])
+                                {
+                                    reconsume = true;
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                                }
+                                _index++;
+                                continue;
+                            }
+                            switch (c)
+                            {
+                                case '\r':
+                                    EmitCarriageReturn(buf, pos);
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                case '/':
+                                case '>':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * U+002F SOLIDUS (/) U+003E GREATER-THAN SIGN
@@ -5009,184 +5011,185 @@ namespace HtmlParserSharp.Portable.Core
 									 * the string "script", then switch to the
 									 * script data escaped state.
 									 */
-									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-								default:
-									/*
+                                    state = Transition(state, SCRIPT_DATA_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    /*
 									 * Reconsume the current input character in the
 									 * script data double escaped state.
 									 */
-									reconsume = true;
-									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
+                                    reconsume = true;
+                                    state = Transition(state, SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
 
-					// XXX reorder point
-					case MARKUP_DECLARATION_OCTYPE:
-						/*markupdeclarationdoctypeloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							if (_index < 6)
-							{ // OCTYPE.Length
-								char folded = c;
-								if (c >= 'A' && c <= 'Z')
-								{
-									folded += (char)0x20;
-								}
-								if (folded == Tokenizer.OCTYPE[_index])
-								{
-									AppendLongStrBuf(c);
-								}
-								else
-								{
-									ErrBogusComment();
-									state = Transition(state, Tokenizer.BOGUS_COMMENT, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-								_index++;
-								continue;
-							}
-							else
-							{
-								state = Transition(state, Tokenizer.DOCTYPE, reconsume, pos);
-								reconsume = true;
-								goto breakMarkupdeclarationdoctypeloop;
-								// goto continueStateloop;
-							}
-						}
-					breakMarkupdeclarationdoctypeloop:
-						goto case DOCTYPE;
-					// FALLTHRU DON'T REORDER
-					case DOCTYPE:
-						/*doctypeloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							InitDoctypeFields();
-							/*
+                        // XXX reorder point
+                    case MARKUP_DECLARATION_OCTYPE:
+                        /*markupdeclarationdoctypeloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            if (_index < 6)
+                            {
+                                // OCTYPE.Length
+                                char folded = c;
+                                if (c >= 'A' && c <= 'Z')
+                                {
+                                    folded += (char) 0x20;
+                                }
+                                if (folded == OCTYPE[_index])
+                                {
+                                    AppendLongStrBuf(c);
+                                }
+                                else
+                                {
+                                    ErrBogusComment();
+                                    state = Transition(state, BOGUS_COMMENT, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                                _index++;
+                                continue;
+                            }
+                            else
+                            {
+                                state = Transition(state, DOCTYPE, reconsume, pos);
+                                reconsume = true;
+                                goto breakMarkupdeclarationdoctypeloop;
+                                // goto continueStateloop;
+                            }
+                        }
+                        breakMarkupdeclarationdoctypeloop:
+                        goto case DOCTYPE;
+                        // FALLTHRU DON'T REORDER
+                    case DOCTYPE:
+                        /*doctypeloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            InitDoctypeFields();
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									state = Transition(state, Tokenizer.BEFORE_DOCTYPE_NAME, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto case ' ';
-								// fall thru
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    state = Transition(state, BEFORE_DOCTYPE_NAME, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto case ' ';
+                                    // fall thru
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * Switch to the before DOCTYPE name state.
 									 */
-									state = Transition(state, Tokenizer.BEFORE_DOCTYPE_NAME, reconsume, pos);
-									goto breakDoctypeloop;
-								// goto continueStateloop;
-								default:
-									/*
+                                    state = Transition(state, BEFORE_DOCTYPE_NAME, reconsume, pos);
+                                    goto breakDoctypeloop;
+                                    // goto continueStateloop;
+                                default:
+                                    /*
 									 * Anything else Parse error.
 									 */
-									ErrMissingSpaceBeforeDoctypeName();
-									/*
+                                    ErrMissingSpaceBeforeDoctypeName();
+                                    /*
 									 * Reconsume the current character in the before
 									 * DOCTYPE name state.
 									 */
-									state = Transition(state, Tokenizer.BEFORE_DOCTYPE_NAME, reconsume, pos);
-									reconsume = true;
-									goto breakDoctypeloop;
-								// goto continueStateloop;
-							}
-						}
-					breakDoctypeloop:
-						goto case BEFORE_DOCTYPE_NAME;
-					// FALLTHRU DON'T REORDER
-					case BEFORE_DOCTYPE_NAME:
-						/*beforedoctypenameloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                                    state = Transition(state, BEFORE_DOCTYPE_NAME, reconsume, pos);
+                                    reconsume = true;
+                                    goto breakDoctypeloop;
+                                    // goto continueStateloop;
+                            }
+                        }
+                        breakDoctypeloop:
+                        goto case BEFORE_DOCTYPE_NAME;
+                        // FALLTHRU DON'T REORDER
+                    case BEFORE_DOCTYPE_NAME:
+                        /*beforedoctypenameloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE Stay
 									 * in the before DOCTYPE name state.
 									 */
-									continue;
-								case '>':
-									/*
+                                    continue;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Parse error.
 									 */
-									ErrNamelessDoctype();
-									/*
+                                    ErrNamelessDoctype();
+                                    /*
 									 * Create a new DOCTYPE token. Set its
 									 * force-quirks flag to on.
 									 */
-									_forceQuirks = true;
-									/*
+                                    _forceQuirks = true;
+                                    /*
 									 * Emit the token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									if (c >= 'A' && c <= 'Z')
-									{
-										/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    if (c >= 'A' && c <= 'Z')
+                                    {
+                                        /*
 										 * U+0041 LATIN CAPITAL LETTER A through to
 										 * U+005A LATIN CAPITAL LETTER Z Create a
 										 * new DOCTYPE token. Set the token's name
@@ -5194,1789 +5197,1799 @@ namespace HtmlParserSharp.Portable.Core
 										 * character (add 0x0020 to the character's
 										 * code point).
 										 */
-										c += (char)0x20;
-									}
-									/* Anything else Create a new DOCTYPE token. */
-									/*
+                                        c += (char) 0x20;
+                                    }
+                                    /* Anything else Create a new DOCTYPE token. */
+                                    /*
 									 * Set the token's name name to the current
 									 * input character.
 									 */
-									ClearStrBufAndAppend(c);
-									/*
+                                    ClearStrBufAndAppend(c);
+                                    /*
 									 * Switch to the DOCTYPE name state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_NAME, reconsume, pos);
-									goto breakBeforedoctypenameloop;
-								// goto continueStateloop;
-							}
-						}
-					breakBeforedoctypenameloop:
-						goto case DOCTYPE_NAME;
-					// FALLTHRU DON'T REORDER
-					case DOCTYPE_NAME:
-						/*doctypenameloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, DOCTYPE_NAME, reconsume, pos);
+                                    goto breakBeforedoctypenameloop;
+                                    // goto continueStateloop;
+                            }
+                        }
+                        breakBeforedoctypenameloop:
+                        goto case DOCTYPE_NAME;
+                        // FALLTHRU DON'T REORDER
+                    case DOCTYPE_NAME:
+                        /*doctypenameloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									StrBufToDoctypeName();
-									state = Transition(state, Tokenizer.AFTER_DOCTYPE_NAME, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    StrBufToDoctypeName();
+                                    state = Transition(state, AFTER_DOCTYPE_NAME, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * Switch to the after DOCTYPE name state.
 									 */
-									StrBufToDoctypeName();
-									state = Transition(state, Tokenizer.AFTER_DOCTYPE_NAME, reconsume, pos);
-									goto breakDoctypenameloop;
-								// goto continueStateloop;
-								case '>':
-									/*
+                                    StrBufToDoctypeName();
+                                    state = Transition(state, AFTER_DOCTYPE_NAME, reconsume, pos);
+                                    goto breakDoctypenameloop;
+                                    // goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * DOCTYPE token.
 									 */
-									StrBufToDoctypeName();
-									EmitDoctypeToken(pos);
-									/*
+                                    StrBufToDoctypeName();
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * U+0041 LATIN CAPITAL LETTER A through to
 									 * U+005A LATIN CAPITAL LETTER Z Append the
 									 * lowercase version of the input character (add
 									 * 0x0020 to the character's code point) to the
 									 * current DOCTYPE token's name.
 									 */
-									if (c >= 'A' && c <= 'Z')
-									{
-										c += (char)0x0020;
-									}
-									/*
+                                    if (c >= 'A' && c <= 'Z')
+                                    {
+                                        c += (char) 0x0020;
+                                    }
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current DOCTYPE token's
 									 * name.
 									 */
-									AppendStrBuf(c);
-									/*
+                                    AppendStrBuf(c);
+                                    /*
 									 * Stay in the DOCTYPE name state.
 									 */
-									continue;
-							}
-						}
-					breakDoctypenameloop:
-						goto case AFTER_DOCTYPE_NAME;
-					// FALLTHRU DON'T REORDER
-					case AFTER_DOCTYPE_NAME:
-						/*afterdoctypenameloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        breakDoctypenameloop:
+                        goto case AFTER_DOCTYPE_NAME;
+                        // FALLTHRU DON'T REORDER
+                    case AFTER_DOCTYPE_NAME:
+                        /*afterdoctypenameloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE Stay
 									 * in the after DOCTYPE name state.
 									 */
-									continue;
-								case '>':
-									/*
+                                    continue;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * DOCTYPE token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case 'p':
-								case 'P':
-									_index = 0;
-									state = Transition(state, Tokenizer.DOCTYPE_UBLIC, reconsume, pos);
-									goto breakAfterdoctypenameloop;
-								// goto continueStateloop;
-								case 's':
-								case 'S':
-									_index = 0;
-									state = Transition(state, Tokenizer.DOCTYPE_YSTEM, reconsume, pos);
-									goto continueStateloop;
-								default:
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case 'p':
+                                case 'P':
+                                    _index = 0;
+                                    state = Transition(state, DOCTYPE_UBLIC, reconsume, pos);
+                                    goto breakAfterdoctypenameloop;
+                                    // goto continueStateloop;
+                                case 's':
+                                case 'S':
+                                    _index = 0;
+                                    state = Transition(state, DOCTYPE_YSTEM, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    /*
 									 * Otherwise, this is the parse error.
 									 */
-									BogusDoctype();
+                                    BogusDoctype();
 
-									/*
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									// done by bogusDoctype();
-									/*
+                                    // done by bogusDoctype();
+                                    /*
 									 * Switch to the bogus DOCTYPE state.
 									 */
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakAfterdoctypenameloop:
-						goto case DOCTYPE_UBLIC;
-					// FALLTHRU DON'T REORDER
-					case DOCTYPE_UBLIC:
-						/*doctypeublicloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakAfterdoctypenameloop:
+                        goto case DOCTYPE_UBLIC;
+                        // FALLTHRU DON'T REORDER
+                    case DOCTYPE_UBLIC:
+                        /*doctypeublicloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * If the six characters starting from the current input
 							 * character are an ASCII case-insensitive match for the
 							 * word "PUBLIC", then consume those characters and
 							 * switch to the before DOCTYPE public identifier state.
 							 */
-							if (_index < 5)
-							{ // UBLIC.Length
-								char folded = c;
-								if (c >= 'A' && c <= 'Z')
-								{
-									folded += (char)0x20;
-								}
-								if (folded != Tokenizer.UBLIC[_index])
-								{
-									BogusDoctype();
-									// forceQuirks = true;
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-								_index++;
-								continue;
-							}
-							else
-							{
-								state = Transition(state, Tokenizer.AFTER_DOCTYPE_PUBLIC_KEYWORD, reconsume, pos);
-								reconsume = true;
-								goto breakDoctypeublicloop;
-								// goto continueStateloop;
-							}
-						}
-					breakDoctypeublicloop:
-						goto case AFTER_DOCTYPE_PUBLIC_KEYWORD;
-					// FALLTHRU DON'T REORDER
-					case AFTER_DOCTYPE_PUBLIC_KEYWORD:
-						/*afterdoctypepublickeywordloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                            if (_index < 5)
+                            {
+                                // UBLIC.Length
+                                char folded = c;
+                                if (c >= 'A' && c <= 'Z')
+                                {
+                                    folded += (char) 0x20;
+                                }
+                                if (folded != UBLIC[_index])
+                                {
+                                    BogusDoctype();
+                                    // forceQuirks = true;
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                                _index++;
+                                continue;
+                            }
+                            else
+                            {
+                                state = Transition(state, AFTER_DOCTYPE_PUBLIC_KEYWORD, reconsume, pos);
+                                reconsume = true;
+                                goto breakDoctypeublicloop;
+                                // goto continueStateloop;
+                            }
+                        }
+                        breakDoctypeublicloop:
+                        goto case AFTER_DOCTYPE_PUBLIC_KEYWORD;
+                        // FALLTHRU DON'T REORDER
+                    case AFTER_DOCTYPE_PUBLIC_KEYWORD:
+                        /*afterdoctypepublickeywordloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									state = Transition(state, Tokenizer.BEFORE_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    state = Transition(state, BEFORE_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * Switch to the before DOCTYPE public
 									 * identifier state.
 									 */
-									state = Transition(state, Tokenizer.BEFORE_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
-									goto breakAfterdoctypepublickeywordloop;
-								// FALL THROUGH continue stateloop
-								case '"':
-									/*
+                                    state = Transition(state, BEFORE_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
+                                    goto breakAfterdoctypepublickeywordloop;
+                                    // FALL THROUGH continue stateloop
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Parse Error.
 									 */
-									ErrNoSpaceBetweenDoctypePublicKeywordAndQuote();
-									/*
+                                    ErrNoSpaceBetweenDoctypePublicKeywordAndQuote();
+                                    /*
 									 * Set the DOCTYPE token's public identifier to
 									 * the empty string (not missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE public identifier
 									 * (double-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								case '\'':
-									/*
+                                    state = Transition(state, DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Parse Error.
 									 */
-									ErrNoSpaceBetweenDoctypePublicKeywordAndQuote();
-									/*
+                                    ErrNoSpaceBetweenDoctypePublicKeywordAndQuote();
+                                    /*
 									 * Set the DOCTYPE token's public identifier to
 									 * the empty string (not missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE public identifier
 									 * (single-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/* U+003E GREATER-THAN SIGN (>) Parse error. */
-									ErrExpectedPublicId();
-									/*
+                                    state = Transition(state, DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /* U+003E GREATER-THAN SIGN (>) Parse error. */
+                                    ErrExpectedPublicId();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									_forceQuirks = true;
-									/*
+                                    _forceQuirks = true;
+                                    /*
 									 * Emit that DOCTYPE token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								default:
-									BogusDoctype();
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    BogusDoctype();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									// done by bogusDoctype();
-									/*
+                                    // done by bogusDoctype();
+                                    /*
 									 * Switch to the bogus DOCTYPE state.
 									 */
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakAfterdoctypepublickeywordloop:
-						goto case BEFORE_DOCTYPE_PUBLIC_IDENTIFIER;
-					// FALLTHRU DON'T REORDER
-					case BEFORE_DOCTYPE_PUBLIC_IDENTIFIER:
-						/*beforedoctypepublicidentifierloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakAfterdoctypepublickeywordloop:
+                        goto case BEFORE_DOCTYPE_PUBLIC_IDENTIFIER;
+                        // FALLTHRU DON'T REORDER
+                    case BEFORE_DOCTYPE_PUBLIC_IDENTIFIER:
+                        /*beforedoctypepublicidentifierloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE Stay
 									 * in the before DOCTYPE public identifier
 									 * state.
 									 */
-									continue;
-								case '"':
-									/*
+                                    continue;
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Set the DOCTYPE
 									 * token's public identifier to the empty string
 									 * (not missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE public identifier
 									 * (double-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
-									goto breakBeforedoctypepublicidentifierloop;
-								// goto continueStateloop;
-								case '\'':
-									/*
+                                    state = Transition(state, DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
+                                    goto breakBeforedoctypepublicidentifierloop;
+                                    // goto continueStateloop;
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Set the DOCTYPE token's
 									 * public identifier to the empty string (not
 									 * missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE public identifier
 									 * (single-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/* U+003E GREATER-THAN SIGN (>) Parse error. */
-									ErrExpectedPublicId();
-									/*
+                                    state = Transition(state, DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /* U+003E GREATER-THAN SIGN (>) Parse error. */
+                                    ErrExpectedPublicId();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									_forceQuirks = true;
-									/*
+                                    _forceQuirks = true;
+                                    /*
 									 * Emit that DOCTYPE token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								default:
-									BogusDoctype();
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    BogusDoctype();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									// done by bogusDoctype();
-									/*
+                                    // done by bogusDoctype();
+                                    /*
 									 * Switch to the bogus DOCTYPE state.
 									 */
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakBeforedoctypepublicidentifierloop:
-						goto case DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED;
-					// FALLTHRU DON'T REORDER
-					case DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED:
-						/*doctypepublicidentifierdoublequotedloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakBeforedoctypepublicidentifierloop:
+                        goto case DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED;
+                        // FALLTHRU DON'T REORDER
+                    case DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED:
+                        /*doctypepublicidentifierdoublequotedloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '"':
-									/*
+                            switch (c)
+                            {
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Switch to the after
 									 * DOCTYPE public identifier state.
 									 */
-									_publicIdentifier = LongStrBufToString();
-									state = Transition(state, Tokenizer.AFTER_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
-									goto breakDoctypepublicidentifierdoublequotedloop;
-								// goto continueStateloop;
-								case '>':
-									/*
+                                    _publicIdentifier = LongStrBufToString();
+                                    state = Transition(state, AFTER_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
+                                    goto breakDoctypepublicidentifierdoublequotedloop;
+                                    // goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Parse error.
 									 */
-									ErrGtInPublicId();
-									/*
+                                    ErrGtInPublicId();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									_forceQuirks = true;
-									/*
+                                    _forceQuirks = true;
+                                    /*
 									 * Emit that DOCTYPE token.
 									 */
-									_publicIdentifier = LongStrBufToString();
-									EmitDoctypeToken(pos);
-									/*
+                                    _publicIdentifier = LongStrBufToString();
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									continue;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    continue;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current DOCTYPE token's
 									 * public identifier.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Stay in the DOCTYPE public identifier
 									 * (double-quoted) state.
 									 */
-									continue;
-							}
-						}
-					breakDoctypepublicidentifierdoublequotedloop:
-						goto case AFTER_DOCTYPE_PUBLIC_IDENTIFIER;
-					// FALLTHRU DON'T REORDER
-					case AFTER_DOCTYPE_PUBLIC_IDENTIFIER:
-						/*afterdoctypepublicidentifierloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        breakDoctypepublicidentifierdoublequotedloop:
+                        goto case AFTER_DOCTYPE_PUBLIC_IDENTIFIER;
+                        // FALLTHRU DON'T REORDER
+                    case AFTER_DOCTYPE_PUBLIC_IDENTIFIER:
+                        /*afterdoctypepublicidentifierloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									state = Transition(state, Tokenizer.BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    state = Transition(state, BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS, reconsume,
+                                                       pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * Switch to the between DOCTYPE public and
 									 * system identifiers state.
 									 */
-									state = Transition(state, Tokenizer.BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS, reconsume, pos);
-									goto breakAfterdoctypepublicidentifierloop;
-								// goto continueStateloop;
-								case '>':
-									/*
+                                    state = Transition(state, BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS, reconsume,
+                                                       pos);
+                                    goto breakAfterdoctypepublicidentifierloop;
+                                    // goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * DOCTYPE token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '"':
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Parse error.
 									 */
-									ErrNoSpaceBetweenPublicAndSystemIds();
-									/*
+                                    ErrNoSpaceBetweenPublicAndSystemIds();
+                                    /*
 									 * Set the DOCTYPE token's system identifier to
 									 * the empty string (not missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE system identifier
 									 * (double-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								case '\'':
-									/*
+                                    state = Transition(state, DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Parse error.
 									 */
-									ErrNoSpaceBetweenPublicAndSystemIds();
-									/*
+                                    ErrNoSpaceBetweenPublicAndSystemIds();
+                                    /*
 									 * Set the DOCTYPE token's system identifier to
 									 * the empty string (not missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE system identifier
 									 * (single-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								default:
-									BogusDoctype();
-									/*
+                                    state = Transition(state, DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    BogusDoctype();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									// done by bogusDoctype();
-									/*
+                                    // done by bogusDoctype();
+                                    /*
 									 * Switch to the bogus DOCTYPE state.
 									 */
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakAfterdoctypepublicidentifierloop:
-						goto case BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS;
-					// FALLTHRU DON'T REORDER
-					case BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS:
-						/*betweendoctypepublicandsystemidentifiersloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakAfterdoctypepublicidentifierloop:
+                        goto case BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS;
+                        // FALLTHRU DON'T REORDER
+                    case BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS:
+                        /*betweendoctypepublicandsystemidentifiersloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto case ' ';
-								// fall thru
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto case ' ';
+                                    // fall thru
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE Stay
 									 * in the between DOCTYPE public and system
 									 * identifiers state.
 									 */
-									continue;
-								case '>':
-									/*
+                                    continue;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * DOCTYPE token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '"':
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Set the DOCTYPE
 									 * token's system identifier to the empty string
 									 * (not missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE system identifier
 									 * (double-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
-									goto breakBetweendoctypepublicandsystemidentifiersloop;
-								// goto continueStateloop;
-								case '\'':
-									/*
+                                    state = Transition(state, DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
+                                    goto breakBetweendoctypepublicandsystemidentifiersloop;
+                                    // goto continueStateloop;
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Set the DOCTYPE token's
 									 * system identifier to the empty string (not
 									 * missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE system identifier
 									 * (single-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								default:
-									BogusDoctype();
-									/*
+                                    state = Transition(state, DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    BogusDoctype();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									// done by bogusDoctype();
-									/*
+                                    // done by bogusDoctype();
+                                    /*
 									 * Switch to the bogus DOCTYPE state.
 									 */
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakBetweendoctypepublicandsystemidentifiersloop:
-						goto case DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED;
-					// FALLTHRU DON'T REORDER
-					case DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED:
-						/*doctypesystemidentifierdoublequotedloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakBetweendoctypepublicandsystemidentifiersloop:
+                        goto case DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED;
+                        // FALLTHRU DON'T REORDER
+                    case DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED:
+                        /*doctypesystemidentifierdoublequotedloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '"':
-									/*
+                            switch (c)
+                            {
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Switch to the after
 									 * DOCTYPE system identifier state.
 									 */
-									_systemIdentifier = LongStrBufToString();
-									state = Transition(state, Tokenizer.AFTER_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/*
+                                    _systemIdentifier = LongStrBufToString();
+                                    state = Transition(state, AFTER_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Parse error.
 									 */
-									ErrGtInSystemId();
-									/*
+                                    ErrGtInSystemId();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									_forceQuirks = true;
-									/*
+                                    _forceQuirks = true;
+                                    /*
 									 * Emit that DOCTYPE token.
 									 */
-									_systemIdentifier = LongStrBufToString();
-									EmitDoctypeToken(pos);
-									/*
+                                    _systemIdentifier = LongStrBufToString();
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									continue;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    continue;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current DOCTYPE token's
 									 * system identifier.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Stay in the DOCTYPE system identifier
 									 * (double-quoted) state.
 									 */
-									continue;
-							}
-						}
-					breakDoctypesystemidentifierdoublequotedloop:
-						goto case AFTER_DOCTYPE_SYSTEM_IDENTIFIER;
-					// FALLTHRU DON'T REORDER
-					case AFTER_DOCTYPE_SYSTEM_IDENTIFIER:
-						/*afterdoctypesystemidentifierloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        breakDoctypesystemidentifierdoublequotedloop:
+                        goto case AFTER_DOCTYPE_SYSTEM_IDENTIFIER;
+                        // FALLTHRU DON'T REORDER
+                    case AFTER_DOCTYPE_SYSTEM_IDENTIFIER:
+                        /*afterdoctypesystemidentifierloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									goto case ' ';
-								// fall thru
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    goto case ' ';
+                                    // fall thru
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE Stay
 									 * in the after DOCTYPE system identifier state.
 									 */
-									continue;
-								case '>':
-									/*
+                                    continue;
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit the current
 									 * DOCTYPE token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								default:
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    /*
 									 * Switch to the bogus DOCTYPE state. (This does
 									 * not set the DOCTYPE token's force-quirks flag
 									 * to on.)
 									 */
-									BogusDoctypeWithoutQuirks();
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									goto breakAfterdoctypesystemidentifierloop;
-								// goto continueStateloop;
-							}
-						}
-					breakAfterdoctypesystemidentifierloop:
-						goto case BOGUS_DOCTYPE;
-					// FALLTHRU DON'T REORDER
-					case BOGUS_DOCTYPE:
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                                    BogusDoctypeWithoutQuirks();
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    goto breakAfterdoctypesystemidentifierloop;
+                                    // goto continueStateloop;
+                            }
+                        }
+                        breakAfterdoctypesystemidentifierloop:
+                        goto case BOGUS_DOCTYPE;
+                        // FALLTHRU DON'T REORDER
+                    case BOGUS_DOCTYPE:
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '>':
-									/*
+                            switch (c)
+                            {
+                                case '>':
+                                    /*
 									 * U+003E GREATER-THAN SIGN (>) Emit that
 									 * DOCTYPE token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Stay in the bogus DOCTYPE
 									 * state.
 									 */
-									continue;
-							}
-						}
-					// XXX reorder point
-					case DOCTYPE_YSTEM:
-						/*doctypeystemloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    continue;
+                            }
+                        }
+                        // XXX reorder point
+                    case DOCTYPE_YSTEM:
+                        /*doctypeystemloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Otherwise, if the six characters starting from the
 							 * current input character are an ASCII case-insensitive
 							 * match for the word "SYSTEM", then consume those
 							 * characters and switch to the before DOCTYPE system
 							 * identifier state.
 							 */
-							if (_index < 5)
-							{ // YSTEM.Length
-								char folded = c;
-								if (c >= 'A' && c <= 'Z')
-								{
-									folded += (char)0x20;
-								}
-								if (folded != Tokenizer.YSTEM[_index])
-								{
-									BogusDoctype();
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									reconsume = true;
-									goto continueStateloop;
-								}
-								_index++;
-								goto continueStateloop;
-							}
-							else
-							{
-								state = Transition(state, Tokenizer.AFTER_DOCTYPE_SYSTEM_KEYWORD, reconsume, pos);
-								reconsume = true;
-								goto breakDoctypeystemloop;
-								// goto continueStateloop;
-							}
-						}
-					breakDoctypeystemloop:
-						goto case AFTER_DOCTYPE_SYSTEM_KEYWORD;
-					// FALLTHRU DON'T REORDER
-					case AFTER_DOCTYPE_SYSTEM_KEYWORD:
-						/*afterdoctypesystemkeywordloop:*/
-						for (; ; )
-						{
-							if (reconsume)
-							{
-								reconsume = false;
-							}
-							else
-							{
-								if (++pos == endPos)
-								{
-									goto breakStateloop;
-								}
-								c = CheckChar(buf, pos);
-							}
-							/*
+                            if (_index < 5)
+                            {
+                                // YSTEM.Length
+                                char folded = c;
+                                if (c >= 'A' && c <= 'Z')
+                                {
+                                    folded += (char) 0x20;
+                                }
+                                if (folded != YSTEM[_index])
+                                {
+                                    BogusDoctype();
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    reconsume = true;
+                                    goto continueStateloop;
+                                }
+                                _index++;
+                                goto continueStateloop;
+                            }
+                            else
+                            {
+                                state = Transition(state, AFTER_DOCTYPE_SYSTEM_KEYWORD, reconsume, pos);
+                                reconsume = true;
+                                goto breakDoctypeystemloop;
+                                // goto continueStateloop;
+                            }
+                        }
+                        breakDoctypeystemloop:
+                        goto case AFTER_DOCTYPE_SYSTEM_KEYWORD;
+                        // FALLTHRU DON'T REORDER
+                    case AFTER_DOCTYPE_SYSTEM_KEYWORD:
+                        /*afterdoctypesystemkeywordloop:*/
+                        for (;;)
+                        {
+                            if (reconsume)
+                            {
+                                reconsume = false;
+                            }
+                            else
+                            {
+                                if (++pos == endPos)
+                                {
+                                    goto breakStateloop;
+                                }
+                                c = CheckChar(buf, pos);
+                            }
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									state = Transition(state, Tokenizer.BEFORE_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    state = Transition(state, BEFORE_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE
 									 * Switch to the before DOCTYPE public
 									 * identifier state.
 									 */
-									state = Transition(state, Tokenizer.BEFORE_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
-									goto breakAfterdoctypesystemkeywordloop;
-								// FALL THROUGH continue stateloop
-								case '"':
-									/*
+                                    state = Transition(state, BEFORE_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
+                                    goto breakAfterdoctypesystemkeywordloop;
+                                    // FALL THROUGH continue stateloop
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Parse Error.
 									 */
-									ErrNoSpaceBetweenDoctypeSystemKeywordAndQuote();
-									/*
+                                    ErrNoSpaceBetweenDoctypeSystemKeywordAndQuote();
+                                    /*
 									 * Set the DOCTYPE token's system identifier to
 									 * the empty string (not missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE public identifier
 									 * (double-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								case '\'':
-									/*
+                                    state = Transition(state, DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Parse Error.
 									 */
-									ErrNoSpaceBetweenDoctypeSystemKeywordAndQuote();
-									/*
+                                    ErrNoSpaceBetweenDoctypeSystemKeywordAndQuote();
+                                    /*
 									 * Set the DOCTYPE token's public identifier to
 									 * the empty string (not missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE public identifier
 									 * (single-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									/* U+003E GREATER-THAN SIGN (>) Parse error. */
-									ErrExpectedPublicId();
-									/*
+                                    state = Transition(state, DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    /* U+003E GREATER-THAN SIGN (>) Parse error. */
+                                    ErrExpectedPublicId();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									_forceQuirks = true;
-									/*
+                                    _forceQuirks = true;
+                                    /*
 									 * Emit that DOCTYPE token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								default:
-									BogusDoctype();
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    BogusDoctype();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									// done by bogusDoctype();
-									/*
+                                    // done by bogusDoctype();
+                                    /*
 									 * Switch to the bogus DOCTYPE state.
 									 */
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakAfterdoctypesystemkeywordloop:
-						goto case BEFORE_DOCTYPE_SYSTEM_IDENTIFIER;
-					// FALLTHRU DON'T REORDER
-					case BEFORE_DOCTYPE_SYSTEM_IDENTIFIER:
-						/*beforedoctypesystemidentifierloop:*/
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakAfterdoctypesystemkeywordloop:
+                        goto case BEFORE_DOCTYPE_SYSTEM_IDENTIFIER;
+                        // FALLTHRU DON'T REORDER
+                    case BEFORE_DOCTYPE_SYSTEM_IDENTIFIER:
+                        /*beforedoctypesystemidentifierloop:*/
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\r':
-									SilentCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									SilentLineFeed();
-									// fall thru
-									goto case ' ';
-								case ' ':
-								case '\t':
-								case '\u000C':
-									/*
+                            switch (c)
+                            {
+                                case '\r':
+                                    SilentCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    SilentLineFeed();
+                                    // fall thru
+                                    goto case ' ';
+                                case ' ':
+                                case '\t':
+                                case '\u000C':
+                                    /*
 									 * U+0009 CHARACTER TABULATION U+000A LINE FEED
 									 * (LF) U+000C FORM FEED (FF) U+0020 SPACE Stay
 									 * in the before DOCTYPE system identifier
 									 * state.
 									 */
-									continue;
-								case '"':
-									/*
+                                    continue;
+                                case '"':
+                                    /*
 									 * U+0022 QUOTATION MARK (") Set the DOCTYPE
 									 * token's system identifier to the empty string
 									 * (not missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE system identifier
 									 * (double-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
-									goto continueStateloop;
-								case '\'':
-									/*
+                                    state = Transition(state, DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Set the DOCTYPE token's
 									 * system identifier to the empty string (not
 									 * missing),
 									 */
-									ClearLongStrBuf();
-									/*
+                                    ClearLongStrBuf();
+                                    /*
 									 * then switch to the DOCTYPE system identifier
 									 * (single-quoted) state.
 									 */
-									state = Transition(state, Tokenizer.DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
-									goto breakBeforedoctypesystemidentifierloop;
-								// goto continueStateloop;
-								case '>':
-									/* U+003E GREATER-THAN SIGN (>) Parse error. */
-									ErrExpectedSystemId();
-									/*
+                                    state = Transition(state, DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED, reconsume, pos);
+                                    goto breakBeforedoctypesystemidentifierloop;
+                                    // goto continueStateloop;
+                                case '>':
+                                    /* U+003E GREATER-THAN SIGN (>) Parse error. */
+                                    ErrExpectedSystemId();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									_forceQuirks = true;
-									/*
+                                    _forceQuirks = true;
+                                    /*
 									 * Emit that DOCTYPE token.
 									 */
-									EmitDoctypeToken(pos);
-									/*
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								default:
-									BogusDoctype();
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                default:
+                                    BogusDoctype();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									// done by bogusDoctype();
-									/*
+                                    // done by bogusDoctype();
+                                    /*
 									 * Switch to the bogus DOCTYPE state.
 									 */
-									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
-									goto continueStateloop;
-							}
-						}
-					breakBeforedoctypesystemidentifierloop:
-						goto case DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED;
-					// FALLTHRU DON'T REORDER
-					case DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED:
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                                    state = Transition(state, BOGUS_DOCTYPE, reconsume, pos);
+                                    goto continueStateloop;
+                            }
+                        }
+                        breakBeforedoctypesystemidentifierloop:
+                        goto case DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED;
+                        // FALLTHRU DON'T REORDER
+                    case DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED:
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\'':
-									/*
+                            switch (c)
+                            {
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Switch to the after
 									 * DOCTYPE system identifier state.
 									 */
-									_systemIdentifier = LongStrBufToString();
-									state = Transition(state, Tokenizer.AFTER_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									ErrGtInSystemId();
-									/*
+                                    _systemIdentifier = LongStrBufToString();
+                                    state = Transition(state, AFTER_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    ErrGtInSystemId();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									_forceQuirks = true;
-									/*
+                                    _forceQuirks = true;
+                                    /*
 									 * Emit that DOCTYPE token.
 									 */
-									_systemIdentifier = LongStrBufToString();
-									EmitDoctypeToken(pos);
-									/*
+                                    _systemIdentifier = LongStrBufToString();
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									continue;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    continue;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current DOCTYPE token's
 									 * system identifier.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Stay in the DOCTYPE system identifier
 									 * (double-quoted) state.
 									 */
-									continue;
-							}
-						}
-					// XXX reorder point
+                                    continue;
+                            }
+                        }
+                        // XXX reorder point
 
-					case DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED:
-						for (; ; )
-						{
-							if (++pos == endPos)
-							{
-								goto breakStateloop;
-							}
-							c = CheckChar(buf, pos);
-							/*
+                    case DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED:
+                        for (;;)
+                        {
+                            if (++pos == endPos)
+                            {
+                                goto breakStateloop;
+                            }
+                            c = CheckChar(buf, pos);
+                            /*
 							 * Consume the next input character:
 							 */
-							switch (c)
-							{
-								case '\'':
-									/*
+                            switch (c)
+                            {
+                                case '\'':
+                                    /*
 									 * U+0027 APOSTROPHE (') Switch to the after
 									 * DOCTYPE public identifier state.
 									 */
-									_publicIdentifier = LongStrBufToString();
-									state = Transition(state, Tokenizer.AFTER_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
-									goto continueStateloop;
-								case '>':
-									ErrGtInPublicId();
-									/*
+                                    _publicIdentifier = LongStrBufToString();
+                                    state = Transition(state, AFTER_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
+                                    goto continueStateloop;
+                                case '>':
+                                    ErrGtInPublicId();
+                                    /*
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									_forceQuirks = true;
-									/*
+                                    _forceQuirks = true;
+                                    /*
 									 * Emit that DOCTYPE token.
 									 */
-									_publicIdentifier = LongStrBufToString();
-									EmitDoctypeToken(pos);
-									/*
+                                    _publicIdentifier = LongStrBufToString();
+                                    EmitDoctypeToken(pos);
+                                    /*
 									 * Switch to the data state.
 									 */
-									state = Transition(state, Tokenizer.DATA, reconsume, pos);
-									goto continueStateloop;
-								case '\r':
-									AppendLongStrBufCarriageReturn();
-									goto breakStateloop;
-								case '\n':
-									AppendLongStrBufLineFeed();
-									continue;
-								case '\u0000':
-									c = '\uFFFD';
-									// fall thru
-									goto default;
-								default:
-									/*
+                                    state = Transition(state, DATA, reconsume, pos);
+                                    goto continueStateloop;
+                                case '\r':
+                                    AppendLongStrBufCarriageReturn();
+                                    goto breakStateloop;
+                                case '\n':
+                                    AppendLongStrBufLineFeed();
+                                    continue;
+                                case '\u0000':
+                                    c = '\uFFFD';
+                                    // fall thru
+                                    goto default;
+                                default:
+                                    /*
 									 * Anything else Append the current input
 									 * character to the current DOCTYPE token's
 									 * public identifier.
 									 */
-									AppendLongStrBuf(c);
-									/*
+                                    AppendLongStrBuf(c);
+                                    /*
 									 * Stay in the DOCTYPE public identifier
 									 * (single-quoted) state.
 									 */
-									continue;
-							}
-						}
-					// END HOTSPOT WORKAROUND
-				}
-			} // stateloop
+                                    continue;
+                            }
+                        }
+                        // END HOTSPOT WORKAROUND
+                }
+            } // stateloop
 
 
-			breakStateloop:
+            breakStateloop:
 
-			FlushChars(buf, pos);
-			/*
+            FlushChars(buf, pos);
+            /*
 			 * if (prevCR && pos != endPos) { // why is this needed? pos--; col--; }
 			 */
-			// Save locals
-			_stateSave = state;
-			_returnStateSave = returnState;
-			return pos;
-		}
+            // Save locals
+            _stateSave = state;
+            _returnStateSave = returnState;
+            return pos;
+        }
 
-		// HOTSPOT WORKAROUND INSERTION POINT
+        // HOTSPOT WORKAROUND INSERTION POINT
 
-		// [NOCPP[
+        // [NOCPP[
 
-		protected int Transition(int from, int to, bool reconsume, int pos)
-		{
-			return to;
-		}
+        protected int Transition(int from, int to, bool reconsume, int pos)
+        {
+            return to;
+        }
 
-		// ]NOCPP]
+        // ]NOCPP]
 
-		private void InitDoctypeFields()
-		{
-			_doctypeName = "";
-			if (_systemIdentifier != null)
-			{
-				_systemIdentifier = null;
-			}
-			if (_publicIdentifier != null)
-			{
-				_publicIdentifier = null;
-			}
-			_forceQuirks = false;
-		}
+        private void InitDoctypeFields()
+        {
+            _doctypeName = "";
+            if (_systemIdentifier != null)
+            {
+                _systemIdentifier = null;
+            }
+            if (_publicIdentifier != null)
+            {
+                _publicIdentifier = null;
+            }
+            _forceQuirks = false;
+        }
 
-		/*@Inline*/
-		private void AdjustDoubleHyphenAndAppendToLongStrBufCarriageReturn()
-		{
-			SilentCarriageReturn();
-			AdjustDoubleHyphenAndAppendToLongStrBufAndErr('\n');
-		}
+        /*@Inline*/
 
-		/*@Inline*/
-		private void AdjustDoubleHyphenAndAppendToLongStrBufLineFeed()
-		{
-			SilentLineFeed();
-			AdjustDoubleHyphenAndAppendToLongStrBufAndErr('\n');
-		}
+        private void AdjustDoubleHyphenAndAppendToLongStrBufCarriageReturn()
+        {
+            SilentCarriageReturn();
+            AdjustDoubleHyphenAndAppendToLongStrBufAndErr('\n');
+        }
 
-		/*@Inline*/
-		private void AppendLongStrBufLineFeed()
-		{
-			SilentLineFeed();
-			AppendLongStrBuf('\n');
-		}
+        /*@Inline*/
 
-		/*@Inline*/
-		private void AppendLongStrBufCarriageReturn()
-		{
-			SilentCarriageReturn();
-			AppendLongStrBuf('\n');
-		}
+        private void AdjustDoubleHyphenAndAppendToLongStrBufLineFeed()
+        {
+            SilentLineFeed();
+            AdjustDoubleHyphenAndAppendToLongStrBufAndErr('\n');
+        }
 
-		/*@Inline*/
-		protected void SilentCarriageReturn()
-		{
-			++_line;
-			_lastCR = true;
-		}
+        /*@Inline*/
 
-		/*@Inline*/
-		protected void SilentLineFeed()
-		{
-			++_line;
-		}
+        private void AppendLongStrBufLineFeed()
+        {
+            SilentLineFeed();
+            AppendLongStrBuf('\n');
+        }
 
-		private void EmitCarriageReturn(char[] buf, int pos)
-		{
-			SilentCarriageReturn();
-			FlushChars(buf, pos);
-			TokenHandler.Characters(Tokenizer.LF, 0, 1);
-			_cstart = int.MaxValue;
-		}
+        /*@Inline*/
 
-		private void EmitReplacementCharacter(char[] buf, int pos)
-		{
-			FlushChars(buf, pos);
-			TokenHandler.ZeroOriginatingReplacementCharacter();
-			_cstart = pos + 1;
-		}
+        private void AppendLongStrBufCarriageReturn()
+        {
+            SilentCarriageReturn();
+            AppendLongStrBuf('\n');
+        }
 
-		private void EmitPlaintextReplacementCharacter(char[] buf, int pos)
-		{
-			FlushChars(buf, pos);
-			TokenHandler.Characters(REPLACEMENT_CHARACTER, 0, 1);
-			_cstart = pos + 1;
-		}
+        /*@Inline*/
 
-		private void SetAdditionalAndRememberAmpersandLocation(char add)
-		{
-			_additional = add;
-			// [NOCPP[
-			_ampersandLocation = new Locator(this);
-			// ]NOCPP]
-		}
+        protected void SilentCarriageReturn()
+        {
+            ++_line;
+            _lastCR = true;
+        }
 
-		private void BogusDoctype()
-		{
-			ErrBogusDoctype();
-			_forceQuirks = true;
-		}
+        /*@Inline*/
 
-		private void BogusDoctypeWithoutQuirks()
-		{
-			ErrBogusDoctype();
-			_forceQuirks = false;
-		}
+        protected void SilentLineFeed()
+        {
+            ++_line;
+        }
 
-		private void EmitOrAppendStrBuf(int returnState)
-		{
-			if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-			{
-				AppendStrBufToLongStrBuf();
-			}
-			else
-			{
-				EmitStrBuf();
-			}
-		}
+        private void EmitCarriageReturn(char[] buf, int pos)
+        {
+            SilentCarriageReturn();
+            FlushChars(buf, pos);
+            TokenHandler.Characters(LF, 0, 1);
+            _cstart = int.MaxValue;
+        }
 
-		private void HandleNcrValue(int returnState)
-		{
-			/*
+        private void EmitReplacementCharacter(char[] buf, int pos)
+        {
+            FlushChars(buf, pos);
+            TokenHandler.ZeroOriginatingReplacementCharacter();
+            _cstart = pos + 1;
+        }
+
+        private void EmitPlaintextReplacementCharacter(char[] buf, int pos)
+        {
+            FlushChars(buf, pos);
+            TokenHandler.Characters(REPLACEMENT_CHARACTER, 0, 1);
+            _cstart = pos + 1;
+        }
+
+        private void SetAdditionalAndRememberAmpersandLocation(char add)
+        {
+            _additional = add;
+            // [NOCPP[
+            _ampersandLocation = new Locator(this);
+            // ]NOCPP]
+        }
+
+        private void BogusDoctype()
+        {
+            ErrBogusDoctype();
+            _forceQuirks = true;
+        }
+
+        private void BogusDoctypeWithoutQuirks()
+        {
+            ErrBogusDoctype();
+            _forceQuirks = false;
+        }
+
+        private void EmitOrAppendStrBuf(int returnState)
+        {
+            if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+            {
+                AppendStrBufToLongStrBuf();
+            }
+            else
+            {
+                EmitStrBuf();
+            }
+        }
+
+        private void HandleNcrValue(int returnState)
+        {
+            /*
 			 * If one or more characters match the range, then take them all and
 			 * interpret the string of characters as a number (either hexadecimal or
 			 * decimal as appropriate).
 			 */
-			if (_value <= 0xFFFF)
-			{
-				if (_value >= 0x80 && _value <= 0x9f)
-				{
-					/*
+            if (_value <= 0xFFFF)
+            {
+                if (_value >= 0x80 && _value <= 0x9f)
+                {
+                    /*
 					 * If that number is one of the numbers in the first column of
 					 * the following table, then this is a parse error.
 					 */
-					ErrNcrInC1Range();
-					/*
+                    ErrNcrInC1Range();
+                    /*
 					 * Find the row with that number in the first column, and return
 					 * a character token for the Unicode character given in the
 					 * second column of that row.
 					 */
-					char[] val = NamedCharacters.WINDOWS_1252[_value - 0x80];
-					EmitOrAppendOne(val, returnState);
-					// [NOCPP[
-				}
-				else if (_value == 0xC
-					  && _contentSpacePolicy != XmlViolationPolicy.Allow)
-				{
-					if (_contentSpacePolicy == XmlViolationPolicy.AlterInfoset)
-					{
-						EmitOrAppendOne(Tokenizer.SPACE, returnState);
-					}
-					else if (_contentSpacePolicy == XmlViolationPolicy.Fatal)
-					{
-						Fatal("A character reference expanded to a form feed which is not legal XML 1.0 white space.");
-					}
-					// ]NOCPP]
-				}
-				else if (_value == 0x0)
-				{
-					ErrNcrZero();
-					EmitOrAppendOne(Tokenizer.REPLACEMENT_CHARACTER, returnState);
-				}
-				else if ((_value & 0xF800) == 0xD800)
-				{
-					ErrNcrSurrogate();
-					EmitOrAppendOne(Tokenizer.REPLACEMENT_CHARACTER, returnState);
-				}
-				else
-				{
-					/*
+                    char[] val = NamedCharacters.WINDOWS_1252[_value - 0x80];
+                    EmitOrAppendOne(val, returnState);
+                    // [NOCPP[
+                }
+                else if (_value == 0xC
+                         && _contentSpacePolicy != XmlViolationPolicy.Allow)
+                {
+                    if (_contentSpacePolicy == XmlViolationPolicy.AlterInfoset)
+                    {
+                        EmitOrAppendOne(SPACE, returnState);
+                    }
+                    else if (_contentSpacePolicy == XmlViolationPolicy.Fatal)
+                    {
+                        Fatal("A character reference expanded to a form feed which is not legal XML 1.0 white space.");
+                    }
+                    // ]NOCPP]
+                }
+                else if (_value == 0x0)
+                {
+                    ErrNcrZero();
+                    EmitOrAppendOne(REPLACEMENT_CHARACTER, returnState);
+                }
+                else if ((_value & 0xF800) == 0xD800)
+                {
+                    ErrNcrSurrogate();
+                    EmitOrAppendOne(REPLACEMENT_CHARACTER, returnState);
+                }
+                else
+                {
+                    /*
 					 * Otherwise, return a character token for the Unicode character
 					 * whose code point is that number.
 					 */
-					char ch = (char)_value;
-					// [NOCPP[
-					if (_value == 0x0D)
-					{
-						ErrNcrCr();
-					}
-					else if ((_value <= 0x0008) || (_value == 0x000B)
-						  || (_value >= 0x000E && _value <= 0x001F))
-					{
-						ch = ErrNcrControlChar(ch);
-					}
-					else if (_value >= 0xFDD0 && _value <= 0xFDEF)
-					{
-						ErrNcrUnassigned();
-					}
-					else if ((_value & 0xFFFE) == 0xFFFE)
-					{
-						ch = ErrNcrNonCharacter(ch);
-					}
-					else if (_value >= 0x007F && _value <= 0x009F)
-					{
-						ErrNcrControlChar();
-					}
-					else
-					{
-						MaybeWarnPrivateUse(ch);
-					}
-					// ]NOCPP]
-					_bmpChar[0] = ch;
-					EmitOrAppendOne(_bmpChar, returnState);
-				}
-			}
-			else if (_value <= 0x10FFFF)
-			{
-				// [NOCPP[
-				MaybeWarnPrivateUseAstral();
-				if ((_value & 0xFFFE) == 0xFFFE)
-				{
-					ErrAstralNonCharacter(_value);
-				}
-				// ]NOCPP]
-				_astralChar[0] = (char)(Tokenizer.LEAD_OFFSET + (_value >> 10));
-				_astralChar[1] = (char)(0xDC00 + (_value & 0x3FF));
-				EmitOrAppendTwo(_astralChar, returnState);
-			}
-			else
-			{
-				ErrNcrOutOfRange();
-				EmitOrAppendOne(Tokenizer.REPLACEMENT_CHARACTER, returnState);
-			}
-		}
+                    var ch = (char) _value;
+                    // [NOCPP[
+                    if (_value == 0x0D)
+                    {
+                        ErrNcrCr();
+                    }
+                    else if ((_value <= 0x0008) || (_value == 0x000B)
+                             || (_value >= 0x000E && _value <= 0x001F))
+                    {
+                        ch = ErrNcrControlChar(ch);
+                    }
+                    else if (_value >= 0xFDD0 && _value <= 0xFDEF)
+                    {
+                        ErrNcrUnassigned();
+                    }
+                    else if ((_value & 0xFFFE) == 0xFFFE)
+                    {
+                        ch = ErrNcrNonCharacter(ch);
+                    }
+                    else if (_value >= 0x007F && _value <= 0x009F)
+                    {
+                        ErrNcrControlChar();
+                    }
+                    else
+                    {
+                        MaybeWarnPrivateUse(ch);
+                    }
+                    // ]NOCPP]
+                    _bmpChar[0] = ch;
+                    EmitOrAppendOne(_bmpChar, returnState);
+                }
+            }
+            else if (_value <= 0x10FFFF)
+            {
+                // [NOCPP[
+                MaybeWarnPrivateUseAstral();
+                if ((_value & 0xFFFE) == 0xFFFE)
+                {
+                    ErrAstralNonCharacter(_value);
+                }
+                // ]NOCPP]
+                _astralChar[0] = (char) (LEAD_OFFSET + (_value >> 10));
+                _astralChar[1] = (char) (0xDC00 + (_value & 0x3FF));
+                EmitOrAppendTwo(_astralChar, returnState);
+            }
+            else
+            {
+                ErrNcrOutOfRange();
+                EmitOrAppendOne(REPLACEMENT_CHARACTER, returnState);
+            }
+        }
 
-		public void Eof()
-		{
-			int state = _stateSave;
-			int returnState = _returnStateSave;
+        public void Eof()
+        {
+            int state = _stateSave;
+            int returnState = _returnStateSave;
 
-			/*eofloop:*/
-			for (; ; )
-			{
-				switch (state)
-				{
-					case SCRIPT_DATA_LESS_THAN_SIGN:
-					case SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN:
-						/*
+            /*eofloop:*/
+            for (;;)
+            {
+                switch (state)
+                {
+                    case SCRIPT_DATA_LESS_THAN_SIGN:
+                    case SCRIPT_DATA_ESCAPED_LESS_THAN_SIGN:
+                        /*
 						 * Otherwise, emit a U+003C LESS-THAN SIGN character token
 						 */
-						TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-						/*
+                        TokenHandler.Characters(LT_GT, 0, 1);
+                        /*
 						 * and reconsume the current input character in the data
 						 * state.
 						 */
-						goto breakEofloop;
-					case TAG_OPEN:
-						/*
+                        goto breakEofloop;
+                    case TAG_OPEN:
+                        /*
 						 * The behavior of this state depends on the content model
 						 * flag.
 						 */
-						/*
+                        /*
 						 * Anything else Parse error.
 						 */
-						ErrEofAfterLt();
-						/*
+                        ErrEofAfterLt();
+                        /*
 						 * Emit a U+003C LESS-THAN SIGN character token
 						 */
-						TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-						/*
+                        TokenHandler.Characters(LT_GT, 0, 1);
+                        /*
 						 * and reconsume the current input character in the data
 						 * state.
 						 */
-						goto breakEofloop;
-					case RAWTEXT_RCDATA_LESS_THAN_SIGN:
-						/*
+                        goto breakEofloop;
+                    case RAWTEXT_RCDATA_LESS_THAN_SIGN:
+                        /*
 						 * Emit a U+003C LESS-THAN SIGN character token
 						 */
-						TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-						/*
+                        TokenHandler.Characters(LT_GT, 0, 1);
+                        /*
 						 * and reconsume the current input character in the RCDATA
 						 * state.
 						 */
-						goto breakEofloop;
-					case NON_DATA_END_TAG_NAME:
-						/*
+                        goto breakEofloop;
+                    case NON_DATA_END_TAG_NAME:
+                        /*
 						 * Emit a U+003C LESS-THAN SIGN character token, a U+002F
 						 * SOLIDUS character token,
 						 */
-						TokenHandler.Characters(Tokenizer.LT_SOLIDUS, 0, 2);
-						/*
+                        TokenHandler.Characters(LT_SOLIDUS, 0, 2);
+                        /*
 						 * a character token for each of the characters in the
 						 * temporary buffer (in the order they were added to the
 						 * buffer),
 						 */
-						EmitStrBuf();
-						/*
+                        EmitStrBuf();
+                        /*
 						 * and reconsume the current input character in the RCDATA
 						 * state.
 						 */
-						goto breakEofloop;
-					case CLOSE_TAG_OPEN:
-						/* EOF Parse error. */
-						ErrEofAfterLt();
-						/*
+                        goto breakEofloop;
+                    case CLOSE_TAG_OPEN:
+                        /* EOF Parse error. */
+                        ErrEofAfterLt();
+                        /*
 						 * Emit a U+003C LESS-THAN SIGN character token and a U+002F
 						 * SOLIDUS character token.
 						 */
-						TokenHandler.Characters(Tokenizer.LT_SOLIDUS, 0, 2);
-						/*
+                        TokenHandler.Characters(LT_SOLIDUS, 0, 2);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case TAG_NAME:
-						/*
+                        goto breakEofloop;
+                    case TAG_NAME:
+                        /*
 						 * EOF Parse error.
 						 */
-						ErrEofInTagName();
-						/*
+                        ErrEofInTagName();
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case BEFORE_ATTRIBUTE_NAME:
-					case AFTER_ATTRIBUTE_VALUE_QUOTED:
-					case SELF_CLOSING_START_TAG:
-						/* EOF Parse error. */
-						ErrEofWithoutGt();
-						/*
+                        goto breakEofloop;
+                    case BEFORE_ATTRIBUTE_NAME:
+                    case AFTER_ATTRIBUTE_VALUE_QUOTED:
+                    case SELF_CLOSING_START_TAG:
+                        /* EOF Parse error. */
+                        ErrEofWithoutGt();
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case ATTRIBUTE_NAME:
-						/*
+                        goto breakEofloop;
+                    case ATTRIBUTE_NAME:
+                        /*
 						 * EOF Parse error.
 						 */
-						ErrEofInAttributeName();
-						/*
+                        ErrEofInAttributeName();
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case AFTER_ATTRIBUTE_NAME:
-					case BEFORE_ATTRIBUTE_VALUE:
-						/* EOF Parse error. */
-						ErrEofWithoutGt();
-						/*
+                        goto breakEofloop;
+                    case AFTER_ATTRIBUTE_NAME:
+                    case BEFORE_ATTRIBUTE_VALUE:
+                        /* EOF Parse error. */
+                        ErrEofWithoutGt();
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case ATTRIBUTE_VALUE_DOUBLE_QUOTED:
-					case ATTRIBUTE_VALUE_SINGLE_QUOTED:
-					case ATTRIBUTE_VALUE_UNQUOTED:
-						/* EOF Parse error. */
-						ErrEofInAttributeValue();
-						/*
+                        goto breakEofloop;
+                    case ATTRIBUTE_VALUE_DOUBLE_QUOTED:
+                    case ATTRIBUTE_VALUE_SINGLE_QUOTED:
+                    case ATTRIBUTE_VALUE_UNQUOTED:
+                        /* EOF Parse error. */
+                        ErrEofInAttributeValue();
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case BOGUS_COMMENT:
-						EmitComment(0, 0);
-						goto breakEofloop;
-					case BOGUS_COMMENT_HYPHEN:
-						// [NOCPP[
-						MaybeAppendSpaceToBogusComment();
-						// ]NOCPP]
-						EmitComment(0, 0);
-						goto breakEofloop;
-					case MARKUP_DECLARATION_OPEN:
-						ErrBogusComment();
-						ClearLongStrBuf();
-						EmitComment(0, 0);
-						goto breakEofloop;
-					case MARKUP_DECLARATION_HYPHEN:
-						ErrBogusComment();
-						EmitComment(0, 0);
-						goto breakEofloop;
-					case MARKUP_DECLARATION_OCTYPE:
-						if (_index < 6)
-						{
-							ErrBogusComment();
-							EmitComment(0, 0);
-						}
-						else
-						{
-							/* EOF Parse error. */
-							ErrEofInDoctype();
-							/*
+                        goto breakEofloop;
+                    case BOGUS_COMMENT:
+                        EmitComment(0, 0);
+                        goto breakEofloop;
+                    case BOGUS_COMMENT_HYPHEN:
+                        // [NOCPP[
+                        MaybeAppendSpaceToBogusComment();
+                        // ]NOCPP]
+                        EmitComment(0, 0);
+                        goto breakEofloop;
+                    case MARKUP_DECLARATION_OPEN:
+                        ErrBogusComment();
+                        ClearLongStrBuf();
+                        EmitComment(0, 0);
+                        goto breakEofloop;
+                    case MARKUP_DECLARATION_HYPHEN:
+                        ErrBogusComment();
+                        EmitComment(0, 0);
+                        goto breakEofloop;
+                    case MARKUP_DECLARATION_OCTYPE:
+                        if (_index < 6)
+                        {
+                            ErrBogusComment();
+                            EmitComment(0, 0);
+                        }
+                        else
+                        {
+                            /* EOF Parse error. */
+                            ErrEofInDoctype();
+                            /*
 							 * Create a new DOCTYPE token. Set its force-quirks flag
 							 * to on.
 							 */
-							_doctypeName = "";
-							if (_systemIdentifier != null)
-							{
-								_systemIdentifier = null;
-							}
-							if (_publicIdentifier != null)
-							{
-								_publicIdentifier = null;
-							}
-							_forceQuirks = true;
-							/*
+                            _doctypeName = "";
+                            if (_systemIdentifier != null)
+                            {
+                                _systemIdentifier = null;
+                            }
+                            if (_publicIdentifier != null)
+                            {
+                                _publicIdentifier = null;
+                            }
+                            _forceQuirks = true;
+                            /*
 							 * Emit the token.
 							 */
-							EmitDoctypeToken(0);
-							/*
+                            EmitDoctypeToken(0);
+                            /*
 							 * Reconsume the EOF character in the data state.
 							 */
-							goto breakEofloop;
-						}
-						goto breakEofloop;
-					case COMMENT_START:
-					case COMMENT:
-						/*
+                            goto breakEofloop;
+                        }
+                        goto breakEofloop;
+                    case COMMENT_START:
+                    case COMMENT:
+                        /*
 						 * EOF Parse error.
 						 */
-						ErrEofInComment();
-						/* Emit the comment token. */
-						EmitComment(0, 0);
-						/*
+                        ErrEofInComment();
+                        /* Emit the comment token. */
+                        EmitComment(0, 0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case COMMENT_END:
-						ErrEofInComment();
-						/* Emit the comment token. */
-						EmitComment(2, 0);
-						/*
+                        goto breakEofloop;
+                    case COMMENT_END:
+                        ErrEofInComment();
+                        /* Emit the comment token. */
+                        EmitComment(2, 0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case COMMENT_END_DASH:
-					case COMMENT_START_DASH:
-						ErrEofInComment();
-						/* Emit the comment token. */
-						EmitComment(1, 0);
-						/*
+                        goto breakEofloop;
+                    case COMMENT_END_DASH:
+                    case COMMENT_START_DASH:
+                        ErrEofInComment();
+                        /* Emit the comment token. */
+                        EmitComment(1, 0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case COMMENT_END_BANG:
-						ErrEofInComment();
-						/* Emit the comment token. */
-						EmitComment(3, 0);
-						/*
+                        goto breakEofloop;
+                    case COMMENT_END_BANG:
+                        ErrEofInComment();
+                        /* Emit the comment token. */
+                        EmitComment(3, 0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case DOCTYPE:
-					case BEFORE_DOCTYPE_NAME:
-						ErrEofInDoctype();
-						/*
+                        goto breakEofloop;
+                    case DOCTYPE:
+                    case BEFORE_DOCTYPE_NAME:
+                        ErrEofInDoctype();
+                        /*
 						 * Create a new DOCTYPE token. Set its force-quirks flag to
 						 * on.
 						 */
-						_forceQuirks = true;
-						/*
+                        _forceQuirks = true;
+                        /*
 						 * Emit the token.
 						 */
-						EmitDoctypeToken(0);
-						/*
+                        EmitDoctypeToken(0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case DOCTYPE_NAME:
-						ErrEofInDoctype();
-						StrBufToDoctypeName();
-						/*
+                        goto breakEofloop;
+                    case DOCTYPE_NAME:
+                        ErrEofInDoctype();
+                        StrBufToDoctypeName();
+                        /*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						_forceQuirks = true;
-						/*
+                        _forceQuirks = true;
+                        /*
 						 * Emit that DOCTYPE token.
 						 */
-						EmitDoctypeToken(0);
-						/*
+                        EmitDoctypeToken(0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case DOCTYPE_UBLIC:
-					case DOCTYPE_YSTEM:
-					case AFTER_DOCTYPE_NAME:
-					case AFTER_DOCTYPE_PUBLIC_KEYWORD:
-					case AFTER_DOCTYPE_SYSTEM_KEYWORD:
-					case BEFORE_DOCTYPE_PUBLIC_IDENTIFIER:
-						ErrEofInDoctype();
-						/*
+                        goto breakEofloop;
+                    case DOCTYPE_UBLIC:
+                    case DOCTYPE_YSTEM:
+                    case AFTER_DOCTYPE_NAME:
+                    case AFTER_DOCTYPE_PUBLIC_KEYWORD:
+                    case AFTER_DOCTYPE_SYSTEM_KEYWORD:
+                    case BEFORE_DOCTYPE_PUBLIC_IDENTIFIER:
+                        ErrEofInDoctype();
+                        /*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						_forceQuirks = true;
-						/*
+                        _forceQuirks = true;
+                        /*
 						 * Emit that DOCTYPE token.
 						 */
-						EmitDoctypeToken(0);
-						/*
+                        EmitDoctypeToken(0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED:
-					case DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED:
-						/* EOF Parse error. */
-						ErrEofInPublicId();
-						/*
+                        goto breakEofloop;
+                    case DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED:
+                    case DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED:
+                        /* EOF Parse error. */
+                        ErrEofInPublicId();
+                        /*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						_forceQuirks = true;
-						/*
+                        _forceQuirks = true;
+                        /*
 						 * Emit that DOCTYPE token.
 						 */
-						_publicIdentifier = LongStrBufToString();
-						EmitDoctypeToken(0);
-						/*
+                        _publicIdentifier = LongStrBufToString();
+                        EmitDoctypeToken(0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case AFTER_DOCTYPE_PUBLIC_IDENTIFIER:
-					case BEFORE_DOCTYPE_SYSTEM_IDENTIFIER:
-					case BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS:
-						ErrEofInDoctype();
-						/*
+                        goto breakEofloop;
+                    case AFTER_DOCTYPE_PUBLIC_IDENTIFIER:
+                    case BEFORE_DOCTYPE_SYSTEM_IDENTIFIER:
+                    case BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDENTIFIERS:
+                        ErrEofInDoctype();
+                        /*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						_forceQuirks = true;
-						/*
+                        _forceQuirks = true;
+                        /*
 						 * Emit that DOCTYPE token.
 						 */
-						EmitDoctypeToken(0);
-						/*
+                        EmitDoctypeToken(0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED:
-					case DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED:
-						/* EOF Parse error. */
-						ErrEofInSystemId();
-						/*
+                        goto breakEofloop;
+                    case DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED:
+                    case DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED:
+                        /* EOF Parse error. */
+                        ErrEofInSystemId();
+                        /*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						_forceQuirks = true;
-						/*
+                        _forceQuirks = true;
+                        /*
 						 * Emit that DOCTYPE token.
 						 */
-						_systemIdentifier = LongStrBufToString();
-						EmitDoctypeToken(0);
-						/*
+                        _systemIdentifier = LongStrBufToString();
+                        EmitDoctypeToken(0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case AFTER_DOCTYPE_SYSTEM_IDENTIFIER:
-						ErrEofInDoctype();
-						/*
+                        goto breakEofloop;
+                    case AFTER_DOCTYPE_SYSTEM_IDENTIFIER:
+                        ErrEofInDoctype();
+                        /*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						_forceQuirks = true;
-						/*
+                        _forceQuirks = true;
+                        /*
 						 * Emit that DOCTYPE token.
 						 */
-						EmitDoctypeToken(0);
-						/*
+                        EmitDoctypeToken(0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case BOGUS_DOCTYPE:
-						/*
+                        goto breakEofloop;
+                    case BOGUS_DOCTYPE:
+                        /*
 						 * Emit that DOCTYPE token.
 						 */
-						EmitDoctypeToken(0);
-						/*
+                        EmitDoctypeToken(0);
+                        /*
 						 * Reconsume the EOF character in the data state.
 						 */
-						goto breakEofloop;
-					case CONSUME_CHARACTER_REFERENCE:
-						/*
+                        goto breakEofloop;
+                    case CONSUME_CHARACTER_REFERENCE:
+                        /*
 						 * Unlike the definition is the spec, this state does not
 						 * return a value and never requires the caller to
 						 * backtrack. This state takes care of emitting characters
@@ -6984,7 +6997,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * takes care of that in the case when consuming the entity
 						 * fails.
 						 */
-						/*
+                        /*
 						 * This section defines how to consume an entity. This
 						 * definition is used when parsing entities in text and in
 						 * attributes.
@@ -6994,133 +7007,133 @@ namespace HtmlParserSharp.Portable.Core
 						 * character):
 						 */
 
-						EmitOrAppendStrBuf(returnState);
-						state = returnState;
-						continue;
-					case CHARACTER_REFERENCE_HILO_LOOKUP:
-						ErrNoNamedCharacterMatch();
-						EmitOrAppendStrBuf(returnState);
-						state = returnState;
-						continue;
-					case CHARACTER_REFERENCE_TAIL:
-						/*outer:*/
-						for (; ; )
-						{
-							char c = '\u0000';
-							_entCol++;
-							/*
+                        EmitOrAppendStrBuf(returnState);
+                        state = returnState;
+                        continue;
+                    case CHARACTER_REFERENCE_HILO_LOOKUP:
+                        ErrNoNamedCharacterMatch();
+                        EmitOrAppendStrBuf(returnState);
+                        state = returnState;
+                        continue;
+                    case CHARACTER_REFERENCE_TAIL:
+                        /*outer:*/
+                        for (;;)
+                        {
+                            char c = '\u0000';
+                            _entCol++;
+                            /*
 							 * Consume the maximum number of characters possible,
 							 * with the consumed characters matching one of the
 							 * identifiers in the first column of the named
 							 * character references table (in a case-sensitive
 							 * manner).
 							 */
-							/*hiloop:*/
-							for (; ; )
-							{
-								if (_hi == -1)
-								{
-									goto breakHiloop;
-								}
-								if (_entCol == NamedCharacters.NAMES[_hi].Length)
-								{
-									goto breakHiloop;
-								}
-								if (_entCol > NamedCharacters.NAMES[_hi].Length)
-								{
-									goto breakOuter;
-								}
-								else if (c < NamedCharacters.NAMES[_hi][_entCol])
-								{
-									_hi--;
-								}
-								else
-								{
-									goto breakHiloop;
-								}
-							}
+                            /*hiloop:*/
+                            for (;;)
+                            {
+                                if (_hi == -1)
+                                {
+                                    goto breakHiloop;
+                                }
+                                if (_entCol == NamedCharacters.NAMES[_hi].Length)
+                                {
+                                    goto breakHiloop;
+                                }
+                                if (_entCol > NamedCharacters.NAMES[_hi].Length)
+                                {
+                                    goto breakOuter;
+                                }
+                                else if (c < NamedCharacters.NAMES[_hi][_entCol])
+                                {
+                                    _hi--;
+                                }
+                                else
+                                {
+                                    goto breakHiloop;
+                                }
+                            }
 
-						breakHiloop:
+                            breakHiloop:
 
-							/*loloop:*/
-							for (; ; )
-							{
-								if (_hi < _lo)
-								{
-									goto breakOuter;
-								}
-								if (_entCol == NamedCharacters.NAMES[_lo].Length)
-								{
-									_candidate = _lo;
-									_strBufMark = _strBufLen;
-									_lo++;
-								}
-								else if (_entCol > NamedCharacters.NAMES[_lo].Length)
-								{
-									goto breakOuter;
-								}
-								else if (c > NamedCharacters.NAMES[_lo][_entCol])
-								{
-									_lo++;
-								}
-								else
-								{
-									goto breakLoloop;
-								}
-							}
+                            /*loloop:*/
+                            for (;;)
+                            {
+                                if (_hi < _lo)
+                                {
+                                    goto breakOuter;
+                                }
+                                if (_entCol == NamedCharacters.NAMES[_lo].Length)
+                                {
+                                    _candidate = _lo;
+                                    _strBufMark = _strBufLen;
+                                    _lo++;
+                                }
+                                else if (_entCol > NamedCharacters.NAMES[_lo].Length)
+                                {
+                                    goto breakOuter;
+                                }
+                                else if (c > NamedCharacters.NAMES[_lo][_entCol])
+                                {
+                                    _lo++;
+                                }
+                                else
+                                {
+                                    goto breakLoloop;
+                                }
+                            }
 
-						breakLoloop:
+                            breakLoloop:
 
-							if (_hi < _lo)
-							{
-								goto breakOuter;
-							}
-							continue;
-						}
+                            if (_hi < _lo)
+                            {
+                                goto breakOuter;
+                            }
+                            continue;
+                        }
 
-					breakOuter:
+                        breakOuter:
 
-						if (_candidate == -1)
-						{
-							/*
+                        if (_candidate == -1)
+                        {
+                            /*
 							 * If no match can be made, then this is a parse error.
 							 */
-							ErrNoNamedCharacterMatch();
-							EmitOrAppendStrBuf(returnState);
-							state = returnState;
-							goto continueEofloop;
-						}
-						else
-						{
-							string candidateName = NamedCharacters.NAMES[_candidate];
-							if (candidateName.Length == 0
-									|| candidateName[candidateName.Length - 1] != ';')
-							{
-								/*
+                            ErrNoNamedCharacterMatch();
+                            EmitOrAppendStrBuf(returnState);
+                            state = returnState;
+                            goto continueEofloop;
+                        }
+                        else
+                        {
+                            string candidateName = NamedCharacters.NAMES[_candidate];
+                            if (candidateName.Length == 0
+                                || candidateName[candidateName.Length - 1] != ';')
+                            {
+                                /*
 								 * If the last character matched is not a U+003B
 								 * SEMICOLON (;), there is a parse error.
 								 */
-								if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-								{
-									/*
+                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                                {
+                                    /*
 									 * If the entity is being consumed as part of an
 									 * attribute, and the last character matched is
 									 * not a U+003B SEMICOLON (;),
 									 */
-									char ch;
-									if (_strBufMark == _strBufLen)
-									{
-										ch = '\u0000';
-									}
-									else
-									{
-										ch = _strBuf[_strBufMark];
-									}
-									if ((ch >= '0' && ch <= '9')
-											|| (ch >= 'A' && ch <= 'Z')
-											|| (ch >= 'a' && ch <= 'z'))
-									{
-										/*
+                                    char ch;
+                                    if (_strBufMark == _strBufLen)
+                                    {
+                                        ch = '\u0000';
+                                    }
+                                    else
+                                    {
+                                        ch = _strBuf[_strBufMark];
+                                    }
+                                    if ((ch >= '0' && ch <= '9')
+                                        || (ch >= 'A' && ch <= 'Z')
+                                        || (ch >= 'a' && ch <= 'z'))
+                                    {
+                                        /*
 										 * and the next character is in the range
 										 * U+0030 DIGIT ZERO to U+0039 DIGIT NINE,
 										 * U+0041 LATIN CAPITAL LETTER A to U+005A
@@ -7131,72 +7144,72 @@ namespace HtmlParserSharp.Portable.Core
 										 * after the U+0026 AMPERSAND (&) must be
 										 * unconsumed, and nothing is returned.
 										 */
-										ErrNoNamedCharacterMatch();
-										AppendStrBufToLongStrBuf();
-										state = returnState;
-										goto continueEofloop;
-									}
-								}
-								if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-								{
-									ErrUnescapedAmpersandInterpretedAsCharacterReference();
-								}
-								else
-								{
-									ErrNotSemicolonTerminated();
-								}
-							}
+                                        ErrNoNamedCharacterMatch();
+                                        AppendStrBufToLongStrBuf();
+                                        state = returnState;
+                                        goto continueEofloop;
+                                    }
+                                }
+                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                                {
+                                    ErrUnescapedAmpersandInterpretedAsCharacterReference();
+                                }
+                                else
+                                {
+                                    ErrNotSemicolonTerminated();
+                                }
+                            }
 
-							/*
+                            /*
 							 * Otherwise, return a character token for the character
 							 * corresponding to the entity name (as given by the
 							 * second column of the named character references
 							 * table).
 							 */
-							char[] val = NamedCharacters.VALUES[_candidate];
-							if (
-								// [NOCPP[
-							val.Length == 1
-								// ]NOCPP]
-								// CPPONLY: val[1] == 0
-							)
-							{
-								EmitOrAppendOne(val, returnState);
-							}
-							else
-							{
-								EmitOrAppendTwo(val, returnState);
-							}
-							// this is so complicated!
-							if (_strBufMark < _strBufLen)
-							{
-								if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-								{
-									for (int i = _strBufMark; i < _strBufLen; i++)
-									{
-										AppendLongStrBuf(_strBuf[i]);
-									}
-								}
-								else
-								{
-									TokenHandler.Characters(_strBuf, _strBufMark,
-											_strBufLen - _strBufMark);
-								}
-							}
-							state = returnState;
-							goto continueEofloop;
-							/*
+                            char[] val = NamedCharacters.VALUES[_candidate];
+                            if (
+                                // [NOCPP[
+                                val.Length == 1
+                                // ]NOCPP]
+                                // CPPONLY: val[1] == 0
+                                )
+                            {
+                                EmitOrAppendOne(val, returnState);
+                            }
+                            else
+                            {
+                                EmitOrAppendTwo(val, returnState);
+                            }
+                            // this is so complicated!
+                            if (_strBufMark < _strBufLen)
+                            {
+                                if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+                                {
+                                    for (int i = _strBufMark; i < _strBufLen; i++)
+                                    {
+                                        AppendLongStrBuf(_strBuf[i]);
+                                    }
+                                }
+                                else
+                                {
+                                    TokenHandler.Characters(_strBuf, _strBufMark,
+                                                            _strBufLen - _strBufMark);
+                                }
+                            }
+                            state = returnState;
+                            goto continueEofloop;
+                            /*
 							 * If the markup contains I'm &notit; I tell you, the
 							 * entity is parsed as "not", as in, I'm Â¬it; I tell
 							 * you. But if the markup was I'm &notin; I tell you,
 							 * the entity would be parsed as "notin;", resulting in
 							 * I'm âˆ‰ I tell you.
 							 */
-						}
-					case CONSUME_NCR:
-					case DECIMAL_NRC_LOOP:
-					case HEX_NCR_LOOP:
-						/*
+                        }
+                    case CONSUME_NCR:
+                    case DECIMAL_NRC_LOOP:
+                    case HEX_NCR_LOOP:
+                        /*
 						 * If no characters match the range, then don't consume any
 						 * characters (and unconsume the U+0023 NUMBER SIGN
 						 * character and, if appropriate, the X character). This is
@@ -7205,640 +7218,628 @@ namespace HtmlParserSharp.Portable.Core
 						 * Otherwise, if the next character is a U+003B SEMICOLON,
 						 * consume that too. If it isn't, there is a parse error.
 						 */
-						if (!_seenDigits)
-						{
-							ErrNoDigitsInNCR();
-							EmitOrAppendStrBuf(returnState);
-							state = returnState;
-							continue;
-						}
-						else
-						{
-							ErrCharRefLacksSemicolon();
-						}
-						// WARNING previous state sets reconsume
-						HandleNcrValue(returnState);
-						state = returnState;
-						continue;
-					case CDATA_RSQB:
-						TokenHandler.Characters(Tokenizer.RSQB_RSQB, 0, 1);
-						goto breakEofloop;
-					case CDATA_RSQB_RSQB:
-						TokenHandler.Characters(Tokenizer.RSQB_RSQB, 0, 2);
-						goto breakEofloop;
-					case DATA:
-					default:
-						goto breakEofloop;
-				}
+                        if (!_seenDigits)
+                        {
+                            ErrNoDigitsInNCR();
+                            EmitOrAppendStrBuf(returnState);
+                            state = returnState;
+                            continue;
+                        }
+                        else
+                        {
+                            ErrCharRefLacksSemicolon();
+                        }
+                        // WARNING previous state sets reconsume
+                        HandleNcrValue(returnState);
+                        state = returnState;
+                        continue;
+                    case CDATA_RSQB:
+                        TokenHandler.Characters(RSQB_RSQB, 0, 1);
+                        goto breakEofloop;
+                    case CDATA_RSQB_RSQB:
+                        TokenHandler.Characters(RSQB_RSQB, 0, 2);
+                        goto breakEofloop;
+                    case DATA:
+                    default:
+                        goto breakEofloop;
+                }
 
-			continueEofloop:
-				continue;
-			} // eofloop
+                continueEofloop:
+                continue;
+            } // eofloop
 
-			breakEofloop:
-			// case DATA:
-			/*
+            breakEofloop:
+            // case DATA:
+            /*
 			 * EOF Emit an end-of-file token.
 			 */
-			TokenHandler.Eof();
-			return;
-		}
+            TokenHandler.Eof();
+            return;
+        }
 
-		private void EmitDoctypeToken(int pos)
-		{
-			_cstart = pos + 1;
-			TokenHandler.Doctype(_doctypeName, _publicIdentifier, _systemIdentifier,
-					_forceQuirks);
-			// It is OK and sufficient to release these here, since
-			// there's no way out of the doctype states than through paths
-			// that call this method.
-			_doctypeName = null;
-			_publicIdentifier = null;
-			_systemIdentifier = null;
-		}
+        private void EmitDoctypeToken(int pos)
+        {
+            _cstart = pos + 1;
+            TokenHandler.Doctype(_doctypeName, _publicIdentifier, _systemIdentifier,
+                                 _forceQuirks);
+            // It is OK and sufficient to release these here, since
+            // there's no way out of the doctype states than through paths
+            // that call this method.
+            _doctypeName = null;
+            _publicIdentifier = null;
+            _systemIdentifier = null;
+        }
 
-		/*@Inline*/
-		protected char CheckChar(char[] buf, int pos)
-		{
-			return buf[pos];
-		}
+        /*@Inline*/
 
-		// [NOCPP[
+        protected char CheckChar(char[] buf, int pos)
+        {
+            return buf[pos];
+        }
 
-		/**
+        // [NOCPP[
+
+        /**
 		 * Returns the alreadyComplainedAboutNonAscii.
 		 * 
 		 * @return the alreadyComplainedAboutNonAscii
 		 */
-		public bool IsAlreadyComplainedAboutNonAscii
-		{
-			get
-			{
-				return true;
-			}
-		}
 
-		// ]NOCPP]
+        public bool IsAlreadyComplainedAboutNonAscii
+        {
+            get { return true; }
+        }
 
-		public bool InternalEncodingDeclaration(string internalCharset)
-		{
-			bool accept = false;
-			if (EncodingDeclared != null)
-			{
-				foreach (var inv in EncodingDeclared.GetInvocationList())
-				{
-					var args = new EncodingDetectedEventArgs(internalCharset);
-					inv.DynamicInvoke(this, args);
-					if (args.AcceptEncoding)
-						accept = true;
-				}
-			}
+        // ]NOCPP]
 
-			return accept;
-		}
+        public bool InternalEncodingDeclaration(string internalCharset)
+        {
+            bool accept = false;
+            if (EncodingDeclared != null)
+            {
+                foreach (Delegate inv in EncodingDeclared.GetInvocationList())
+                {
+                    var args = new EncodingDetectedEventArgs(internalCharset);
+                    inv.DynamicInvoke(this, args);
+                    if (args.AcceptEncoding)
+                        accept = true;
+                }
+            }
 
-		/**
+            return accept;
+        }
+
+        /**
 		 * @param val
 		 * @throws SAXException
 		 */
-		private void EmitOrAppendTwo(char[] val, int returnState)
-		{
-			if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-			{
-				AppendLongStrBuf(val[0]);
-				AppendLongStrBuf(val[1]);
-			}
-			else
-			{
-				TokenHandler.Characters(val, 0, 2);
-			}
-		}
 
-		private void EmitOrAppendOne(char[] val, int returnState)
-		{
-			if ((returnState & DATA_AND_RCDATA_MASK) != 0)
-			{
-				AppendLongStrBuf(val[0]);
-			}
-			else
-			{
-				TokenHandler.Characters(val, 0, 1);
-			}
-		}
+        private void EmitOrAppendTwo(char[] val, int returnState)
+        {
+            if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+            {
+                AppendLongStrBuf(val[0]);
+                AppendLongStrBuf(val[1]);
+            }
+            else
+            {
+                TokenHandler.Characters(val, 0, 2);
+            }
+        }
 
-		public void End()
-		{
-			_strBuf = null;
-			_longStrBuf = null;
-			_doctypeName = null;
-			_systemIdentifier = null;
-			_publicIdentifier = null;
-			_tagName = null;
-			_attributeName = null;
-			TokenHandler.EndTokenization();
-			if (_attributes != null)
-			{
-				_attributes.Clear(_mappingLangToXmlLang);
-				_attributes = null;
-			}
-		}
+        private void EmitOrAppendOne(char[] val, int returnState)
+        {
+            if ((returnState & DATA_AND_RCDATA_MASK) != 0)
+            {
+                AppendLongStrBuf(val[0]);
+            }
+            else
+            {
+                TokenHandler.Characters(val, 0, 1);
+            }
+        }
 
-		public void RequestSuspension()
-		{
-			_shouldSuspend = true;
-		}
+        public void End()
+        {
+            _strBuf = null;
+            _longStrBuf = null;
+            _doctypeName = null;
+            _systemIdentifier = null;
+            _publicIdentifier = null;
+            _tagName = null;
+            _attributeName = null;
+            TokenHandler.EndTokenization();
+            if (_attributes != null)
+            {
+                _attributes.Clear(_mappingLangToXmlLang);
+                _attributes = null;
+            }
+        }
 
-		// [NOCPP[
+        public void RequestSuspension()
+        {
+            _shouldSuspend = true;
+        }
 
-		public void BecomeConfident()
-		{
-			_confident = true;
-		}
+        // [NOCPP[
 
-		/**
+        public void BecomeConfident()
+        {
+            _confident = true;
+        }
+
+        /**
 		 * Returns the nextCharOnNewLine.
 		 * 
 		 * @return the nextCharOnNewLine
 		 */
-		public bool IsNextCharOnNewLine
-		{
-			get
-			{
-				return false;
-			}
-		}
 
-		public bool IsPrevCR
-		{
-			get
-			{
-				return _lastCR;
-			}
-		}
+        public bool IsNextCharOnNewLine
+        {
+            get { return false; }
+        }
 
-		/**
+        public bool IsPrevCR
+        {
+            get { return _lastCR; }
+        }
+
+        /**
 		 * Returns the line.
 		 * 
 		 * @return the line
 		 */
-		public int Line
-		{
-			get
-			{
-				return -1;
-			}
-		}
 
-		/**
+        public int Line
+        {
+            get { return -1; }
+        }
+
+        /**
 		 * Returns the col.
 		 * 
 		 * @return the col
 		 */
-		public int Col
-		{
-			get
-			{
-				return -1;
-			}
-		}
-
-		// ]NOCPP]
-
-		public bool IsInDataState
-		{
-			get
-			{
-				return (_stateSave == DATA);
-			}
-		}
-
-		public void ResetToDataState()
-		{
-			_strBufLen = 0;
-			_longStrBufLen = 0;
-			_stateSave = Tokenizer.DATA;
-			// line = 1; XXX line numbers
-			_lastCR = false;
-			_index = 0;
-			_forceQuirks = false;
-			_additional = '\u0000';
-			_entCol = -1;
-			_firstCharKey = -1;
-			_lo = 0;
-			_hi = 0; // will always be overwritten before use anyway
-			_candidate = -1;
-			_strBufMark = 0;
-			_prevValue = -1;
-			_value = 0;
-			_seenDigits = false;
-			_endTag = false;
-			_shouldSuspend = false;
-			InitDoctypeFields();
-			if (_tagName != null)
-			{
-				_tagName = null;
-			}
-			if (_attributeName != null)
-			{
-				_attributeName = null;
-			}
-			// [NOCPP[
-			if (_newAttributesEachTime)
-			{
-				// ]NOCPP]
-				if (_attributes != null)
-				{
-					_attributes = null;
-				}
-				// [NOCPP[
-			}
-			// ]NOCPP]
-		}
-
-		public void LoadState(Tokenizer other)
-		{
-			_strBufLen = other._strBufLen;
-			if (_strBufLen > _strBuf.Length)
-			{
-				_strBuf = new char[_strBufLen];
-			}
-			Array.Copy(other._strBuf, _strBuf, _strBufLen);
-
-			_longStrBufLen = other._longStrBufLen;
-			if (_longStrBufLen > _longStrBuf.Length)
-			{
-				_longStrBuf = new char[_longStrBufLen];
-			}
-			Array.Copy(other._longStrBuf, _longStrBuf, _longStrBufLen);
-
-			_stateSave = other._stateSave;
-			_returnStateSave = other._returnStateSave;
-			_endTagExpectation = other._endTagExpectation;
-			_endTagExpectationAsArray = other._endTagExpectationAsArray;
-			// line = 1; XXX line numbers
-			_lastCR = other._lastCR;
-			_index = other._index;
-			_forceQuirks = other._forceQuirks;
-			_additional = other._additional;
-			_entCol = other._entCol;
-			_firstCharKey = other._firstCharKey;
-			_lo = other._lo;
-			_hi = other._hi;
-			_candidate = other._candidate;
-			_strBufMark = other._strBufMark;
-			_prevValue = other._prevValue;
-			_value = other._value;
-			_seenDigits = other._seenDigits;
-			_endTag = other._endTag;
-			_shouldSuspend = false;
-
-			if (other._doctypeName == null)
-			{
-				_doctypeName = null;
-			}
-			else
-			{
-				_doctypeName = other._doctypeName;
-			}
-
-			if (other._systemIdentifier == null)
-			{
-				_systemIdentifier = null;
-			}
-			else
-			{
-				_systemIdentifier = other._systemIdentifier;
-			}
-
-			if (other._publicIdentifier == null)
-			{
-				_publicIdentifier = null;
-			}
-			else
-			{
-				_publicIdentifier = other._publicIdentifier;
-			}
-
-			if (other._tagName == null)
-			{
-				_tagName = null;
-			}
-			else
-			{
-				_tagName = other._tagName.CloneElementName();
-			}
-
-			if (other._attributeName == null)
-			{
-				_attributeName = null;
-			}
-			else
-			{
-				_attributeName = other._attributeName.CloneAttributeName();
-			}
-
-			if (other._attributes == null)
-			{
-				_attributes = null;
-			}
-			else
-			{
-				_attributes = other._attributes.CloneAttributes();
-			}
-		}
-
-		public void InitializeWithoutStarting()
-		{
-			_confident = false;
-			_strBuf = new char[64];
-			_longStrBuf = new char[1024];
-			_line = 1;
-			// [NOCPP[
-			_html4 = false;
-			_metaBoundaryPassed = false;
-			_wantsComments = TokenHandler.WantsComments;
-			if (!_newAttributesEachTime)
-			{
-				_attributes = new HtmlAttributes(_mappingLangToXmlLang);
-			}
-			// ]NOCPP]
-			ResetToDataState();
-		}
-
-		#region Mostly unused error/warning handlers (What are they for?)
-
-		protected void ErrGarbageAfterLtSlash()
-		{
-		}
-
-		protected void ErrLtSlashGt()
-		{
-		}
-
-		protected void ErrWarnLtSlashInRcdata()
-		{
-		}
-
-		protected void ErrHtml4LtSlashInRcdata(char folded)
-		{
-		}
-
-		protected void ErrCharRefLacksSemicolon()
-		{
-		}
-
-		protected void ErrNoDigitsInNCR()
-		{
-		}
-
-		protected void ErrGtInSystemId()
-		{
-		}
-
-		protected void ErrGtInPublicId()
-		{
-		}
-
-		protected void ErrNamelessDoctype()
-		{
-		}
-
-		protected void ErrConsecutiveHyphens()
-		{
-		}
-
-		protected void ErrPrematureEndOfComment()
-		{
-		}
-
-		protected void ErrBogusComment()
-		{
-		}
-
-		protected void ErrUnquotedAttributeValOrNull(char c)
-		{
-		}
-
-		protected void ErrSlashNotFollowedByGt()
-		{
-		}
-
-		protected void ErrHtml4XmlVoidSyntax()
-		{
-		}
-
-		protected void ErrNoSpaceBetweenAttributes()
-		{
-		}
-
-		protected void ErrHtml4NonNameInUnquotedAttribute(char c)
-		{
-		}
-
-		protected void ErrLtOrEqualsOrGraveInUnquotedAttributeOrNull(char c)
-		{
-		}
-
-		protected void ErrAttributeValueMissing()
-		{
-		}
-
-		protected void ErrBadCharBeforeAttributeNameOrNull(char c)
-		{
-		}
-
-		protected void ErrEqualsSignBeforeAttributeName()
-		{
-		}
-
-		protected void ErrBadCharAfterLt(char c)
-		{
-		}
-
-		protected void ErrLtGt()
-		{
-		}
-
-		protected void ErrProcessingInstruction()
-		{
-		}
-
-		protected void ErrUnescapedAmpersandInterpretedAsCharacterReference()
-		{
-		}
-
-		protected void ErrNotSemicolonTerminated()
-		{
-		}
-
-		protected void ErrNoNamedCharacterMatch()
-		{
-		}
-
-		protected void ErrQuoteBeforeAttributeName(char c)
-		{
-		}
-
-		protected void ErrQuoteOrLtInAttributeNameOrNull(char c)
-		{
-		}
-
-		protected void ErrExpectedPublicId()
-		{
-		}
-
-		protected void ErrBogusDoctype()
-		{
-		}
-
-		protected void MaybeWarnPrivateUseAstral()
-		{
-		}
-
-		protected void MaybeWarnPrivateUse(char ch)
-		{
-		}
-
-		protected void MaybeErrAttributesOnEndTag(HtmlAttributes attrs)
-		{
-		}
-
-		protected void MaybeErrSlashInEndTag(bool selfClosing)
-		{
-		}
-
-		protected char ErrNcrNonCharacter(char ch)
-		{
-			return ch;
-		}
-
-		protected void ErrAstralNonCharacter(int ch)
-		{
-		}
-
-		protected void ErrNcrSurrogate()
-		{
-		}
-
-		protected char ErrNcrControlChar(char ch)
-		{
-			return ch;
-		}
-
-		protected void ErrNcrCr()
-		{
-		}
-
-		protected void ErrNcrInC1Range()
-		{
-		}
-
-		protected void ErrEofInPublicId()
-		{
-		}
-
-		protected void ErrEofInComment()
-		{
-		}
-
-		protected void ErrEofInDoctype()
-		{
-		}
-
-		protected void ErrEofInAttributeValue()
-		{
-		}
-
-		protected void ErrEofInAttributeName()
-		{
-		}
-
-		protected void ErrEofWithoutGt()
-		{
-		}
-
-		protected void ErrEofInTagName()
-		{
-		}
-
-		protected void ErrEofInEndTag()
-		{
-		}
-
-		protected void ErrEofAfterLt()
-		{
-		}
-
-		protected void ErrNcrOutOfRange()
-		{
-		}
-
-		protected void ErrNcrUnassigned()
-		{
-		}
-
-		protected void ErrDuplicateAttribute()
-		{
-		}
-
-		protected void ErrEofInSystemId()
-		{
-		}
-
-		protected void ErrExpectedSystemId()
-		{
-		}
-
-		protected void ErrMissingSpaceBeforeDoctypeName()
-		{
-		}
-
-		protected void ErrHyphenHyphenBang()
-		{
-		}
-
-		protected void ErrNcrControlChar()
-		{
-		}
-
-		protected void ErrNcrZero()
-		{
-		}
-
-		protected void ErrNoSpaceBetweenDoctypeSystemKeywordAndQuote()
-		{
-		}
-
-		protected void ErrNoSpaceBetweenPublicAndSystemIds()
-		{
-		}
-
-		protected void ErrNoSpaceBetweenDoctypePublicKeywordAndQuote()
-		{
-		}
-
-		protected void NoteAttributeWithoutValue()
-		{
-		}
-
-		protected void NoteUnquotedAttributeValue()
-		{
-		}
-
-		#endregion
-
-		// [NOCPP[
-
-		/// <summary>
-		/// Sets an offset to be added to the position reported to
-		/// <code>TransitionHandler</code>.
-		/// </summary>
-		/// <param name="offset">The offset.</param>
-		public void SetTransitionBaseOffset(int offset)
-		{
-			// TODO: nothing done here??
-		}
-
-		// ]NOCPP]
-	}
+
+        public int Col
+        {
+            get { return -1; }
+        }
+
+        // ]NOCPP]
+
+        public bool IsInDataState
+        {
+            get { return (_stateSave == DATA); }
+        }
+
+        public void ResetToDataState()
+        {
+            _strBufLen = 0;
+            _longStrBufLen = 0;
+            _stateSave = DATA;
+            // line = 1; XXX line numbers
+            _lastCR = false;
+            _index = 0;
+            _forceQuirks = false;
+            _additional = '\u0000';
+            _entCol = -1;
+            _firstCharKey = -1;
+            _lo = 0;
+            _hi = 0; // will always be overwritten before use anyway
+            _candidate = -1;
+            _strBufMark = 0;
+            _prevValue = -1;
+            _value = 0;
+            _seenDigits = false;
+            _endTag = false;
+            _shouldSuspend = false;
+            InitDoctypeFields();
+            if (_tagName != null)
+            {
+                _tagName = null;
+            }
+            if (_attributeName != null)
+            {
+                _attributeName = null;
+            }
+            // [NOCPP[
+            if (_newAttributesEachTime)
+            {
+                // ]NOCPP]
+                if (_attributes != null)
+                {
+                    _attributes = null;
+                }
+                // [NOCPP[
+            }
+            // ]NOCPP]
+        }
+
+        public void LoadState(Tokenizer other)
+        {
+            _strBufLen = other._strBufLen;
+            if (_strBufLen > _strBuf.Length)
+            {
+                _strBuf = new char[_strBufLen];
+            }
+            Array.Copy(other._strBuf, _strBuf, _strBufLen);
+
+            _longStrBufLen = other._longStrBufLen;
+            if (_longStrBufLen > _longStrBuf.Length)
+            {
+                _longStrBuf = new char[_longStrBufLen];
+            }
+            Array.Copy(other._longStrBuf, _longStrBuf, _longStrBufLen);
+
+            _stateSave = other._stateSave;
+            _returnStateSave = other._returnStateSave;
+            _endTagExpectation = other._endTagExpectation;
+            _endTagExpectationAsArray = other._endTagExpectationAsArray;
+            // line = 1; XXX line numbers
+            _lastCR = other._lastCR;
+            _index = other._index;
+            _forceQuirks = other._forceQuirks;
+            _additional = other._additional;
+            _entCol = other._entCol;
+            _firstCharKey = other._firstCharKey;
+            _lo = other._lo;
+            _hi = other._hi;
+            _candidate = other._candidate;
+            _strBufMark = other._strBufMark;
+            _prevValue = other._prevValue;
+            _value = other._value;
+            _seenDigits = other._seenDigits;
+            _endTag = other._endTag;
+            _shouldSuspend = false;
+
+            if (other._doctypeName == null)
+            {
+                _doctypeName = null;
+            }
+            else
+            {
+                _doctypeName = other._doctypeName;
+            }
+
+            if (other._systemIdentifier == null)
+            {
+                _systemIdentifier = null;
+            }
+            else
+            {
+                _systemIdentifier = other._systemIdentifier;
+            }
+
+            if (other._publicIdentifier == null)
+            {
+                _publicIdentifier = null;
+            }
+            else
+            {
+                _publicIdentifier = other._publicIdentifier;
+            }
+
+            if (other._tagName == null)
+            {
+                _tagName = null;
+            }
+            else
+            {
+                _tagName = other._tagName.CloneElementName();
+            }
+
+            if (other._attributeName == null)
+            {
+                _attributeName = null;
+            }
+            else
+            {
+                _attributeName = other._attributeName.CloneAttributeName();
+            }
+
+            if (other._attributes == null)
+            {
+                _attributes = null;
+            }
+            else
+            {
+                _attributes = other._attributes.CloneAttributes();
+            }
+        }
+
+        public void InitializeWithoutStarting()
+        {
+            _confident = false;
+            _strBuf = new char[64];
+            _longStrBuf = new char[1024];
+            _line = 1;
+            // [NOCPP[
+            _html4 = false;
+            _metaBoundaryPassed = false;
+            _wantsComments = TokenHandler.WantsComments;
+            if (!_newAttributesEachTime)
+            {
+                _attributes = new HtmlAttributes(_mappingLangToXmlLang);
+            }
+            // ]NOCPP]
+            ResetToDataState();
+        }
+
+        #region Mostly unused error/warning handlers (What are they for?)
+
+        protected void ErrGarbageAfterLtSlash()
+        {
+        }
+
+        protected void ErrLtSlashGt()
+        {
+        }
+
+        protected void ErrWarnLtSlashInRcdata()
+        {
+        }
+
+        protected void ErrHtml4LtSlashInRcdata(char folded)
+        {
+        }
+
+        protected void ErrCharRefLacksSemicolon()
+        {
+        }
+
+        protected void ErrNoDigitsInNCR()
+        {
+        }
+
+        protected void ErrGtInSystemId()
+        {
+        }
+
+        protected void ErrGtInPublicId()
+        {
+        }
+
+        protected void ErrNamelessDoctype()
+        {
+        }
+
+        protected void ErrConsecutiveHyphens()
+        {
+        }
+
+        protected void ErrPrematureEndOfComment()
+        {
+        }
+
+        protected void ErrBogusComment()
+        {
+        }
+
+        protected void ErrUnquotedAttributeValOrNull(char c)
+        {
+        }
+
+        protected void ErrSlashNotFollowedByGt()
+        {
+        }
+
+        protected void ErrHtml4XmlVoidSyntax()
+        {
+        }
+
+        protected void ErrNoSpaceBetweenAttributes()
+        {
+        }
+
+        protected void ErrHtml4NonNameInUnquotedAttribute(char c)
+        {
+        }
+
+        protected void ErrLtOrEqualsOrGraveInUnquotedAttributeOrNull(char c)
+        {
+        }
+
+        protected void ErrAttributeValueMissing()
+        {
+        }
+
+        protected void ErrBadCharBeforeAttributeNameOrNull(char c)
+        {
+        }
+
+        protected void ErrEqualsSignBeforeAttributeName()
+        {
+        }
+
+        protected void ErrBadCharAfterLt(char c)
+        {
+        }
+
+        protected void ErrLtGt()
+        {
+        }
+
+        protected void ErrProcessingInstruction()
+        {
+        }
+
+        protected void ErrUnescapedAmpersandInterpretedAsCharacterReference()
+        {
+        }
+
+        protected void ErrNotSemicolonTerminated()
+        {
+        }
+
+        protected void ErrNoNamedCharacterMatch()
+        {
+        }
+
+        protected void ErrQuoteBeforeAttributeName(char c)
+        {
+        }
+
+        protected void ErrQuoteOrLtInAttributeNameOrNull(char c)
+        {
+        }
+
+        protected void ErrExpectedPublicId()
+        {
+        }
+
+        protected void ErrBogusDoctype()
+        {
+        }
+
+        protected void MaybeWarnPrivateUseAstral()
+        {
+        }
+
+        protected void MaybeWarnPrivateUse(char ch)
+        {
+        }
+
+        protected void MaybeErrAttributesOnEndTag(HtmlAttributes attrs)
+        {
+        }
+
+        protected void MaybeErrSlashInEndTag(bool selfClosing)
+        {
+        }
+
+        protected char ErrNcrNonCharacter(char ch)
+        {
+            return ch;
+        }
+
+        protected void ErrAstralNonCharacter(int ch)
+        {
+        }
+
+        protected void ErrNcrSurrogate()
+        {
+        }
+
+        protected char ErrNcrControlChar(char ch)
+        {
+            return ch;
+        }
+
+        protected void ErrNcrCr()
+        {
+        }
+
+        protected void ErrNcrInC1Range()
+        {
+        }
+
+        protected void ErrEofInPublicId()
+        {
+        }
+
+        protected void ErrEofInComment()
+        {
+        }
+
+        protected void ErrEofInDoctype()
+        {
+        }
+
+        protected void ErrEofInAttributeValue()
+        {
+        }
+
+        protected void ErrEofInAttributeName()
+        {
+        }
+
+        protected void ErrEofWithoutGt()
+        {
+        }
+
+        protected void ErrEofInTagName()
+        {
+        }
+
+        protected void ErrEofInEndTag()
+        {
+        }
+
+        protected void ErrEofAfterLt()
+        {
+        }
+
+        protected void ErrNcrOutOfRange()
+        {
+        }
+
+        protected void ErrNcrUnassigned()
+        {
+        }
+
+        protected void ErrDuplicateAttribute()
+        {
+        }
+
+        protected void ErrEofInSystemId()
+        {
+        }
+
+        protected void ErrExpectedSystemId()
+        {
+        }
+
+        protected void ErrMissingSpaceBeforeDoctypeName()
+        {
+        }
+
+        protected void ErrHyphenHyphenBang()
+        {
+        }
+
+        protected void ErrNcrControlChar()
+        {
+        }
+
+        protected void ErrNcrZero()
+        {
+        }
+
+        protected void ErrNoSpaceBetweenDoctypeSystemKeywordAndQuote()
+        {
+        }
+
+        protected void ErrNoSpaceBetweenPublicAndSystemIds()
+        {
+        }
+
+        protected void ErrNoSpaceBetweenDoctypePublicKeywordAndQuote()
+        {
+        }
+
+        protected void NoteAttributeWithoutValue()
+        {
+        }
+
+        protected void NoteUnquotedAttributeValue()
+        {
+        }
+
+        #endregion
+
+        // [NOCPP[
+
+        /// <summary>
+        ///     Sets an offset to be added to the position reported to
+        ///     <code>TransitionHandler</code>.
+        /// </summary>
+        /// <param name="offset">The offset.</param>
+        public void SetTransitionBaseOffset(int offset)
+        {
+            // TODO: nothing done here??
+        }
+
+        // ]NOCPP]
+    }
 }
