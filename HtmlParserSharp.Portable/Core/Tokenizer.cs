@@ -306,47 +306,47 @@ namespace HtmlParserSharp.Portable.Core
 		/**
 		 * Whether the previous char read was CR.
 		 */
-		protected bool lastCR;
+		protected bool _lastCR;
 
-		protected int stateSave;
+		protected int _stateSave;
 
-		private int returnStateSave;
+		private int _returnStateSave;
 
-		protected int index;
+		protected int _index;
 
-		private bool forceQuirks;
+		private bool _forceQuirks;
 
-		private char additional;
+		private char _additional;
 
-		private int entCol;
+		private int _entCol;
 
-		private int firstCharKey;
+		private int _firstCharKey;
 
-		private int lo;
+		private int _lo;
 
-		private int hi;
+		private int _hi;
 
-		private int candidate;
+		private int _candidate;
 
-		private int strBufMark;
+		private int _strBufMark;
 
-		private int prevValue;
+		private int _prevValue;
 
-		protected int value;
+		protected int _value;
 
-		private bool seenDigits;
+		private bool _seenDigits;
 
-		protected int cstart;
+		protected int _cstart;
 
 		/**
 		 * Buffer for short identifiers.
 		 */
-		private char[] strBuf;
+		private char[] _strBuf;
 
 		/**
 		 * Number of significant <code>char</code>s in <code>strBuf</code>.
 		 */
-		private int strBufLen;
+		private int _strBufLen;
 
 		/**
 		 * <code>-1</code> to indicate that <code>strBuf</code> is used or otherwise
@@ -356,12 +356,12 @@ namespace HtmlParserSharp.Portable.Core
 		/**
 		 * Buffer for long strings.
 		 */
-		private char[] longStrBuf;
+		private char[] _longStrBuf;
 
 		/**
 		 * Number of significant <code>char</code>s in <code>longStrBuf</code>.
 		 */
-		private int longStrBufLen;
+		private int _longStrBufLen;
 
 		/**
 		 * <code>-1</code> to indicate that <code>longStrBuf</code> is used or
@@ -372,51 +372,51 @@ namespace HtmlParserSharp.Portable.Core
 		/**
 		 * Buffer for expanding NCRs falling into the Basic Multilingual Plane.
 		 */
-		private readonly char[] bmpChar;
+		private readonly char[] _bmpChar;
 
 		/**
 		 * Buffer for expanding astral NCRs.
 		 */
-		private readonly char[] astralChar;
+		private readonly char[] _astralChar;
 
 		/**
 		 * The element whose end tag closes the current CDATA or RCDATA element.
 		 */
-		protected ElementName endTagExpectation = null;
+		protected ElementName _endTagExpectation = null;
 
-		private char[] endTagExpectationAsArray; // not @Auto!
+		private char[] _endTagExpectationAsArray; // not @Auto!
 
 		/**
 		 * <code>true</code> if tokenizing an end tag
 		 */
-		protected bool endTag;
+		protected bool _endTag;
 
 		/**
 		 * The current tag token name.
 		 */
-		private ElementName tagName = null;
+		private ElementName _tagName = null;
 
 		/**
 		 * The current attribute name.
 		 */
-		protected AttributeName attributeName = null;
+		protected AttributeName _attributeName = null;
 
 		// [NOCPP[
 
 		/**
 		 * Whether comment tokens are emitted.
 		 */
-		private bool wantsComments = false;
+		private bool _wantsComments = false;
 
 		/**
 		 * <code>true</code> when HTML4-specific additional errors are requested.
 		 */
-		protected bool html4;
+		protected bool _html4;
 
 		/**
 		 * Whether the stream is past the first 512 bytes.
 		 */
-		private bool metaBoundaryPassed;
+		private bool _metaBoundaryPassed;
 
 		// ]NOCPP]
 
@@ -424,69 +424,69 @@ namespace HtmlParserSharp.Portable.Core
 		 * The name of the current doctype token.
 		 */
 		[Local]
-		private string doctypeName;
+		private string _doctypeName;
 
 		/**
 		 * The public id of the current doctype token.
 		 */
-		private string publicIdentifier;
+		private string _publicIdentifier;
 
 		/**
 		 * The system id of the current doctype token.
 		 */
-		private string systemIdentifier;
+		private string _systemIdentifier;
 
 		/**
 		 * The attribute holder.
 		 */
-		private HtmlAttributes attributes;
+		private HtmlAttributes _attributes;
 
 		// [NOCPP[
 
 		/**
 		 * The policy for vertical tab and form feed.
 		 */
-		private XmlViolationPolicy contentSpacePolicy = XmlViolationPolicy.AlterInfoset;
+		private XmlViolationPolicy _contentSpacePolicy = XmlViolationPolicy.AlterInfoset;
 
 		/**
 		 * The policy for comments.
 		 */
-		private XmlViolationPolicy commentPolicy = XmlViolationPolicy.AlterInfoset;
+		private XmlViolationPolicy _commentPolicy = XmlViolationPolicy.AlterInfoset;
 
-		private XmlViolationPolicy xmlnsPolicy = XmlViolationPolicy.AlterInfoset;
+		private XmlViolationPolicy _xmlnsPolicy = XmlViolationPolicy.AlterInfoset;
 
-		private XmlViolationPolicy namePolicy = XmlViolationPolicy.AlterInfoset;
+		private XmlViolationPolicy _namePolicy = XmlViolationPolicy.AlterInfoset;
 
-		private bool html4ModeCompatibleWithXhtml1Schemata;
+		private bool _html4ModeCompatibleWithXhtml1Schemata;
 
-		private readonly bool newAttributesEachTime;
+		private readonly bool _newAttributesEachTime;
 
 		// ]NOCPP]
 
-		private int mappingLangToXmlLang;
+		private int _mappingLangToXmlLang;
 
-		private bool shouldSuspend;
+		private bool _shouldSuspend;
 
-		protected bool confident;
+		protected bool _confident;
 
-		private int line;
+		private int _line;
 
 		// [NOCPP[
 
-		protected Locator ampersandLocation;
+		protected Locator _ampersandLocation;
 
 		public Tokenizer(ITokenHandler tokenHandler, bool newAttributesEachTime)
 		{
 			this.TokenHandler = tokenHandler;
-			this.newAttributesEachTime = newAttributesEachTime;
-			this.bmpChar = new char[1];
-			this.astralChar = new char[2];
-			this.tagName = null;
-			this.attributeName = null;
-			this.doctypeName = null;
-			this.publicIdentifier = null;
-			this.systemIdentifier = null;
-			this.attributes = null;
+			this._newAttributesEachTime = newAttributesEachTime;
+			this._bmpChar = new char[1];
+			this._astralChar = new char[2];
+			this._tagName = null;
+			this._attributeName = null;
+			this._doctypeName = null;
+			this._publicIdentifier = null;
+			this._systemIdentifier = null;
+			this._attributes = null;
 		}
 
 		// ]NOCPP]
@@ -501,16 +501,16 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			this.TokenHandler = tokenHandler;
 			// [NOCPP[
-			this.newAttributesEachTime = false;
+			this._newAttributesEachTime = false;
 			// ]NOCPP]
-			this.bmpChar = new char[1];
-			this.astralChar = new char[2];
-			this.tagName = null;
-			this.attributeName = null;
-			this.doctypeName = null;
-			this.publicIdentifier = null;
-			this.systemIdentifier = null;
-			this.attributes = null;
+			this._bmpChar = new char[1];
+			this._astralChar = new char[2];
+			this._tagName = null;
+			this._attributeName = null;
+			this._doctypeName = null;
+			this._publicIdentifier = null;
+			this._systemIdentifier = null;
+			this._attributes = null;
 		}
 
 		// [NOCPP[
@@ -524,11 +524,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return mappingLangToXmlLang == AttributeName.HTML_LANG;
+				return _mappingLangToXmlLang == AttributeName.HTML_LANG;
 			}
 			set
 			{
-				this.mappingLangToXmlLang = value ? AttributeName.HTML_LANG	: AttributeName.HTML;
+				this._mappingLangToXmlLang = value ? AttributeName.HTML_LANG	: AttributeName.HTML;
 			}
 		}
 
@@ -542,11 +542,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return this.commentPolicy;
+				return this._commentPolicy;
 			}
 			set
 			{
-				this.commentPolicy = value;
+				this._commentPolicy = value;
 			}
 		}
 
@@ -577,11 +577,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return this.contentSpacePolicy;
+				return this._contentSpacePolicy;
 			}
 			set
 			{
-				this.contentSpacePolicy = value;
+				this._contentSpacePolicy = value;
 			}
 		}
 
@@ -595,7 +595,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return this.xmlnsPolicy;
+				return this._xmlnsPolicy;
 			}
 			set
 			{
@@ -603,7 +603,7 @@ namespace HtmlParserSharp.Portable.Core
 				{
 					throw new ArgumentException("Can't use FATAL here.");
 				}
-				this.xmlnsPolicy = value;
+				this._xmlnsPolicy = value;
 			}
 		}
 
@@ -611,11 +611,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return this.namePolicy;
+				return this._namePolicy;
 			}
 			set
 			{
-				this.namePolicy = value;
+				this._namePolicy = value;
 			}
 		}
 
@@ -629,11 +629,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return this.html4ModeCompatibleWithXhtml1Schemata;
+				return this._html4ModeCompatibleWithXhtml1Schemata;
 			}
 			set
 			{
-				this.html4ModeCompatibleWithXhtml1Schemata = value;
+				this._html4ModeCompatibleWithXhtml1Schemata = value;
 			}
 		}
 
@@ -653,13 +653,13 @@ namespace HtmlParserSharp.Portable.Core
 		public void SetStateAndEndTagExpectation(int specialTokenizerState,
 				[Local] String endTagExpectation)
 		{
-			this.stateSave = specialTokenizerState;
+			this._stateSave = specialTokenizerState;
 			if (specialTokenizerState == Tokenizer.DATA)
 			{
 				return;
 			}
 			char[] asArray = endTagExpectation.ToCharArray();
-			this.endTagExpectation = ElementName.ElementNameByBuffer(asArray, 0, asArray.Length);
+			this._endTagExpectation = ElementName.ElementNameByBuffer(asArray, 0, asArray.Length);
 			EndTagExpectationToArray();
 		}
 
@@ -676,44 +676,44 @@ namespace HtmlParserSharp.Portable.Core
 		public void SetStateAndEndTagExpectation(int specialTokenizerState,
 				ElementName endTagExpectation)
 		{
-			this.stateSave = specialTokenizerState;
-			this.endTagExpectation = endTagExpectation;
+			this._stateSave = specialTokenizerState;
+			this._endTagExpectation = endTagExpectation;
 			EndTagExpectationToArray();
 		}
 
 		private void EndTagExpectationToArray()
 		{
-			switch (endTagExpectation.Group)
+			switch (_endTagExpectation.Group)
 			{
 				case DispatchGroup.TITLE:
-					endTagExpectationAsArray = TITLE_ARR;
+					_endTagExpectationAsArray = TITLE_ARR;
 					return;
 				case DispatchGroup.SCRIPT:
-					endTagExpectationAsArray = SCRIPT_ARR;
+					_endTagExpectationAsArray = SCRIPT_ARR;
 					return;
 				case DispatchGroup.STYLE:
-					endTagExpectationAsArray = STYLE_ARR;
+					_endTagExpectationAsArray = STYLE_ARR;
 					return;
 				case DispatchGroup.PLAINTEXT:
-					endTagExpectationAsArray = PLAINTEXT_ARR;
+					_endTagExpectationAsArray = PLAINTEXT_ARR;
 					return;
 				case DispatchGroup.XMP:
-					endTagExpectationAsArray = XMP_ARR;
+					_endTagExpectationAsArray = XMP_ARR;
 					return;
 				case DispatchGroup.TEXTAREA:
-					endTagExpectationAsArray = TEXTAREA_ARR;
+					_endTagExpectationAsArray = TEXTAREA_ARR;
 					return;
 				case DispatchGroup.IFRAME:
-					endTagExpectationAsArray = IFRAME_ARR;
+					_endTagExpectationAsArray = IFRAME_ARR;
 					return;
 				case DispatchGroup.NOEMBED:
-					endTagExpectationAsArray = NOEMBED_ARR;
+					_endTagExpectationAsArray = NOEMBED_ARR;
 					return;
 				case DispatchGroup.NOSCRIPT:
-					endTagExpectationAsArray = NOSCRIPT_ARR;
+					_endTagExpectationAsArray = NOSCRIPT_ARR;
 					return;
 				case DispatchGroup.NOFRAMES:
-					endTagExpectationAsArray = NOFRAMES_ARR;
+					_endTagExpectationAsArray = NOFRAMES_ARR;
 					return;
 				default:
 					Debug.Assert(false, "Bad end tag expectation.");
@@ -730,11 +730,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return line;
+				return _line;
 			}
 			set
 			{
-				this.line = value;
+				this._line = value;
 			}
 		}
 
@@ -757,12 +757,12 @@ namespace HtmlParserSharp.Portable.Core
 
 		public void NotifyAboutMetaBoundary()
 		{
-			metaBoundaryPassed = true;
+			_metaBoundaryPassed = true;
 		}
 
 		internal void TurnOnAdditionalHtml4Errors()
 		{
-			html4 = true;
+			_html4 = true;
 		}
 
 		// ]NOCPP]
@@ -770,9 +770,9 @@ namespace HtmlParserSharp.Portable.Core
 		internal HtmlAttributes EmptyAttributes()
 		{
 			// [NOCPP[
-			if (newAttributesEachTime)
+			if (_newAttributesEachTime)
 			{
-				return new HtmlAttributes(mappingLangToXmlLang);
+				return new HtmlAttributes(_mappingLangToXmlLang);
 			}
 			else
 			{
@@ -786,14 +786,14 @@ namespace HtmlParserSharp.Portable.Core
 		/*@Inline*/
 		private void ClearStrBufAndAppend(char c)
 		{
-			strBuf[0] = c;
-			strBufLen = 1;
+			_strBuf[0] = c;
+			_strBufLen = 1;
 		}
 
 		/*@Inline*/
 		private void ClearStrBuf()
 		{
-			strBufLen = 0;
+			_strBufLen = 0;
 		}
 
 		/**
@@ -804,13 +804,13 @@ namespace HtmlParserSharp.Portable.Core
 		 */
 		private void AppendStrBuf(char c)
 		{
-			if (strBufLen == strBuf.Length)
+			if (_strBufLen == _strBuf.Length)
 			{
-				char[] newBuf = new char[strBuf.Length + Tokenizer.BUFFER_GROW_BY];
-				Array.Copy(strBuf, newBuf, strBuf.Length);
-				strBuf = newBuf;
+				char[] newBuf = new char[_strBuf.Length + Tokenizer.BUFFER_GROW_BY];
+				Array.Copy(_strBuf, newBuf, _strBuf.Length);
+				_strBuf = newBuf;
 			}
-			strBuf[strBufLen++] = c;
+			_strBuf[_strBufLen++] = c;
 		}
 
 		/**
@@ -821,7 +821,7 @@ namespace HtmlParserSharp.Portable.Core
 		 */
 		private void StrBufToDoctypeName()
 		{
-			doctypeName = Portability.NewLocalNameFromBuffer(strBuf, 0, strBufLen);
+			_doctypeName = Portability.NewLocalNameFromBuffer(_strBuf, 0, _strBufLen);
 		}
 
 		/**
@@ -832,23 +832,23 @@ namespace HtmlParserSharp.Portable.Core
 		 */
 		private void EmitStrBuf()
 		{
-			if (strBufLen > 0)
+			if (_strBufLen > 0)
 			{
-				TokenHandler.Characters(strBuf, 0, strBufLen);
+				TokenHandler.Characters(_strBuf, 0, _strBufLen);
 			}
 		}
 
 		/*@Inline*/
 		private void ClearLongStrBuf()
 		{
-			longStrBufLen = 0;
+			_longStrBufLen = 0;
 		}
 
 		/*@Inline*/
 		private void ClearLongStrBufAndAppend(char c)
 		{
-			longStrBuf[0] = c;
-			longStrBufLen = 1;
+			_longStrBuf[0] = c;
+			_longStrBufLen = 1;
 		}
 
 		/**
@@ -859,20 +859,20 @@ namespace HtmlParserSharp.Portable.Core
 		 */
 		private void AppendLongStrBuf(char c)
 		{
-			if (longStrBufLen == longStrBuf.Length)
+			if (_longStrBufLen == _longStrBuf.Length)
 			{
-				char[] newBuf = new char[longStrBufLen + (longStrBufLen >> 1)];
-				Array.Copy(longStrBuf, newBuf, longStrBuf.Length);
-				longStrBuf = newBuf;
+				char[] newBuf = new char[_longStrBufLen + (_longStrBufLen >> 1)];
+				Array.Copy(_longStrBuf, newBuf, _longStrBuf.Length);
+				_longStrBuf = newBuf;
 			}
-			longStrBuf[longStrBufLen++] = c;
+			_longStrBuf[_longStrBufLen++] = c;
 		}
 
 		/*@Inline*/
 		private void AppendSecondHyphenToBogusComment()
 		{
 			// [NOCPP[
-			switch (commentPolicy)
+			switch (_commentPolicy)
 			{
 				case XmlViolationPolicy.AlterInfoset:
 					// detachLongStrBuf();
@@ -895,7 +895,7 @@ namespace HtmlParserSharp.Portable.Core
 		// [NOCPP[
 		private void MaybeAppendSpaceToBogusComment()
 		{
-			switch (commentPolicy)
+			switch (_commentPolicy)
 			{
 				case XmlViolationPolicy.AlterInfoset:
 					// detachLongStrBuf();
@@ -918,11 +918,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			ErrConsecutiveHyphens();
 			// [NOCPP[
-			switch (commentPolicy)
+			switch (_commentPolicy)
 			{
 				case XmlViolationPolicy.AlterInfoset:
 					// detachLongStrBuf();
-					longStrBufLen--;
+					_longStrBufLen--;
 					AppendLongStrBuf(' ');
 					AppendLongStrBuf('-');
 					// FALLTHROUGH
@@ -942,15 +942,15 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void AppendLongStrBuf(char[] buffer, int offset, int length)
 		{
-			int reqLen = longStrBufLen + length;
-			if (longStrBuf.Length < reqLen)
+			int reqLen = _longStrBufLen + length;
+			if (_longStrBuf.Length < reqLen)
 			{
 				char[] newBuf = new char[reqLen + (reqLen >> 1)];
-				Array.Copy(longStrBuf, newBuf, longStrBuf.Length);
-				longStrBuf = newBuf;
+				Array.Copy(_longStrBuf, newBuf, _longStrBuf.Length);
+				_longStrBuf = newBuf;
 			}
-			Array.Copy(buffer, offset, longStrBuf, longStrBufLen, length);
-			longStrBufLen = reqLen;
+			Array.Copy(buffer, offset, _longStrBuf, _longStrBufLen, length);
+			_longStrBufLen = reqLen;
 		}
 
 		/**
@@ -959,7 +959,7 @@ namespace HtmlParserSharp.Portable.Core
 		/*@Inline*/
 		private void AppendStrBufToLongStrBuf()
 		{
-			AppendLongStrBuf(strBuf, 0, strBufLen);
+			AppendLongStrBuf(_strBuf, 0, _strBufLen);
 		}
 
 		/**
@@ -972,7 +972,7 @@ namespace HtmlParserSharp.Portable.Core
 		 */
 		private string LongStrBufToString()
 		{
-			return new String(longStrBuf, 0, longStrBufLen);
+			return new String(_longStrBuf, 0, _longStrBufLen);
 		}
 
 		/// <summary>
@@ -983,19 +983,19 @@ namespace HtmlParserSharp.Portable.Core
 		private void EmitComment(int provisionalHyphens, int pos)
 		{
 			// [NOCPP[
-			if (wantsComments)
+			if (_wantsComments)
 			{
 				// ]NOCPP]
 				// if (longStrBufOffset != -1) {
 				// tokenHandler.comment(buf, longStrBufOffset, longStrBufLen
 				// - provisionalHyphens);
 				// } else {
-				TokenHandler.Comment(longStrBuf, 0, longStrBufLen - provisionalHyphens);
+				TokenHandler.Comment(_longStrBuf, 0, _longStrBufLen - provisionalHyphens);
 				// }
 				// [NOCPP[
 			}
 			// ]NOCPP]
-			cstart = pos + 1;
+			_cstart = pos + 1;
 		}
 
 		/// <summary>
@@ -1005,11 +1005,11 @@ namespace HtmlParserSharp.Portable.Core
 		/// <param name="pos">The position.</param>
 		protected void FlushChars(char[] buf, int pos)
 		{
-			if (pos > cstart)
+			if (pos > _cstart)
 			{
-				TokenHandler.Characters(buf, cstart, pos - cstart);
+				TokenHandler.Characters(buf, _cstart, pos - _cstart);
 			}
-			cstart = int.MaxValue;
+			_cstart = int.MaxValue;
 		}
 
 		/**
@@ -1087,15 +1087,15 @@ namespace HtmlParserSharp.Portable.Core
 		private void ResetAttributes()
 		{
 			// [NOCPP[
-			if (newAttributesEachTime)
+			if (_newAttributesEachTime)
 			{
 				// ]NOCPP]
-				attributes = null;
+				_attributes = null;
 				// [NOCPP[
 			}
 			else
 			{
-				attributes.Clear(mappingLangToXmlLang);
+				_attributes.Clear(_mappingLangToXmlLang);
 			}
 			// ]NOCPP]
 		}
@@ -1105,37 +1105,37 @@ namespace HtmlParserSharp.Portable.Core
 			// if (strBufOffset != -1) {
 			// return ElementName.elementNameByBuffer(buf, strBufOffset, strBufLen);
 			// } else {
-			tagName = ElementName.ElementNameByBuffer(strBuf, 0, strBufLen);
+			_tagName = ElementName.ElementNameByBuffer(_strBuf, 0, _strBufLen);
 			// }
 		}
 
 		private int EmitCurrentTagToken(bool selfClosing, int pos)
 		{
-			cstart = pos + 1;
+			_cstart = pos + 1;
 			MaybeErrSlashInEndTag(selfClosing);
-			stateSave = Tokenizer.DATA;
-			HtmlAttributes attrs = (attributes == null ? HtmlAttributes.EMPTY_ATTRIBUTES
-					: attributes);
-			if (endTag)
+			_stateSave = Tokenizer.DATA;
+			HtmlAttributes attrs = (_attributes == null ? HtmlAttributes.EMPTY_ATTRIBUTES
+					: _attributes);
+			if (_endTag)
 			{
 				/*
 				 * When an end tag token is emitted, the content model flag must be
 				 * switched to the PCDATA state.
 				 */
 				MaybeErrAttributesOnEndTag(attrs);
-				TokenHandler.EndTag(tagName);
+				TokenHandler.EndTag(_tagName);
 			}
 			else
 			{
-				TokenHandler.StartTag(tagName, attrs, selfClosing);
+				TokenHandler.StartTag(_tagName, attrs, selfClosing);
 			}
-			tagName = null;
+			_tagName = null;
 			ResetAttributes();
 			/*
 			 * The token handler may have called setStateAndEndTagExpectation
 			 * and changed stateSave since the start of this method.
 			 */
-			return stateSave;
+			return _stateSave;
 		}
 
 		private void AttributeNameComplete()
@@ -1144,16 +1144,16 @@ namespace HtmlParserSharp.Portable.Core
 			// attributeName = AttributeName.nameByBuffer(buf, strBufOffset,
 			// strBufLen, namePolicy != XmlViolationPolicy.ALLOW);
 			// } else {
-			attributeName = AttributeName.NameByBuffer(strBuf, 0, strBufLen
+			_attributeName = AttributeName.NameByBuffer(_strBuf, 0, _strBufLen
 				// [NOCPP[
-					, namePolicy != XmlViolationPolicy.Allow
+					, _namePolicy != XmlViolationPolicy.Allow
 				// ]NOCPP]
 					);
 			// }
 
-			if (attributes == null)
+			if (_attributes == null)
 			{
-				attributes = new HtmlAttributes(mappingLangToXmlLang);
+				_attributes = new HtmlAttributes(_mappingLangToXmlLang);
 			}
 
 			/*
@@ -1164,10 +1164,10 @@ namespace HtmlParserSharp.Portable.Core
 			 * then this is a parse error and the new attribute must be dropped,
 			 * along with the value that gets associated with it (if any).
 			 */
-			if (attributes.Contains(attributeName))
+			if (_attributes.Contains(_attributeName))
 			{
 				ErrDuplicateAttribute();
-				attributeName = null;
+				_attributeName = null;
 			}
 		}
 
@@ -1176,59 +1176,59 @@ namespace HtmlParserSharp.Portable.Core
 			NoteAttributeWithoutValue();
 
 			// [NOCPP[
-			if (metaBoundaryPassed && AttributeName.CHARSET == attributeName
-					&& ElementName.META == tagName)
+			if (_metaBoundaryPassed && AttributeName.CHARSET == _attributeName
+					&& ElementName.META == _tagName)
 			{
 				Err("A \u201Ccharset\u201D attribute on a \u201Cmeta\u201D element found after the first 512 bytes.");
 			}
 			// ]NOCPP]
-			if (attributeName != null)
+			if (_attributeName != null)
 			{
 				// [NOCPP[
-				if (html4)
+				if (_html4)
 				{
-					if (attributeName.IsBoolean)
+					if (_attributeName.IsBoolean)
 					{
-						if (html4ModeCompatibleWithXhtml1Schemata)
+						if (_html4ModeCompatibleWithXhtml1Schemata)
 						{
-							attributes.AddAttribute(attributeName,
-									attributeName.GetLocal(AttributeName.HTML),
-									xmlnsPolicy);
+							_attributes.AddAttribute(_attributeName,
+									_attributeName.GetLocal(AttributeName.HTML),
+									_xmlnsPolicy);
 						}
 						else
 						{
-							attributes.AddAttribute(attributeName, "", xmlnsPolicy);
+							_attributes.AddAttribute(_attributeName, "", _xmlnsPolicy);
 						}
 					}
 					else
 					{
-						if (AttributeName.BORDER != attributeName)
+						if (AttributeName.BORDER != _attributeName)
 						{
 							Err("Attribute value omitted for a non-bool attribute. (HTML4-only error.)");
-							attributes.AddAttribute(attributeName, "", xmlnsPolicy);
+							_attributes.AddAttribute(_attributeName, "", _xmlnsPolicy);
 						}
 					}
 				}
 				else
 				{
-					if (AttributeName.SRC == attributeName
-							|| AttributeName.HREF == attributeName)
+					if (AttributeName.SRC == _attributeName
+							|| AttributeName.HREF == _attributeName)
 					{
 						Warn("Attribute \u201C"
-								+ attributeName.GetLocal(AttributeName.HTML)
+								+ _attributeName.GetLocal(AttributeName.HTML)
 								+ "\u201D without an explicit value seen. The attribute may be dropped by IE7.");
 					}
 					// ]NOCPP]
-					attributes.AddAttribute(attributeName,
+					_attributes.AddAttribute(_attributeName,
 							String.Empty
 						// [NOCPP[
-							, xmlnsPolicy
+							, _xmlnsPolicy
 						// ]NOCPP]
 					);
 					// [NOCPP[
 				}
 				// ]NOCPP]
-				attributeName = null; // attributeName has been adopted by the
+				_attributeName = null; // attributeName has been adopted by the
 				// |attributes| object
 			}
 		}
@@ -1236,29 +1236,29 @@ namespace HtmlParserSharp.Portable.Core
 		private void AddAttributeWithValue()
 		{
 			// [NOCPP[
-			if (metaBoundaryPassed && ElementName.META == tagName
-					&& AttributeName.CHARSET == attributeName)
+			if (_metaBoundaryPassed && ElementName.META == _tagName
+					&& AttributeName.CHARSET == _attributeName)
 			{
 				Err("A \u201Ccharset\u201D attribute on a \u201Cmeta\u201D element found after the first 512 bytes.");
 			}
 			// ]NOCPP]
-			if (attributeName != null)
+			if (_attributeName != null)
 			{
 				String val = LongStrBufToString(); // Ownership transferred to
 				// HtmlAttributes
 				// [NOCPP[
-				if (!endTag && html4 && html4ModeCompatibleWithXhtml1Schemata
-						&& attributeName.IsCaseFolded)
+				if (!_endTag && _html4 && _html4ModeCompatibleWithXhtml1Schemata
+						&& _attributeName.IsCaseFolded)
 				{
 					val = NewAsciiLowerCaseStringFromString(val);
 				}
 				// ]NOCPP]
-				attributes.AddAttribute(attributeName, val
+				_attributes.AddAttribute(_attributeName, val
 					// [NOCPP[
-						, xmlnsPolicy
+						, _xmlnsPolicy
 					// ]NOCPP]
 				);
-				attributeName = null; // attributeName has been adopted by the
+				_attributeName = null; // attributeName has been adopted by the
 				// |attributes| object
 			}
 		}
@@ -1302,11 +1302,11 @@ namespace HtmlParserSharp.Portable.Core
 
 		public bool TokenizeBuffer(UTF16Buffer buffer)
 		{
-			int state = stateSave;
-			int returnState = returnStateSave;
+			int state = _stateSave;
+			int returnState = _returnStateSave;
 			char c = '\u0000';
-			shouldSuspend = false;
-			lastCR = false;
+			_shouldSuspend = false;
+			_lastCR = false;
 
 			int start = buffer.Start;
 			/**
@@ -1339,10 +1339,10 @@ namespace HtmlParserSharp.Portable.Core
 				case SCRIPT_DATA_DOUBLE_ESCAPED_DASH:
 				case SCRIPT_DATA_DOUBLE_ESCAPED_DASH_DASH:
 				case SCRIPT_DATA_DOUBLE_ESCAPE_END:
-					cstart = start;
+					_cstart = start;
 					break;
 				default:
-					cstart = int.MaxValue;
+					_cstart = int.MaxValue;
 					break;
 			}
 
@@ -1361,7 +1361,7 @@ namespace HtmlParserSharp.Portable.Core
 			{
 				buffer.Start = pos + 1;
 			}
-			return lastCR;
+			return _lastCR;
 		}
 
 		private int StateLoop(int state, char c,
@@ -1536,7 +1536,7 @@ namespace HtmlParserSharp.Portable.Core
 								 * LATIN CAPITAL LETTER Z Create a new start tag
 								 * token,
 								 */
-								endTag = false;
+								_endTag = false;
 								/*
 								 * set its tag name to the lowercase version of the
 								 * input character (add 0x0020 to the character's
@@ -1559,7 +1559,7 @@ namespace HtmlParserSharp.Portable.Core
 								 * LATIN SMALL LETTER Z Create a new start tag
 								 * token,
 								 */
-								endTag = false;
+								_endTag = false;
 								/*
 								 * set its tag name to the input character,
 								 */
@@ -1612,7 +1612,7 @@ namespace HtmlParserSharp.Portable.Core
 									 */
 									TokenHandler.Characters(Tokenizer.LT_GT, 0, 2);
 									/* Switch to the data state. */
-									cstart = pos + 1;
+									_cstart = pos + 1;
 									state = Transition(state, Tokenizer.DATA, reconsume, pos);
 									goto continueStateloop;
 								default:
@@ -1628,7 +1628,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * and reconsume the current input character in
 									 * the data state.
 									 */
-									cstart = pos;
+									_cstart = pos;
 									state = Transition(state, Tokenizer.DATA, reconsume, pos);
 									reconsume = true;
 									goto continueStateloop;
@@ -1686,7 +1686,7 @@ namespace HtmlParserSharp.Portable.Core
 									 */
 									StrBufToElementNameString();
 									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (shouldSuspend)
+									if (_shouldSuspend)
 									{
 										goto breakStateloop;
 									}
@@ -1776,7 +1776,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * tag token.
 									 */
 									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (shouldSuspend)
+									if (_shouldSuspend)
 									{
 										goto breakStateloop;
 									}
@@ -1899,7 +1899,7 @@ namespace HtmlParserSharp.Portable.Core
 									AttributeNameComplete();
 									AddAttributeWithoutValue();
 									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (shouldSuspend)
+									if (_shouldSuspend)
 									{
 										goto breakStateloop;
 									}
@@ -2019,7 +2019,7 @@ namespace HtmlParserSharp.Portable.Core
 									 */
 									AddAttributeWithoutValue();
 									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (shouldSuspend)
+									if (_shouldSuspend)
 									{
 										goto breakStateloop;
 									}
@@ -2181,7 +2181,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * tag token.
 									 */
 									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (shouldSuspend)
+									if (_shouldSuspend)
 									{
 										goto breakStateloop;
 									}
@@ -2227,7 +2227,7 @@ namespace HtmlParserSharp.Portable.Core
 								ErrHtml4XmlVoidSyntax();
 								// ]NOCPP]
 								state = Transition(state, EmitCurrentTagToken(true, pos), reconsume, pos);
-								if (shouldSuspend)
+								if (_shouldSuspend)
 								{
 									goto breakStateloop;
 								}
@@ -2306,7 +2306,7 @@ namespace HtmlParserSharp.Portable.Core
 									 */
 									AddAttributeWithValue();
 									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (shouldSuspend)
+									if (_shouldSuspend)
 									{
 										goto breakStateloop;
 									}
@@ -2402,7 +2402,7 @@ namespace HtmlParserSharp.Portable.Core
 									 */
 									AddAttributeWithoutValue();
 									state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-									if (shouldSuspend)
+									if (_shouldSuspend)
 									{
 										goto breakStateloop;
 									}
@@ -2501,14 +2501,14 @@ namespace HtmlParserSharp.Portable.Core
 								case 'd':
 								case 'D':
 									ClearLongStrBufAndAppend(c);
-									index = 0;
+									_index = 0;
 									state = Transition(state, Tokenizer.MARKUP_DECLARATION_OCTYPE, reconsume, pos);
 									goto continueStateloop;
 								case '[':
 									if (TokenHandler.IsCDataSectionAllowed)
 									{
 										ClearLongStrBufAndAppend(c);
-										index = 0;
+										_index = 0;
 										state = Transition(state, Tokenizer.CDATA_START, reconsume, pos);
 										goto continueStateloop;
 									}
@@ -2921,9 +2921,9 @@ namespace HtmlParserSharp.Portable.Core
 								goto breakStateloop;
 							}
 							c = CheckChar(buf, pos);
-							if (index < 6)
+							if (_index < 6)
 							{ // CDATA_LSQB.Length
-								if (c == Tokenizer.CDATA_LSQB[index])
+								if (c == Tokenizer.CDATA_LSQB[_index])
 								{
 									AppendLongStrBuf(c);
 								}
@@ -2934,12 +2934,12 @@ namespace HtmlParserSharp.Portable.Core
 									reconsume = true;
 									goto continueStateloop;
 								}
-								index++;
+								_index++;
 								continue;
 							}
 							else
 							{
-								cstart = pos; // start coalescing
+								_cstart = pos; // start coalescing
 								state = Transition(state, Tokenizer.CDATA_SECTION, reconsume, pos);
 								reconsume = true;
 								break; // FALL THROUGH goto continueStateloop;
@@ -3003,7 +3003,7 @@ namespace HtmlParserSharp.Portable.Core
 								default:
 									TokenHandler.Characters(Tokenizer.RSQB_RSQB, 0,
 											1);
-									cstart = pos;
+									_cstart = pos;
 									state = Transition(state, Tokenizer.CDATA_SECTION, reconsume, pos);
 									reconsume = true;
 									goto continueStateloop;
@@ -3021,12 +3021,12 @@ namespace HtmlParserSharp.Portable.Core
 						switch (c)
 						{
 							case '>':
-								cstart = pos + 1;
+								_cstart = pos + 1;
 								state = Transition(state, Tokenizer.DATA, reconsume, pos);
 								goto continueStateloop;
 							default:
 								TokenHandler.Characters(Tokenizer.RSQB_RSQB, 0, 2);
-								cstart = pos;
+								_cstart = pos;
 								state = Transition(state, Tokenizer.CDATA_SECTION, reconsume, pos);
 								reconsume = true;
 								goto continueStateloop;
@@ -3141,7 +3141,7 @@ namespace HtmlParserSharp.Portable.Core
 								EmitOrAppendStrBuf(returnState);
 								if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 								{
-									cstart = pos;
+									_cstart = pos;
 								}
 								state = Transition(state, returnState, reconsume, pos);
 								reconsume = true;
@@ -3155,7 +3155,7 @@ namespace HtmlParserSharp.Portable.Core
 								state = Transition(state, Tokenizer.CONSUME_NCR, reconsume, pos);
 								goto continueStateloop;
 							default:
-								if (c == additional)
+								if (c == _additional)
 								{
 									EmitOrAppendStrBuf(returnState);
 									state = Transition(state, returnState, reconsume, pos);
@@ -3164,11 +3164,11 @@ namespace HtmlParserSharp.Portable.Core
 								}
 								if (c >= 'a' && c <= 'z')
 								{
-									firstCharKey = c - 'a' + 26;
+									_firstCharKey = c - 'a' + 26;
 								}
 								else if (c >= 'A' && c <= 'Z')
 								{
-									firstCharKey = c - 'A';
+									_firstCharKey = c - 'A';
 								}
 								else
 								{
@@ -3181,7 +3181,7 @@ namespace HtmlParserSharp.Portable.Core
 									EmitOrAppendStrBuf(returnState);
 									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 									{
-										cstart = pos;
+										_cstart = pos;
 									}
 									state = Transition(state, returnState, reconsume, pos);
 									reconsume = true;
@@ -3250,7 +3250,7 @@ namespace HtmlParserSharp.Portable.Core
 								int[] row = NamedCharactersAccel.HILO_ACCEL[c];
 								if (row != null)
 								{
-									hilo = row[firstCharKey];
+									hilo = row[_firstCharKey];
 								}
 							}
 							if (hilo == 0)
@@ -3263,7 +3263,7 @@ namespace HtmlParserSharp.Portable.Core
 								EmitOrAppendStrBuf(returnState);
 								if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 								{
-									cstart = pos;
+									_cstart = pos;
 								}
 								state = Transition(state, returnState, reconsume, pos);
 								reconsume = true;
@@ -3271,11 +3271,11 @@ namespace HtmlParserSharp.Portable.Core
 							}
 							// Didn't fail yet
 							AppendStrBuf(c);
-							lo = hilo & 0xFFFF;
-							hi = hilo >> 16;
-							entCol = -1;
-							candidate = -1;
-							strBufMark = 0;
+							_lo = hilo & 0xFFFF;
+							_hi = hilo >> 16;
+							_entCol = -1;
+							_candidate = -1;
+							_strBufMark = 0;
 							state = Transition(state, Tokenizer.CHARACTER_REFERENCE_TAIL, reconsume, pos);
 							// FALL THROUGH goto continueStateloop;
 							goto case CHARACTER_REFERENCE_TAIL;
@@ -3293,7 +3293,7 @@ namespace HtmlParserSharp.Portable.Core
 							{
 								goto breakStateloop;
 							}
-							entCol++;
+							_entCol++;
 							/*
 							 * Consume the maximum number of characters possible,
 							 * with the consumed characters matching one of the
@@ -3304,23 +3304,23 @@ namespace HtmlParserSharp.Portable.Core
 							/*loloop:*/
 							for (; ; )
 							{
-								if (hi < lo)
+								if (_hi < _lo)
 								{
 									goto breakOuter;
 								}
-								if (entCol == NamedCharacters.NAMES[lo].Length)
+								if (_entCol == NamedCharacters.NAMES[_lo].Length)
 								{
-									candidate = lo;
-									strBufMark = strBufLen;
-									lo++;
+									_candidate = _lo;
+									_strBufMark = _strBufLen;
+									_lo++;
 								}
-								else if (entCol > NamedCharacters.NAMES[lo].Length)
+								else if (_entCol > NamedCharacters.NAMES[_lo].Length)
 								{
 									goto breakOuter;
 								}
-								else if (c > NamedCharacters.NAMES[lo][entCol])
+								else if (c > NamedCharacters.NAMES[_lo][_entCol])
 								{
-									lo++;
+									_lo++;
 								}
 								else
 								{
@@ -3333,21 +3333,21 @@ namespace HtmlParserSharp.Portable.Core
 							/*hiloop:*/
 							for (; ; )
 							{
-								if (hi < lo)
+								if (_hi < _lo)
 								{
 									goto breakOuter;
 								}
-								if (entCol == NamedCharacters.NAMES[hi].Length)
+								if (_entCol == NamedCharacters.NAMES[_hi].Length)
 								{
 									goto breakHiloop;
 								}
-								if (entCol > NamedCharacters.NAMES[hi].Length)
+								if (_entCol > NamedCharacters.NAMES[_hi].Length)
 								{
 									goto breakOuter;
 								}
-								else if (c < NamedCharacters.NAMES[hi][entCol])
+								else if (c < NamedCharacters.NAMES[_hi][_entCol])
 								{
-									hi--;
+									_hi--;
 								}
 								else
 								{
@@ -3357,7 +3357,7 @@ namespace HtmlParserSharp.Portable.Core
 
 						breakHiloop:
 
-							if (hi < lo)
+							if (_hi < _lo)
 							{
 								goto breakOuter;
 							}
@@ -3367,7 +3367,7 @@ namespace HtmlParserSharp.Portable.Core
 
 					breakOuter:
 
-						if (candidate == -1)
+						if (_candidate == -1)
 						{
 							// reconsume deals with CR, LF or nul
 							/*
@@ -3377,7 +3377,7 @@ namespace HtmlParserSharp.Portable.Core
 							EmitOrAppendStrBuf(returnState);
 							if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 							{
-								cstart = pos;
+								_cstart = pos;
 							}
 							state = Transition(state, returnState, reconsume, pos);
 							reconsume = true;
@@ -3386,7 +3386,7 @@ namespace HtmlParserSharp.Portable.Core
 						else
 						{
 							// c can't be CR, LF or nul if we got here
-							string candidateName = NamedCharacters.NAMES[candidate];
+							string candidateName = NamedCharacters.NAMES[_candidate];
 							if (candidateName.Length == 0
 									|| candidateName[candidateName.Length - 1] != ';')
 							{
@@ -3402,7 +3402,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * not a U+003B SEMICOLON (;),
 									 */
 									char ch;
-									if (strBufMark == strBufLen)
+									if (_strBufMark == _strBufLen)
 									{
 										ch = c;
 									}
@@ -3411,7 +3411,7 @@ namespace HtmlParserSharp.Portable.Core
 										// if (strBufOffset != -1) {
 										// ch = buf[strBufOffset + strBufMark];
 										// } else {
-										ch = strBuf[strBufMark];
+										ch = _strBuf[_strBufMark];
 										// }
 									}
 									if (ch == '=' || (ch >= '0' && ch <= '9')
@@ -3453,7 +3453,7 @@ namespace HtmlParserSharp.Portable.Core
 							 * second column of the named character references
 							 * table).
 							 */
-							char[] val = NamedCharacters.VALUES[candidate];
+							char[] val = NamedCharacters.VALUES[_candidate];
 							if (
 								// [NOCPP[
 							val.Length == 1
@@ -3468,7 +3468,7 @@ namespace HtmlParserSharp.Portable.Core
 								EmitOrAppendTwo(val, returnState);
 							}
 							// this is so complicated!
-							if (strBufMark < strBufLen)
+							if (_strBufMark < _strBufLen)
 							{
 								// if (strBufOffset != -1) {
 								// if ((returnState & (~1)) != 0) {
@@ -3483,21 +3483,21 @@ namespace HtmlParserSharp.Portable.Core
 								// } else {
 								if ((returnState & DATA_AND_RCDATA_MASK) != 0)
 								{
-									for (int i = strBufMark; i < strBufLen; i++)
+									for (int i = _strBufMark; i < _strBufLen; i++)
 									{
-										AppendLongStrBuf(strBuf[i]);
+										AppendLongStrBuf(_strBuf[i]);
 									}
 								}
 								else
 								{
-									TokenHandler.Characters(strBuf, strBufMark,
-											strBufLen - strBufMark);
+									TokenHandler.Characters(_strBuf, _strBufMark,
+											_strBufLen - _strBufMark);
 								}
 								// }
 							}
 							if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 							{
-								cstart = pos;
+								_cstart = pos;
 							}
 							state = Transition(state, returnState, reconsume, pos);
 							reconsume = true;
@@ -3517,9 +3517,9 @@ namespace HtmlParserSharp.Portable.Core
 							goto breakStateloop;
 						}
 						c = CheckChar(buf, pos);
-						prevValue = -1;
-						value = 0;
-						seenDigits = false;
+						_prevValue = -1;
+						_value = 0;
+						_seenDigits = false;
 						/*
 						 * The behavior further depends on the character after the
 						 * U+0023 NUMBER SIGN:
@@ -3579,31 +3579,31 @@ namespace HtmlParserSharp.Portable.Core
 								c = CheckChar(buf, pos);
 							}
 							// Deal with overflow gracefully
-							if (value < prevValue)
+							if (_value < _prevValue)
 							{
-								value = 0x110000; // Value above Unicode range but
+								_value = 0x110000; // Value above Unicode range but
 								// within int
 								// range
 							}
-							prevValue = value;
+							_prevValue = _value;
 							/*
 							 * Consume as many characters as match the range of
 							 * characters given above.
 							 */
 							if (c >= '0' && c <= '9')
 							{
-								seenDigits = true;
-								value *= 10;
-								value += c - '0';
+								_seenDigits = true;
+								_value *= 10;
+								_value += c - '0';
 								continue;
 							}
 							else if (c == ';')
 							{
-								if (seenDigits)
+								if (_seenDigits)
 								{
 									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 									{
-										cstart = pos + 1;
+										_cstart = pos + 1;
 									}
 									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
 									// FALL THROUGH goto continueStateloop;
@@ -3616,7 +3616,7 @@ namespace HtmlParserSharp.Portable.Core
 									EmitOrAppendStrBuf(returnState);
 									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 									{
-										cstart = pos + 1;
+										_cstart = pos + 1;
 									}
 									state = Transition(state, returnState, reconsume, pos);
 									goto continueStateloop;
@@ -3635,13 +3635,13 @@ namespace HtmlParserSharp.Portable.Core
 								 * SEMICOLON, consume that too. If it isn't, there
 								 * is a parse error.
 								 */
-								if (!seenDigits)
+								if (!_seenDigits)
 								{
 									ErrNoDigitsInNCR();
 									EmitOrAppendStrBuf(returnState);
 									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 									{
-										cstart = pos;
+										_cstart = pos;
 									}
 									state = Transition(state, returnState, reconsume, pos);
 									reconsume = true;
@@ -3652,7 +3652,7 @@ namespace HtmlParserSharp.Portable.Core
 									ErrCharRefLacksSemicolon();
 									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 									{
-										cstart = pos;
+										_cstart = pos;
 									}
 									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
 									reconsume = true;
@@ -3680,45 +3680,45 @@ namespace HtmlParserSharp.Portable.Core
 							}
 							c = CheckChar(buf, pos);
 							// Deal with overflow gracefully
-							if (value < prevValue)
+							if (_value < _prevValue)
 							{
-								value = 0x110000; // Value above Unicode range but
+								_value = 0x110000; // Value above Unicode range but
 								// within int
 								// range
 							}
-							prevValue = value;
+							_prevValue = _value;
 							/*
 							 * Consume as many characters as match the range of
 							 * characters given above.
 							 */
 							if (c >= '0' && c <= '9')
 							{
-								seenDigits = true;
-								value *= 16;
-								value += c - '0';
+								_seenDigits = true;
+								_value *= 16;
+								_value += c - '0';
 								continue;
 							}
 							else if (c >= 'A' && c <= 'F')
 							{
-								seenDigits = true;
-								value *= 16;
-								value += c - 'A' + 10;
+								_seenDigits = true;
+								_value *= 16;
+								_value += c - 'A' + 10;
 								continue;
 							}
 							else if (c >= 'a' && c <= 'f')
 							{
-								seenDigits = true;
-								value *= 16;
-								value += c - 'a' + 10;
+								_seenDigits = true;
+								_value *= 16;
+								_value += c - 'a' + 10;
 								continue;
 							}
 							else if (c == ';')
 							{
-								if (seenDigits)
+								if (_seenDigits)
 								{
 									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 									{
-										cstart = pos + 1;
+										_cstart = pos + 1;
 									}
 									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
 									goto continueStateloop;
@@ -3730,7 +3730,7 @@ namespace HtmlParserSharp.Portable.Core
 									EmitOrAppendStrBuf(returnState);
 									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 									{
-										cstart = pos + 1;
+										_cstart = pos + 1;
 									}
 									state = Transition(state, returnState, reconsume, pos);
 									goto continueStateloop;
@@ -3749,13 +3749,13 @@ namespace HtmlParserSharp.Portable.Core
 								 * SEMICOLON, consume that too. If it isn't, there
 								 * is a parse error.
 								 */
-								if (!seenDigits)
+								if (!_seenDigits)
 								{
 									ErrNoDigitsInNCR();
 									EmitOrAppendStrBuf(returnState);
 									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 									{
-										cstart = pos;
+										_cstart = pos;
 									}
 									state = Transition(state, returnState, reconsume, pos);
 									reconsume = true;
@@ -3766,7 +3766,7 @@ namespace HtmlParserSharp.Portable.Core
 									ErrCharRefLacksSemicolon();
 									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
 									{
-										cstart = pos;
+										_cstart = pos;
 									}
 									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
 									reconsume = true;
@@ -3831,7 +3831,7 @@ namespace HtmlParserSharp.Portable.Core
 								/*
 								 * Switch to the data state.
 								 */
-								cstart = pos + 1;
+								_cstart = pos + 1;
 								state = Transition(state, Tokenizer.DATA, reconsume, pos);
 								goto continueStateloop;
 							case '\r':
@@ -3870,7 +3870,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * LATIN SMALL LETTER Z Create a new end tag
 									 * token,
 									 */
-									endTag = true;
+									_endTag = true;
 									/*
 									 * set its tag name to the input character,
 									 */
@@ -3921,7 +3921,7 @@ namespace HtmlParserSharp.Portable.Core
 									 */
 									FlushChars(buf, pos);
 									ClearStrBufAndAppend(c);
-									additional = '\u0000';
+									_additional = '\u0000';
 									returnState = state;
 									state = Transition(state, Tokenizer.CONSUME_CHARACTER_REFERENCE, reconsume, pos);
 									goto continueStateloop;
@@ -4019,7 +4019,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * to the empty string. Switch to the script
 									 * data end tag open state.
 									 */
-									index = 0;
+									_index = 0;
 									ClearStrBuf();
 									state = Transition(state, Tokenizer.NON_DATA_END_TAG_NAME, reconsume, pos);
 									goto breakRawtextrcdatalessthansignloop;
@@ -4034,7 +4034,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * and reconsume the current input character in
 									 * the data state.
 									 */
-									cstart = pos;
+									_cstart = pos;
 									state = Transition(state, returnState, reconsume, pos);
 									reconsume = true;
 									goto continueStateloop;
@@ -4057,9 +4057,9 @@ namespace HtmlParserSharp.Portable.Core
 							 * null); Let's implement the above without lookahead.
 							 * strBuf is the 'temporary buffer'.
 							 */
-							if (index < endTagExpectationAsArray.Length)
+							if (_index < _endTagExpectationAsArray.Length)
 							{
-								char e = endTagExpectationAsArray[index];
+								char e = _endTagExpectationAsArray[_index];
 								char folded = c;
 								if (c >= 'A' && c <= 'Z')
 								{
@@ -4073,21 +4073,21 @@ namespace HtmlParserSharp.Portable.Core
 									TokenHandler.Characters(Tokenizer.LT_SOLIDUS,
 											0, 2);
 									EmitStrBuf();
-									cstart = pos;
+									_cstart = pos;
 									state = Transition(state, returnState, reconsume, pos);
 									reconsume = true;
 									goto continueStateloop;
 								}
 								AppendStrBuf(c);
-								index++;
+								_index++;
 								continue;
 							}
 							else
 							{
-								endTag = true;
+								_endTag = true;
 								// XXX replace contentModelElement with different
 								// type
-								tagName = endTagExpectation;
+								_tagName = _endTagExpectation;
 								switch (c)
 								{
 									case '\r':
@@ -4127,7 +4127,7 @@ namespace HtmlParserSharp.Portable.Core
 										 * token and switch to the data state.
 										 */
 										state = Transition(state, EmitCurrentTagToken(false, pos), reconsume, pos);
-										if (shouldSuspend)
+										if (_shouldSuspend)
 										{
 											goto breakStateloop;
 										}
@@ -4154,7 +4154,7 @@ namespace HtmlParserSharp.Portable.Core
 										}
 										else
 										{
-											cstart = pos; // don't drop the
+											_cstart = pos; // don't drop the
 											// character
 										}
 										state = Transition(state, returnState, reconsume, pos);
@@ -4335,13 +4335,13 @@ namespace HtmlParserSharp.Portable.Core
 									 * to the empty string. Switch to the script
 									 * data end tag open state.
 									 */
-									index = 0;
+									_index = 0;
 									ClearStrBuf();
 									state = Transition(state, Tokenizer.NON_DATA_END_TAG_NAME, reconsume, pos);
 									goto continueStateloop;
 								case '!':
 									TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-									cstart = pos;
+									_cstart = pos;
 									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPE_START, reconsume, pos);
 									goto breakScriptdatalessthansignloop; // FALL THRU
 								// continue
@@ -4356,7 +4356,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * and reconsume the current input character in
 									 * the data state.
 									 */
-									cstart = pos;
+									_cstart = pos;
 									state = Transition(state, Tokenizer.SCRIPT_DATA, reconsume, pos);
 									reconsume = true;
 									goto continueStateloop;
@@ -4635,7 +4635,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * to the empty string. Switch to the script
 									 * data escaped end tag open state.
 									 */
-									index = 0;
+									_index = 0;
 									ClearStrBuf();
 									returnState = Tokenizer.SCRIPT_DATA_ESCAPED;
 									state = Transition(state, Tokenizer.NON_DATA_END_TAG_NAME, reconsume, pos);
@@ -4649,8 +4649,8 @@ namespace HtmlParserSharp.Portable.Core
 									 * current input character as a character token.
 									 */
 									TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-									cstart = pos;
-									index = 1;
+									_cstart = pos;
+									_index = 1;
 									/*
 									 * Set the temporary buffer to the empty string.
 									 * Append the lowercase version of the current
@@ -4670,7 +4670,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * state.
 									 */
 									TokenHandler.Characters(Tokenizer.LT_GT, 0, 1);
-									cstart = pos;
+									_cstart = pos;
 									reconsume = true;
 									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
 									goto continueStateloop;
@@ -4688,21 +4688,21 @@ namespace HtmlParserSharp.Portable.Core
 								goto breakStateloop;
 							}
 							c = CheckChar(buf, pos);
-							Debug.Assert(index > 0);
-							if (index < 6)
+							Debug.Assert(_index > 0);
+							if (_index < 6)
 							{ // SCRIPT_ARR.Length
 								char folded = c;
 								if (c >= 'A' && c <= 'Z')
 								{
 									folded += (char)0x20;
 								}
-								if (folded != Tokenizer.SCRIPT_ARR[index])
+								if (folded != Tokenizer.SCRIPT_ARR[_index])
 								{
 									reconsume = true;
 									state = Transition(state, Tokenizer.SCRIPT_DATA_ESCAPED, reconsume, pos);
 									goto continueStateloop;
 								}
-								index++;
+								_index++;
 								continue;
 							}
 							switch (c)
@@ -4944,7 +4944,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * the empty string. Switch to the script data
 									 * double escape end state.
 									 */
-									index = 0;
+									_index = 0;
 									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPE_END, reconsume, pos);
 									goto breakScriptdatadoubleescapedlessthanloop;
 								default:
@@ -4970,20 +4970,20 @@ namespace HtmlParserSharp.Portable.Core
 								goto breakStateloop;
 							}
 							c = CheckChar(buf, pos);
-							if (index < 6)
+							if (_index < 6)
 							{ // SCRIPT_ARR.Length
 								char folded = c;
 								if (c >= 'A' && c <= 'Z')
 								{
 									folded += (char)0x20;
 								}
-								if (folded != Tokenizer.SCRIPT_ARR[index])
+								if (folded != Tokenizer.SCRIPT_ARR[_index])
 								{
 									reconsume = true;
 									state = Transition(state, Tokenizer.SCRIPT_DATA_DOUBLE_ESCAPED, reconsume, pos);
 									goto continueStateloop;
 								}
-								index++;
+								_index++;
 								continue;
 							}
 							switch (c)
@@ -5032,14 +5032,14 @@ namespace HtmlParserSharp.Portable.Core
 								goto breakStateloop;
 							}
 							c = CheckChar(buf, pos);
-							if (index < 6)
+							if (_index < 6)
 							{ // OCTYPE.Length
 								char folded = c;
 								if (c >= 'A' && c <= 'Z')
 								{
 									folded += (char)0x20;
 								}
-								if (folded == Tokenizer.OCTYPE[index])
+								if (folded == Tokenizer.OCTYPE[_index])
 								{
 									AppendLongStrBuf(c);
 								}
@@ -5050,7 +5050,7 @@ namespace HtmlParserSharp.Portable.Core
 									reconsume = true;
 									goto continueStateloop;
 								}
-								index++;
+								_index++;
 								continue;
 							}
 							else
@@ -5169,7 +5169,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * Create a new DOCTYPE token. Set its
 									 * force-quirks flag to on.
 									 */
-									forceQuirks = true;
+									_forceQuirks = true;
 									/*
 									 * Emit the token.
 									 */
@@ -5334,13 +5334,13 @@ namespace HtmlParserSharp.Portable.Core
 									goto continueStateloop;
 								case 'p':
 								case 'P':
-									index = 0;
+									_index = 0;
 									state = Transition(state, Tokenizer.DOCTYPE_UBLIC, reconsume, pos);
 									goto breakAfterdoctypenameloop;
 								// goto continueStateloop;
 								case 's':
 								case 'S':
-									index = 0;
+									_index = 0;
 									state = Transition(state, Tokenizer.DOCTYPE_YSTEM, reconsume, pos);
 									goto continueStateloop;
 								default:
@@ -5379,14 +5379,14 @@ namespace HtmlParserSharp.Portable.Core
 							 * word "PUBLIC", then consume those characters and
 							 * switch to the before DOCTYPE public identifier state.
 							 */
-							if (index < 5)
+							if (_index < 5)
 							{ // UBLIC.Length
 								char folded = c;
 								if (c >= 'A' && c <= 'Z')
 								{
 									folded += (char)0x20;
 								}
-								if (folded != Tokenizer.UBLIC[index])
+								if (folded != Tokenizer.UBLIC[_index])
 								{
 									BogusDoctype();
 									// forceQuirks = true;
@@ -5394,7 +5394,7 @@ namespace HtmlParserSharp.Portable.Core
 									reconsume = true;
 									goto continueStateloop;
 								}
-								index++;
+								_index++;
 								continue;
 							}
 							else
@@ -5488,7 +5488,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									forceQuirks = true;
+									_forceQuirks = true;
 									/*
 									 * Emit that DOCTYPE token.
 									 */
@@ -5580,7 +5580,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									forceQuirks = true;
+									_forceQuirks = true;
 									/*
 									 * Emit that DOCTYPE token.
 									 */
@@ -5626,7 +5626,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * U+0022 QUOTATION MARK (") Switch to the after
 									 * DOCTYPE public identifier state.
 									 */
-									publicIdentifier = LongStrBufToString();
+									_publicIdentifier = LongStrBufToString();
 									state = Transition(state, Tokenizer.AFTER_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
 									goto breakDoctypepublicidentifierdoublequotedloop;
 								// goto continueStateloop;
@@ -5639,11 +5639,11 @@ namespace HtmlParserSharp.Portable.Core
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									forceQuirks = true;
+									_forceQuirks = true;
 									/*
 									 * Emit that DOCTYPE token.
 									 */
-									publicIdentifier = LongStrBufToString();
+									_publicIdentifier = LongStrBufToString();
 									EmitDoctypeToken(pos);
 									/*
 									 * Switch to the data state.
@@ -5876,7 +5876,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * U+0022 QUOTATION MARK (") Switch to the after
 									 * DOCTYPE system identifier state.
 									 */
-									systemIdentifier = LongStrBufToString();
+									_systemIdentifier = LongStrBufToString();
 									state = Transition(state, Tokenizer.AFTER_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
 									goto continueStateloop;
 								case '>':
@@ -5888,11 +5888,11 @@ namespace HtmlParserSharp.Portable.Core
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									forceQuirks = true;
+									_forceQuirks = true;
 									/*
 									 * Emit that DOCTYPE token.
 									 */
-									systemIdentifier = LongStrBufToString();
+									_systemIdentifier = LongStrBufToString();
 									EmitDoctypeToken(pos);
 									/*
 									 * Switch to the data state.
@@ -6045,21 +6045,21 @@ namespace HtmlParserSharp.Portable.Core
 							 * characters and switch to the before DOCTYPE system
 							 * identifier state.
 							 */
-							if (index < 5)
+							if (_index < 5)
 							{ // YSTEM.Length
 								char folded = c;
 								if (c >= 'A' && c <= 'Z')
 								{
 									folded += (char)0x20;
 								}
-								if (folded != Tokenizer.YSTEM[index])
+								if (folded != Tokenizer.YSTEM[_index])
 								{
 									BogusDoctype();
 									state = Transition(state, Tokenizer.BOGUS_DOCTYPE, reconsume, pos);
 									reconsume = true;
 									goto continueStateloop;
 								}
-								index++;
+								_index++;
 								goto continueStateloop;
 							}
 							else
@@ -6153,7 +6153,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									forceQuirks = true;
+									_forceQuirks = true;
 									/*
 									 * Emit that DOCTYPE token.
 									 */
@@ -6245,7 +6245,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									forceQuirks = true;
+									_forceQuirks = true;
 									/*
 									 * Emit that DOCTYPE token.
 									 */
@@ -6290,7 +6290,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * U+0027 APOSTROPHE (') Switch to the after
 									 * DOCTYPE system identifier state.
 									 */
-									systemIdentifier = LongStrBufToString();
+									_systemIdentifier = LongStrBufToString();
 									state = Transition(state, Tokenizer.AFTER_DOCTYPE_SYSTEM_IDENTIFIER, reconsume, pos);
 									goto continueStateloop;
 								case '>':
@@ -6299,11 +6299,11 @@ namespace HtmlParserSharp.Portable.Core
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									forceQuirks = true;
+									_forceQuirks = true;
 									/*
 									 * Emit that DOCTYPE token.
 									 */
-									systemIdentifier = LongStrBufToString();
+									_systemIdentifier = LongStrBufToString();
 									EmitDoctypeToken(pos);
 									/*
 									 * Switch to the data state.
@@ -6354,7 +6354,7 @@ namespace HtmlParserSharp.Portable.Core
 									 * U+0027 APOSTROPHE (') Switch to the after
 									 * DOCTYPE public identifier state.
 									 */
-									publicIdentifier = LongStrBufToString();
+									_publicIdentifier = LongStrBufToString();
 									state = Transition(state, Tokenizer.AFTER_DOCTYPE_PUBLIC_IDENTIFIER, reconsume, pos);
 									goto continueStateloop;
 								case '>':
@@ -6363,11 +6363,11 @@ namespace HtmlParserSharp.Portable.Core
 									 * Set the DOCTYPE token's force-quirks flag to
 									 * on.
 									 */
-									forceQuirks = true;
+									_forceQuirks = true;
 									/*
 									 * Emit that DOCTYPE token.
 									 */
-									publicIdentifier = LongStrBufToString();
+									_publicIdentifier = LongStrBufToString();
 									EmitDoctypeToken(pos);
 									/*
 									 * Switch to the data state.
@@ -6410,8 +6410,8 @@ namespace HtmlParserSharp.Portable.Core
 			 * if (prevCR && pos != endPos) { // why is this needed? pos--; col--; }
 			 */
 			// Save locals
-			stateSave = state;
-			returnStateSave = returnState;
+			_stateSave = state;
+			_returnStateSave = returnState;
 			return pos;
 		}
 
@@ -6428,16 +6428,16 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void InitDoctypeFields()
 		{
-			doctypeName = "";
-			if (systemIdentifier != null)
+			_doctypeName = "";
+			if (_systemIdentifier != null)
 			{
-				systemIdentifier = null;
+				_systemIdentifier = null;
 			}
-			if (publicIdentifier != null)
+			if (_publicIdentifier != null)
 			{
-				publicIdentifier = null;
+				_publicIdentifier = null;
 			}
-			forceQuirks = false;
+			_forceQuirks = false;
 		}
 
 		/*@Inline*/
@@ -6471,14 +6471,14 @@ namespace HtmlParserSharp.Portable.Core
 		/*@Inline*/
 		protected void SilentCarriageReturn()
 		{
-			++line;
-			lastCR = true;
+			++_line;
+			_lastCR = true;
 		}
 
 		/*@Inline*/
 		protected void SilentLineFeed()
 		{
-			++line;
+			++_line;
 		}
 
 		private void EmitCarriageReturn(char[] buf, int pos)
@@ -6486,41 +6486,41 @@ namespace HtmlParserSharp.Portable.Core
 			SilentCarriageReturn();
 			FlushChars(buf, pos);
 			TokenHandler.Characters(Tokenizer.LF, 0, 1);
-			cstart = int.MaxValue;
+			_cstart = int.MaxValue;
 		}
 
 		private void EmitReplacementCharacter(char[] buf, int pos)
 		{
 			FlushChars(buf, pos);
 			TokenHandler.ZeroOriginatingReplacementCharacter();
-			cstart = pos + 1;
+			_cstart = pos + 1;
 		}
 
 		private void EmitPlaintextReplacementCharacter(char[] buf, int pos)
 		{
 			FlushChars(buf, pos);
 			TokenHandler.Characters(REPLACEMENT_CHARACTER, 0, 1);
-			cstart = pos + 1;
+			_cstart = pos + 1;
 		}
 
 		private void SetAdditionalAndRememberAmpersandLocation(char add)
 		{
-			additional = add;
+			_additional = add;
 			// [NOCPP[
-			ampersandLocation = new Locator(this);
+			_ampersandLocation = new Locator(this);
 			// ]NOCPP]
 		}
 
 		private void BogusDoctype()
 		{
 			ErrBogusDoctype();
-			forceQuirks = true;
+			_forceQuirks = true;
 		}
 
 		private void BogusDoctypeWithoutQuirks()
 		{
 			ErrBogusDoctype();
-			forceQuirks = false;
+			_forceQuirks = false;
 		}
 
 		private void EmitOrAppendStrBuf(int returnState)
@@ -6542,9 +6542,9 @@ namespace HtmlParserSharp.Portable.Core
 			 * interpret the string of characters as a number (either hexadecimal or
 			 * decimal as appropriate).
 			 */
-			if (value <= 0xFFFF)
+			if (_value <= 0xFFFF)
 			{
-				if (value >= 0x80 && value <= 0x9f)
+				if (_value >= 0x80 && _value <= 0x9f)
 				{
 					/*
 					 * If that number is one of the numbers in the first column of
@@ -6556,29 +6556,29 @@ namespace HtmlParserSharp.Portable.Core
 					 * a character token for the Unicode character given in the
 					 * second column of that row.
 					 */
-					char[] val = NamedCharacters.WINDOWS_1252[value - 0x80];
+					char[] val = NamedCharacters.WINDOWS_1252[_value - 0x80];
 					EmitOrAppendOne(val, returnState);
 					// [NOCPP[
 				}
-				else if (value == 0xC
-					  && contentSpacePolicy != XmlViolationPolicy.Allow)
+				else if (_value == 0xC
+					  && _contentSpacePolicy != XmlViolationPolicy.Allow)
 				{
-					if (contentSpacePolicy == XmlViolationPolicy.AlterInfoset)
+					if (_contentSpacePolicy == XmlViolationPolicy.AlterInfoset)
 					{
 						EmitOrAppendOne(Tokenizer.SPACE, returnState);
 					}
-					else if (contentSpacePolicy == XmlViolationPolicy.Fatal)
+					else if (_contentSpacePolicy == XmlViolationPolicy.Fatal)
 					{
 						Fatal("A character reference expanded to a form feed which is not legal XML 1.0 white space.");
 					}
 					// ]NOCPP]
 				}
-				else if (value == 0x0)
+				else if (_value == 0x0)
 				{
 					ErrNcrZero();
 					EmitOrAppendOne(Tokenizer.REPLACEMENT_CHARACTER, returnState);
 				}
-				else if ((value & 0xF800) == 0xD800)
+				else if ((_value & 0xF800) == 0xD800)
 				{
 					ErrNcrSurrogate();
 					EmitOrAppendOne(Tokenizer.REPLACEMENT_CHARACTER, returnState);
@@ -6589,26 +6589,26 @@ namespace HtmlParserSharp.Portable.Core
 					 * Otherwise, return a character token for the Unicode character
 					 * whose code point is that number.
 					 */
-					char ch = (char)value;
+					char ch = (char)_value;
 					// [NOCPP[
-					if (value == 0x0D)
+					if (_value == 0x0D)
 					{
 						ErrNcrCr();
 					}
-					else if ((value <= 0x0008) || (value == 0x000B)
-						  || (value >= 0x000E && value <= 0x001F))
+					else if ((_value <= 0x0008) || (_value == 0x000B)
+						  || (_value >= 0x000E && _value <= 0x001F))
 					{
 						ch = ErrNcrControlChar(ch);
 					}
-					else if (value >= 0xFDD0 && value <= 0xFDEF)
+					else if (_value >= 0xFDD0 && _value <= 0xFDEF)
 					{
 						ErrNcrUnassigned();
 					}
-					else if ((value & 0xFFFE) == 0xFFFE)
+					else if ((_value & 0xFFFE) == 0xFFFE)
 					{
 						ch = ErrNcrNonCharacter(ch);
 					}
-					else if (value >= 0x007F && value <= 0x009F)
+					else if (_value >= 0x007F && _value <= 0x009F)
 					{
 						ErrNcrControlChar();
 					}
@@ -6617,22 +6617,22 @@ namespace HtmlParserSharp.Portable.Core
 						MaybeWarnPrivateUse(ch);
 					}
 					// ]NOCPP]
-					bmpChar[0] = ch;
-					EmitOrAppendOne(bmpChar, returnState);
+					_bmpChar[0] = ch;
+					EmitOrAppendOne(_bmpChar, returnState);
 				}
 			}
-			else if (value <= 0x10FFFF)
+			else if (_value <= 0x10FFFF)
 			{
 				// [NOCPP[
 				MaybeWarnPrivateUseAstral();
-				if ((value & 0xFFFE) == 0xFFFE)
+				if ((_value & 0xFFFE) == 0xFFFE)
 				{
-					ErrAstralNonCharacter(value);
+					ErrAstralNonCharacter(_value);
 				}
 				// ]NOCPP]
-				astralChar[0] = (char)(Tokenizer.LEAD_OFFSET + (value >> 10));
-				astralChar[1] = (char)(0xDC00 + (value & 0x3FF));
-				EmitOrAppendTwo(astralChar, returnState);
+				_astralChar[0] = (char)(Tokenizer.LEAD_OFFSET + (_value >> 10));
+				_astralChar[1] = (char)(0xDC00 + (_value & 0x3FF));
+				EmitOrAppendTwo(_astralChar, returnState);
 			}
 			else
 			{
@@ -6643,8 +6643,8 @@ namespace HtmlParserSharp.Portable.Core
 
 		public void Eof()
 		{
-			int state = stateSave;
-			int returnState = returnStateSave;
+			int state = _stateSave;
+			int returnState = _returnStateSave;
 
 			/*eofloop:*/
 			for (; ; )
@@ -6782,7 +6782,7 @@ namespace HtmlParserSharp.Portable.Core
 						EmitComment(0, 0);
 						goto breakEofloop;
 					case MARKUP_DECLARATION_OCTYPE:
-						if (index < 6)
+						if (_index < 6)
 						{
 							ErrBogusComment();
 							EmitComment(0, 0);
@@ -6795,16 +6795,16 @@ namespace HtmlParserSharp.Portable.Core
 							 * Create a new DOCTYPE token. Set its force-quirks flag
 							 * to on.
 							 */
-							doctypeName = "";
-							if (systemIdentifier != null)
+							_doctypeName = "";
+							if (_systemIdentifier != null)
 							{
-								systemIdentifier = null;
+								_systemIdentifier = null;
 							}
-							if (publicIdentifier != null)
+							if (_publicIdentifier != null)
 							{
-								publicIdentifier = null;
+								_publicIdentifier = null;
 							}
-							forceQuirks = true;
+							_forceQuirks = true;
 							/*
 							 * Emit the token.
 							 */
@@ -6859,7 +6859,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * Create a new DOCTYPE token. Set its force-quirks flag to
 						 * on.
 						 */
-						forceQuirks = true;
+						_forceQuirks = true;
 						/*
 						 * Emit the token.
 						 */
@@ -6874,7 +6874,7 @@ namespace HtmlParserSharp.Portable.Core
 						/*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						forceQuirks = true;
+						_forceQuirks = true;
 						/*
 						 * Emit that DOCTYPE token.
 						 */
@@ -6893,7 +6893,7 @@ namespace HtmlParserSharp.Portable.Core
 						/*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						forceQuirks = true;
+						_forceQuirks = true;
 						/*
 						 * Emit that DOCTYPE token.
 						 */
@@ -6909,11 +6909,11 @@ namespace HtmlParserSharp.Portable.Core
 						/*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						forceQuirks = true;
+						_forceQuirks = true;
 						/*
 						 * Emit that DOCTYPE token.
 						 */
-						publicIdentifier = LongStrBufToString();
+						_publicIdentifier = LongStrBufToString();
 						EmitDoctypeToken(0);
 						/*
 						 * Reconsume the EOF character in the data state.
@@ -6926,7 +6926,7 @@ namespace HtmlParserSharp.Portable.Core
 						/*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						forceQuirks = true;
+						_forceQuirks = true;
 						/*
 						 * Emit that DOCTYPE token.
 						 */
@@ -6942,11 +6942,11 @@ namespace HtmlParserSharp.Portable.Core
 						/*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						forceQuirks = true;
+						_forceQuirks = true;
 						/*
 						 * Emit that DOCTYPE token.
 						 */
-						systemIdentifier = LongStrBufToString();
+						_systemIdentifier = LongStrBufToString();
 						EmitDoctypeToken(0);
 						/*
 						 * Reconsume the EOF character in the data state.
@@ -6957,7 +6957,7 @@ namespace HtmlParserSharp.Portable.Core
 						/*
 						 * Set the DOCTYPE token's force-quirks flag to on.
 						 */
-						forceQuirks = true;
+						_forceQuirks = true;
 						/*
 						 * Emit that DOCTYPE token.
 						 */
@@ -7007,7 +7007,7 @@ namespace HtmlParserSharp.Portable.Core
 						for (; ; )
 						{
 							char c = '\u0000';
-							entCol++;
+							_entCol++;
 							/*
 							 * Consume the maximum number of characters possible,
 							 * with the consumed characters matching one of the
@@ -7018,21 +7018,21 @@ namespace HtmlParserSharp.Portable.Core
 							/*hiloop:*/
 							for (; ; )
 							{
-								if (hi == -1)
+								if (_hi == -1)
 								{
 									goto breakHiloop;
 								}
-								if (entCol == NamedCharacters.NAMES[hi].Length)
+								if (_entCol == NamedCharacters.NAMES[_hi].Length)
 								{
 									goto breakHiloop;
 								}
-								if (entCol > NamedCharacters.NAMES[hi].Length)
+								if (_entCol > NamedCharacters.NAMES[_hi].Length)
 								{
 									goto breakOuter;
 								}
-								else if (c < NamedCharacters.NAMES[hi][entCol])
+								else if (c < NamedCharacters.NAMES[_hi][_entCol])
 								{
-									hi--;
+									_hi--;
 								}
 								else
 								{
@@ -7045,23 +7045,23 @@ namespace HtmlParserSharp.Portable.Core
 							/*loloop:*/
 							for (; ; )
 							{
-								if (hi < lo)
+								if (_hi < _lo)
 								{
 									goto breakOuter;
 								}
-								if (entCol == NamedCharacters.NAMES[lo].Length)
+								if (_entCol == NamedCharacters.NAMES[_lo].Length)
 								{
-									candidate = lo;
-									strBufMark = strBufLen;
-									lo++;
+									_candidate = _lo;
+									_strBufMark = _strBufLen;
+									_lo++;
 								}
-								else if (entCol > NamedCharacters.NAMES[lo].Length)
+								else if (_entCol > NamedCharacters.NAMES[_lo].Length)
 								{
 									goto breakOuter;
 								}
-								else if (c > NamedCharacters.NAMES[lo][entCol])
+								else if (c > NamedCharacters.NAMES[_lo][_entCol])
 								{
-									lo++;
+									_lo++;
 								}
 								else
 								{
@@ -7071,7 +7071,7 @@ namespace HtmlParserSharp.Portable.Core
 
 						breakLoloop:
 
-							if (hi < lo)
+							if (_hi < _lo)
 							{
 								goto breakOuter;
 							}
@@ -7080,7 +7080,7 @@ namespace HtmlParserSharp.Portable.Core
 
 					breakOuter:
 
-						if (candidate == -1)
+						if (_candidate == -1)
 						{
 							/*
 							 * If no match can be made, then this is a parse error.
@@ -7092,7 +7092,7 @@ namespace HtmlParserSharp.Portable.Core
 						}
 						else
 						{
-							string candidateName = NamedCharacters.NAMES[candidate];
+							string candidateName = NamedCharacters.NAMES[_candidate];
 							if (candidateName.Length == 0
 									|| candidateName[candidateName.Length - 1] != ';')
 							{
@@ -7108,13 +7108,13 @@ namespace HtmlParserSharp.Portable.Core
 									 * not a U+003B SEMICOLON (;),
 									 */
 									char ch;
-									if (strBufMark == strBufLen)
+									if (_strBufMark == _strBufLen)
 									{
 										ch = '\u0000';
 									}
 									else
 									{
-										ch = strBuf[strBufMark];
+										ch = _strBuf[_strBufMark];
 									}
 									if ((ch >= '0' && ch <= '9')
 											|| (ch >= 'A' && ch <= 'Z')
@@ -7153,7 +7153,7 @@ namespace HtmlParserSharp.Portable.Core
 							 * second column of the named character references
 							 * table).
 							 */
-							char[] val = NamedCharacters.VALUES[candidate];
+							char[] val = NamedCharacters.VALUES[_candidate];
 							if (
 								// [NOCPP[
 							val.Length == 1
@@ -7168,19 +7168,19 @@ namespace HtmlParserSharp.Portable.Core
 								EmitOrAppendTwo(val, returnState);
 							}
 							// this is so complicated!
-							if (strBufMark < strBufLen)
+							if (_strBufMark < _strBufLen)
 							{
 								if ((returnState & DATA_AND_RCDATA_MASK) != 0)
 								{
-									for (int i = strBufMark; i < strBufLen; i++)
+									for (int i = _strBufMark; i < _strBufLen; i++)
 									{
-										AppendLongStrBuf(strBuf[i]);
+										AppendLongStrBuf(_strBuf[i]);
 									}
 								}
 								else
 								{
-									TokenHandler.Characters(strBuf, strBufMark,
-											strBufLen - strBufMark);
+									TokenHandler.Characters(_strBuf, _strBufMark,
+											_strBufLen - _strBufMark);
 								}
 							}
 							state = returnState;
@@ -7205,7 +7205,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * Otherwise, if the next character is a U+003B SEMICOLON,
 						 * consume that too. If it isn't, there is a parse error.
 						 */
-						if (!seenDigits)
+						if (!_seenDigits)
 						{
 							ErrNoDigitsInNCR();
 							EmitOrAppendStrBuf(returnState);
@@ -7246,15 +7246,15 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void EmitDoctypeToken(int pos)
 		{
-			cstart = pos + 1;
-			TokenHandler.Doctype(doctypeName, publicIdentifier, systemIdentifier,
-					forceQuirks);
+			_cstart = pos + 1;
+			TokenHandler.Doctype(_doctypeName, _publicIdentifier, _systemIdentifier,
+					_forceQuirks);
 			// It is OK and sufficient to release these here, since
 			// there's no way out of the doctype states than through paths
 			// that call this method.
-			doctypeName = null;
-			publicIdentifier = null;
-			systemIdentifier = null;
+			_doctypeName = null;
+			_publicIdentifier = null;
+			_systemIdentifier = null;
 		}
 
 		/*@Inline*/
@@ -7328,31 +7328,31 @@ namespace HtmlParserSharp.Portable.Core
 
 		public void End()
 		{
-			strBuf = null;
-			longStrBuf = null;
-			doctypeName = null;
-			systemIdentifier = null;
-			publicIdentifier = null;
-			tagName = null;
-			attributeName = null;
+			_strBuf = null;
+			_longStrBuf = null;
+			_doctypeName = null;
+			_systemIdentifier = null;
+			_publicIdentifier = null;
+			_tagName = null;
+			_attributeName = null;
 			TokenHandler.EndTokenization();
-			if (attributes != null)
+			if (_attributes != null)
 			{
-				attributes.Clear(mappingLangToXmlLang);
-				attributes = null;
+				_attributes.Clear(_mappingLangToXmlLang);
+				_attributes = null;
 			}
 		}
 
 		public void RequestSuspension()
 		{
-			shouldSuspend = true;
+			_shouldSuspend = true;
 		}
 
 		// [NOCPP[
 
 		public void BecomeConfident()
 		{
-			confident = true;
+			_confident = true;
 		}
 
 		/**
@@ -7372,7 +7372,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return lastCR;
+				return _lastCR;
 			}
 		}
 
@@ -7408,47 +7408,47 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return (stateSave == DATA);
+				return (_stateSave == DATA);
 			}
 		}
 
 		public void ResetToDataState()
 		{
-			strBufLen = 0;
-			longStrBufLen = 0;
-			stateSave = Tokenizer.DATA;
+			_strBufLen = 0;
+			_longStrBufLen = 0;
+			_stateSave = Tokenizer.DATA;
 			// line = 1; XXX line numbers
-			lastCR = false;
-			index = 0;
-			forceQuirks = false;
-			additional = '\u0000';
-			entCol = -1;
-			firstCharKey = -1;
-			lo = 0;
-			hi = 0; // will always be overwritten before use anyway
-			candidate = -1;
-			strBufMark = 0;
-			prevValue = -1;
-			value = 0;
-			seenDigits = false;
-			endTag = false;
-			shouldSuspend = false;
+			_lastCR = false;
+			_index = 0;
+			_forceQuirks = false;
+			_additional = '\u0000';
+			_entCol = -1;
+			_firstCharKey = -1;
+			_lo = 0;
+			_hi = 0; // will always be overwritten before use anyway
+			_candidate = -1;
+			_strBufMark = 0;
+			_prevValue = -1;
+			_value = 0;
+			_seenDigits = false;
+			_endTag = false;
+			_shouldSuspend = false;
 			InitDoctypeFields();
-			if (tagName != null)
+			if (_tagName != null)
 			{
-				tagName = null;
+				_tagName = null;
 			}
-			if (attributeName != null)
+			if (_attributeName != null)
 			{
-				attributeName = null;
+				_attributeName = null;
 			}
 			// [NOCPP[
-			if (newAttributesEachTime)
+			if (_newAttributesEachTime)
 			{
 				// ]NOCPP]
-				if (attributes != null)
+				if (_attributes != null)
 				{
-					attributes = null;
+					_attributes = null;
 				}
 				// [NOCPP[
 			}
@@ -7457,109 +7457,109 @@ namespace HtmlParserSharp.Portable.Core
 
 		public void LoadState(Tokenizer other)
 		{
-			strBufLen = other.strBufLen;
-			if (strBufLen > strBuf.Length)
+			_strBufLen = other._strBufLen;
+			if (_strBufLen > _strBuf.Length)
 			{
-				strBuf = new char[strBufLen];
+				_strBuf = new char[_strBufLen];
 			}
-			Array.Copy(other.strBuf, strBuf, strBufLen);
+			Array.Copy(other._strBuf, _strBuf, _strBufLen);
 
-			longStrBufLen = other.longStrBufLen;
-			if (longStrBufLen > longStrBuf.Length)
+			_longStrBufLen = other._longStrBufLen;
+			if (_longStrBufLen > _longStrBuf.Length)
 			{
-				longStrBuf = new char[longStrBufLen];
+				_longStrBuf = new char[_longStrBufLen];
 			}
-			Array.Copy(other.longStrBuf, longStrBuf, longStrBufLen);
+			Array.Copy(other._longStrBuf, _longStrBuf, _longStrBufLen);
 
-			stateSave = other.stateSave;
-			returnStateSave = other.returnStateSave;
-			endTagExpectation = other.endTagExpectation;
-			endTagExpectationAsArray = other.endTagExpectationAsArray;
+			_stateSave = other._stateSave;
+			_returnStateSave = other._returnStateSave;
+			_endTagExpectation = other._endTagExpectation;
+			_endTagExpectationAsArray = other._endTagExpectationAsArray;
 			// line = 1; XXX line numbers
-			lastCR = other.lastCR;
-			index = other.index;
-			forceQuirks = other.forceQuirks;
-			additional = other.additional;
-			entCol = other.entCol;
-			firstCharKey = other.firstCharKey;
-			lo = other.lo;
-			hi = other.hi;
-			candidate = other.candidate;
-			strBufMark = other.strBufMark;
-			prevValue = other.prevValue;
-			value = other.value;
-			seenDigits = other.seenDigits;
-			endTag = other.endTag;
-			shouldSuspend = false;
+			_lastCR = other._lastCR;
+			_index = other._index;
+			_forceQuirks = other._forceQuirks;
+			_additional = other._additional;
+			_entCol = other._entCol;
+			_firstCharKey = other._firstCharKey;
+			_lo = other._lo;
+			_hi = other._hi;
+			_candidate = other._candidate;
+			_strBufMark = other._strBufMark;
+			_prevValue = other._prevValue;
+			_value = other._value;
+			_seenDigits = other._seenDigits;
+			_endTag = other._endTag;
+			_shouldSuspend = false;
 
-			if (other.doctypeName == null)
+			if (other._doctypeName == null)
 			{
-				doctypeName = null;
+				_doctypeName = null;
 			}
 			else
 			{
-				doctypeName = other.doctypeName;
+				_doctypeName = other._doctypeName;
 			}
 
-			if (other.systemIdentifier == null)
+			if (other._systemIdentifier == null)
 			{
-				systemIdentifier = null;
+				_systemIdentifier = null;
 			}
 			else
 			{
-				systemIdentifier = other.systemIdentifier;
+				_systemIdentifier = other._systemIdentifier;
 			}
 
-			if (other.publicIdentifier == null)
+			if (other._publicIdentifier == null)
 			{
-				publicIdentifier = null;
+				_publicIdentifier = null;
 			}
 			else
 			{
-				publicIdentifier = other.publicIdentifier;
+				_publicIdentifier = other._publicIdentifier;
 			}
 
-			if (other.tagName == null)
+			if (other._tagName == null)
 			{
-				tagName = null;
+				_tagName = null;
 			}
 			else
 			{
-				tagName = other.tagName.CloneElementName();
+				_tagName = other._tagName.CloneElementName();
 			}
 
-			if (other.attributeName == null)
+			if (other._attributeName == null)
 			{
-				attributeName = null;
+				_attributeName = null;
 			}
 			else
 			{
-				attributeName = other.attributeName.CloneAttributeName();
+				_attributeName = other._attributeName.CloneAttributeName();
 			}
 
-			if (other.attributes == null)
+			if (other._attributes == null)
 			{
-				attributes = null;
+				_attributes = null;
 			}
 			else
 			{
-				attributes = other.attributes.CloneAttributes();
+				_attributes = other._attributes.CloneAttributes();
 			}
 		}
 
 		public void InitializeWithoutStarting()
 		{
-			confident = false;
-			strBuf = new char[64];
-			longStrBuf = new char[1024];
-			line = 1;
+			_confident = false;
+			_strBuf = new char[64];
+			_longStrBuf = new char[1024];
+			_line = 1;
 			// [NOCPP[
-			html4 = false;
-			metaBoundaryPassed = false;
-			wantsComments = TokenHandler.WantsComments;
-			if (!newAttributesEachTime)
+			_html4 = false;
+			_metaBoundaryPassed = false;
+			_wantsComments = TokenHandler.WantsComments;
+			if (!_newAttributesEachTime)
 			{
-				attributes = new HtmlAttributes(mappingLangToXmlLang);
+				_attributes = new HtmlAttributes(_mappingLangToXmlLang);
 			}
 			// ]NOCPP]
 			ResetToDataState();
