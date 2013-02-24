@@ -26,7 +26,7 @@ using HtmlParserSharp.Portable.Common;
 
 namespace HtmlParserSharp.Portable.Core
 {
-	public sealed partial class AttributeName
+	public sealed class AttributeName
 	{
 		// [NOCPP[
 
@@ -158,7 +158,7 @@ namespace HtmlParserSharp.Portable.Core
 
 		private static string[] COMPUTE_QNAME(String[] local, String[] prefix)
 		{
-			string[] arr = new string[4];
+			var arr = new string[4];
 			for (int i = 0; i < arr.Length; i++)
 			{
 				if (prefix[i] == null)
@@ -186,7 +186,7 @@ namespace HtmlParserSharp.Portable.Core
 		private static string[] SVG_DIFFERENT([Local] string name, [Local] string camel)
 		{
 			/*[Local]*/
-			string[] arr = new string[4];
+			var arr = new string[4];
 			arr[0] = name;
 			arr[1] = name;
 			arr[2] = camel;
@@ -207,7 +207,7 @@ namespace HtmlParserSharp.Portable.Core
 		private static string[] MATH_DIFFERENT([Local] string name, [Local] string camel)
 		{
 			/*[Local]*/
-			string[] arr = new string[4];
+			var arr = new string[4];
 			arr[0] = name;
 			arr[1] = camel;
 			arr[2] = name;
@@ -228,7 +228,7 @@ namespace HtmlParserSharp.Portable.Core
 		private static string[] COLONIFIED_LOCAL([Local] string name, [Local] string suffix)
 		{
 			/*[Local]*/
-			string[] arr = new string[4];
+			var arr = new string[4];
 			arr[0] = name;
 			arr[1] = suffix;
 			arr[2] = suffix;
@@ -247,7 +247,7 @@ namespace HtmlParserSharp.Portable.Core
 		static string[] SAME_LOCAL([Local] string name)
 		{
 			/*[Local]*/
-			string[] arr = new string[4];
+			var arr = new string[4];
 			arr[0] = name;
 			arr[1] = name;
 			arr[2] = name;
@@ -277,33 +277,30 @@ namespace HtmlParserSharp.Portable.Core
 				)
 		{
 			// XXX deal with offset
-			int hash = AttributeName.BufToHash(buf, length);
-			int index = Array.BinarySearch<int>(AttributeName.ATTRIBUTE_HASHES, hash);
+			int hash = BufToHash(buf, length);
+			int index = Array.BinarySearch(ATTRIBUTE_HASHES, hash);
 			if (index < 0)
 			{
-				return AttributeName.CreateAttributeName(
+				return CreateAttributeName(
 						Portability.NewLocalNameFromBuffer(buf, offset, length)
 					// [NOCPP[
 						, checkNcName
 					// ]NOCPP]
 				);
 			}
-			else
-			{
-				AttributeName attributeName = AttributeName.ATTRIBUTE_NAMES[index];
-				/*[Local]*/
-				string name = attributeName.GetLocal(AttributeName.HTML);
-				if (!Portability.LocalEqualsBuffer(name, buf, offset, length))
-				{
-					return AttributeName.CreateAttributeName(
-							Portability.NewLocalNameFromBuffer(buf, offset, length)
-						// [NOCPP[
-							, checkNcName
-						// ]NOCPP]
-					);
-				}
-				return attributeName;
-			}
+		    AttributeName attributeName = ATTRIBUTE_NAMES[index];
+		    /*[Local]*/
+		    string name = attributeName.GetLocal(HTML);
+		    if (!Portability.LocalEqualsBuffer(name, buf, offset, length))
+		    {
+		        return CreateAttributeName(
+		            Portability.NewLocalNameFromBuffer(buf, offset, length)
+		            // [NOCPP[
+		            , checkNcName
+		            // ]NOCPP]
+		            );
+		    }
+		    return attributeName;
 		}
 
 
@@ -403,7 +400,7 @@ namespace HtmlParserSharp.Portable.Core
 			this.local = local;
 			this.prefix = prefix;
 			// [NOCPP[
-			this.qName = COMPUTE_QNAME(local, prefix);
+			qName = COMPUTE_QNAME(local, prefix);
 			this.flags = flags;
 			// ]NOCPP]
 		}
@@ -431,17 +428,16 @@ namespace HtmlParserSharp.Portable.Core
 				flags = 0;
 			}
 			// ]NOCPP]
-			return new AttributeName(AttributeName.ALL_NO_NS, AttributeName.SAME_LOCAL(name), ALL_NO_PREFIX, flags);
+			return new AttributeName(ALL_NO_NS, SAME_LOCAL(name), ALL_NO_PREFIX, flags);
 		}
 
-		/// <summary>
-		/// TODO: remove this (?)
-		/// Clones the attribute using an interner. Returns 
-		/// <code>this</code> in Java and for non-dynamic instances in C++.
-		/// </summary>
-		/// <param name="interner">An interner</param>
-		/// <returns>A clone</returns>
-		public /*virtual*/ AttributeName CloneAttributeName(/*Interner interner*/)
+	    /// <summary>
+	    /// TODO: remove this (?)
+	    /// Clones the attribute using an interner. Returns 
+	    /// <code>this</code> in Java and for non-dynamic instances in C++.
+	    /// </summary>
+	    /// <returns>A clone</returns>
+	    public /*virtual*/ AttributeName CloneAttributeName(/*Interner interner*/)
 		{
 			return this;
 		}
@@ -455,8 +451,8 @@ namespace HtmlParserSharp.Portable.Core
 		/// <returns>The name of the attribute to create</returns>
 		internal static AttributeName Create(string name)
 		{
-			return new AttributeName(AttributeName.ALL_NO_NS,
-					AttributeName.SAME_LOCAL(name), ALL_NO_PREFIX,
+			return new AttributeName(ALL_NO_NS,
+					SAME_LOCAL(name), ALL_NO_PREFIX,
 					NCNAME_HTML | NCNAME_FOREIGN | NCNAME_LANG);
 		}
 
@@ -536,7 +532,7 @@ namespace HtmlParserSharp.Portable.Core
 
 		internal bool EqualsAnother(AttributeName another)
 		{
-			return this.GetLocal(AttributeName.HTML) == another.GetLocal(AttributeName.HTML);
+			return GetLocal(HTML) == another.GetLocal(HTML);
 		}
 
 		// START CODE ONLY USED FOR GENERATING CODE uncomment to regenerate
@@ -1884,8 +1880,8 @@ namespace HtmlParserSharp.Portable.Core
 	EXTERNALRESOURCESREQUIRED,
 	GLYPH_ORIENTATION_VERTICAL,
 	COLOR_INTERPOLATION_FILTERS,
-	GLYPH_ORIENTATION_HORIZONTAL,
-	};
+	GLYPH_ORIENTATION_HORIZONTAL
+		};
 		private static readonly int[] ATTRIBUTE_HASHES = {
 	1153,
 	1383,
