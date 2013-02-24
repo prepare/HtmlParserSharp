@@ -26,50 +26,50 @@
 
 namespace HtmlParserSharp.Portable.Core
 {
-	public enum InsertionMode
-	{
-		INITIAL = 0,
+    public enum InsertionMode
+    {
+        INITIAL = 0,
 
-		BEFORE_HTML = 1,
+        BEFORE_HTML = 1,
 
-		BEFORE_HEAD = 2,
+        BEFORE_HEAD = 2,
 
-		IN_HEAD = 3,
+        IN_HEAD = 3,
 
-		IN_HEAD_NOSCRIPT = 4,
+        IN_HEAD_NOSCRIPT = 4,
 
-		AFTER_HEAD = 5,
+        AFTER_HEAD = 5,
 
-		IN_BODY = 6,
+        IN_BODY = 6,
 
-		IN_TABLE = 7,
+        IN_TABLE = 7,
 
-		IN_CAPTION = 8,
+        IN_CAPTION = 8,
 
-		IN_COLUMN_GROUP = 9,
+        IN_COLUMN_GROUP = 9,
 
-		IN_TABLE_BODY = 10,
+        IN_TABLE_BODY = 10,
 
-		IN_ROW = 11,
+        IN_ROW = 11,
 
-		IN_CELL = 12,
+        IN_CELL = 12,
 
-		IN_SELECT = 13,
+        IN_SELECT = 13,
 
-		IN_SELECT_IN_TABLE = 14,
+        IN_SELECT_IN_TABLE = 14,
 
-		AFTER_BODY = 15,
+        AFTER_BODY = 15,
 
-		IN_FRAMESET = 16,
+        IN_FRAMESET = 16,
 
-		AFTER_FRAMESET = 17,
+        AFTER_FRAMESET = 17,
 
-		AFTER_AFTER_BODY = 18,
+        AFTER_AFTER_BODY = 18,
 
-		AFTER_AFTER_FRAMESET = 19,
+        AFTER_AFTER_FRAMESET = 19,
 
-		TEXT = 20,
+        TEXT = 20,
 
-		FRAMESET_OK = 21
-	}
+        FRAMESET_OK = 21
+    }
 }
