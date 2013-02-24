@@ -22,14 +22,14 @@
 
 namespace HtmlParserSharp.Portable.Core
 {
-	/// <summary>
-	/// Interface for getting the current line and column
-	/// (Corresponds to the SAX Locator interface).
-	/// This is implemented by Locator and Tokenizer.
-	/// </summary>
-	public interface ILocator
-	{
-		int LineNumber { get; }
-		int ColumnNumber { get; }
-	}
+    /// <summary>
+    ///     Interface for getting the current line and column
+    ///     (Corresponds to the SAX Locator interface).
+    ///     This is implemented by Locator and Tokenizer.
+    /// </summary>
+    public interface ILocator
+    {
+        int LineNumber { get; }
+        int ColumnNumber { get; }
+    }
 }

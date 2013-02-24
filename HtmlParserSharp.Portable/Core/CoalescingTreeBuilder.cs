@@ -49,7 +49,6 @@ namespace HtmlParserSharp.Portable.Core
             AppendCharacters(parent, new String(buf, start, length));
         }
 
-
         protected override void AppendIsindexPrompt(T parent)
         {
             AppendCharacters(parent, "This is a searchable index. Enter search keywords: ");
