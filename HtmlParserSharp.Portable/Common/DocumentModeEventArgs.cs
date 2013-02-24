@@ -24,27 +24,34 @@ using System;
 
 namespace HtmlParserSharp.Portable.Common
 {
-	public class DocumentModeEventArgs : EventArgs
-	{
-		public DocumentMode Mode { get; private set; }
-		public string PublicIdentifier { get; private set; }
-		public string SystemIdentifier { get; private set; }
-		public bool Html4SpecificAdditionalErrorChecks { get; private set; }
+    public class DocumentModeEventArgs : EventArgs
+    {
+        public DocumentMode Mode { get; private set; }
+        public string PublicIdentifier { get; private set; }
+        public string SystemIdentifier { get; private set; }
+        public bool Html4SpecificAdditionalErrorChecks { get; private set; }
 
-		/// <summary>
-		/// Receive notification of the document mode.
-		/// </summary>
-		/// <param name="mode">The document mode.</param>
-		/// <param name="publicIdentifier">The public identifier of the doctype or <c>null</c> if unavailable.</param>
-		/// <param name="systemIdentifier">The system identifier of the doctype or <c>null</c> if unavailable.</param>
-		/// <param name="html4SpecificAdditionalErrorChecks"><c>true</c>  if HTML 4-specific checks were enabled,
-		/// <c>false</c> otherwise</param>
-		public DocumentModeEventArgs(DocumentMode mode, string publicIdentifier, string systemIdentifier, bool html4SpecificAdditionalErrorChecks)
-		{
-			Mode = mode;
-			PublicIdentifier = publicIdentifier;
-			SystemIdentifier = systemIdentifier;
-			Html4SpecificAdditionalErrorChecks = html4SpecificAdditionalErrorChecks;
-		}
-	}
+        /// <summary>
+        ///     Receive notification of the document mode.
+        /// </summary>
+        /// <param name="mode">The document mode.</param>
+        /// <param name="publicIdentifier">
+        ///     The public identifier of the doctype or <c>null</c> if unavailable.
+        /// </param>
+        /// <param name="systemIdentifier">
+        ///     The system identifier of the doctype or <c>null</c> if unavailable.
+        /// </param>
+        /// <param name="html4SpecificAdditionalErrorChecks">
+        ///     <c>true</c>  if HTML 4-specific checks were enabled,
+        ///     <c>false</c> otherwise
+        /// </param>
+        public DocumentModeEventArgs(DocumentMode mode, string publicIdentifier, string systemIdentifier,
+                                     bool html4SpecificAdditionalErrorChecks)
+        {
+            Mode = mode;
+            PublicIdentifier = publicIdentifier;
+            SystemIdentifier = systemIdentifier;
+            Html4SpecificAdditionalErrorChecks = html4SpecificAdditionalErrorChecks;
+        }
+    }
 }

@@ -23,27 +23,26 @@
 
 namespace HtmlParserSharp.Portable.Common
 {
-	/// <summary>
-	/// Policy for XML 1.0 violations.
-	/// </summary>
-	/// 
-	public enum XmlViolationPolicy
-	{
-		/// <summary>
-		/// Conform to HTML 5, allow XML 1.0 to be violated.
-		/// </summary>
-		Allow,
+    /// <summary>
+    ///     Policy for XML 1.0 violations.
+    /// </summary>
+    public enum XmlViolationPolicy
+    {
+        /// <summary>
+        ///     Conform to HTML 5, allow XML 1.0 to be violated.
+        /// </summary>
+        Allow,
 
-		/// <summary>
-		/// Halt when something cannot be mapped to XML 1.0.
-		/// </summary>
-		Fatal,
+        /// <summary>
+        ///     Halt when something cannot be mapped to XML 1.0.
+        /// </summary>
+        Fatal,
 
-		/// <summary>
-		/// Be non-conforming and alter the infoset to fit
-		/// XML 1.0 when something would otherwise not be
-		/// mappable to XML 1.0.
-		/// </summary>
-		AlterInfoset
-	}
+        /// <summary>
+        ///     Be non-conforming and alter the infoset to fit
+        ///     XML 1.0 when something would otherwise not be
+        ///     mappable to XML 1.0.
+        /// </summary>
+        AlterInfoset
+    }
 }

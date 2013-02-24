@@ -23,43 +23,43 @@
 
 namespace HtmlParserSharp.Portable.Common
 {
-	/// <summary>
-	/// Used for indicating desired behavior with legacy doctypes.
-	/// </summary>
-	public enum DoctypeExpectation
-	{
-		/// <summary>
-		/// Be a pure HTML5 parser.
-		/// </summary>
-		Html,
+    /// <summary>
+    ///     Used for indicating desired behavior with legacy doctypes.
+    /// </summary>
+    public enum DoctypeExpectation
+    {
+        /// <summary>
+        ///     Be a pure HTML5 parser.
+        /// </summary>
+        Html,
 
-		/// <summary>
-		/// Require the HTML 4.01 Transitional public id. Turn on HTML4-specific
-		/// additional errors regardless of doctype.
-		/// </summary>
-		Html401Transitional,
+        /// <summary>
+        ///     Require the HTML 4.01 Transitional public id. Turn on HTML4-specific
+        ///     additional errors regardless of doctype.
+        /// </summary>
+        Html401Transitional,
 
-		/// <summary>
-		/// Require the HTML 4.01 Transitional public id and a system id. Turn on
-		/// HTML4-specific additional errors regardless of doctype.
-		/// </summary>
-		Html401Strict,
+        /// <summary>
+        ///     Require the HTML 4.01 Transitional public id and a system id. Turn on
+        ///     HTML4-specific additional errors regardless of doctype.
+        /// </summary>
+        Html401Strict,
 
-		/// <summary>
-		/// Treat the doctype required by HTML 5, doctypes with the HTML 4.01 Strict
-		/// public id and doctypes with the HTML 4.01 Transitional public id and a
-		/// system id as non-errors. Turn on HTML4-specific additional errors if the
-		/// public id is the HTML 4.01 Strict or Transitional public id.
-		/// </summary>
-		Auto,
+        /// <summary>
+        ///     Treat the doctype required by HTML 5, doctypes with the HTML 4.01 Strict
+        ///     public id and doctypes with the HTML 4.01 Transitional public id and a
+        ///     system id as non-errors. Turn on HTML4-specific additional errors if the
+        ///     public id is the HTML 4.01 Strict or Transitional public id.
+        /// </summary>
+        Auto,
 
-		/// <summary>
-		/// Never enable HTML4-specific error checks. Never report any doctype
-		/// condition as an error. (Doctype tokens in wrong places will be
-		/// reported as errors, though.) The application may decide what to log
-		/// in response to calls to  <code>DocumentModeHanler</code>. This mode
-		/// is meant for doing surveys on existing content.
-		/// </summary>
-		NoDoctypeErrors
-	}
+        /// <summary>
+        ///     Never enable HTML4-specific error checks. Never report any doctype
+        ///     condition as an error. (Doctype tokens in wrong places will be
+        ///     reported as errors, though.) The application may decide what to log
+        ///     in response to calls to  <code>DocumentModeHanler</code>. This mode
+        ///     is meant for doing surveys on existing content.
+        /// </summary>
+        NoDoctypeErrors
+    }
 }

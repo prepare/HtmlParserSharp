@@ -24,15 +24,15 @@ using System;
 
 namespace HtmlParserSharp.Portable.Common
 {
-	public class EncodingDetectedEventArgs : EventArgs
-	{
-		public string Encoding { get; private set; }
-		public bool AcceptEncoding { get; set; }
+    public class EncodingDetectedEventArgs : EventArgs
+    {
+        public string Encoding { get; private set; }
+        public bool AcceptEncoding { get; set; }
 
-		public EncodingDetectedEventArgs(string encoding)
-		{
-			Encoding = encoding;
-			AcceptEncoding = false;
-		}
-	}
+        public EncodingDetectedEventArgs(string encoding)
+        {
+            Encoding = encoding;
+            AcceptEncoding = false;
+        }
+    }
 }

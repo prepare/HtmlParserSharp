@@ -24,22 +24,21 @@
 
 namespace HtmlParserSharp.Portable.Common
 {
-	public enum DocumentMode
-	{
-		/// <summary>
-		/// The Standards Mode
-		/// </summary>
-		StandardsMode,
+    public enum DocumentMode
+    {
+        /// <summary>
+        ///     The Standards Mode
+        /// </summary>
+        StandardsMode,
 
-		/// <summary>
-		/// The Limited Quirks Mode aka. The Almost Standards Mode
-		/// </summary>
-		AlmostStandardsMode,
+        /// <summary>
+        ///     The Limited Quirks Mode aka. The Almost Standards Mode
+        /// </summary>
+        AlmostStandardsMode,
 
-		/// <summary>
-		/// The Quirks Mode
-		/// </summary>
-		///
-		QuirksMode
-	}
+        /// <summary>
+        ///     The Quirks Mode
+        /// </summary>
+        QuirksMode
+    }
 }
