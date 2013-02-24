@@ -51,15 +51,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HtmlParserSharp\HtmlParserSharp.csproj">
-      <Project>{fd150915-d34f-436a-92c1-80aa505da754}</Project>
-      <Name>HtmlParserSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="SampleData\test.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HtmlParserSharp.Portable\HtmlParserSharp.Portable.csproj">
+      <Project>{b27a7987-002e-4f27-92d6-e95872b45bb6}</Project>
+      <Name>HtmlParserSharp.Portable</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

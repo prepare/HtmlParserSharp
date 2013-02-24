@@ -54,11 +54,12 @@ namespace HtmlParserSharp.Console
 			Stopwatch sw = new Stopwatch();
 
 
+
 			System.Console.Write("Parsing ... ");
 			var result = GetTestFiles().Select((file) =>
 				{
 					sw.Restart();
-					var doc = parser.Parse(file.FullName);
+				    var doc = parser.Parse(new StreamReader(file.FullName));
 					sw.Stop();
 					var parseTime = sw.Elapsed;
 					doc.Save("test.xml");

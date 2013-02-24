@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlParserSharp", "HtmlPars
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlParserSharp.Console", "HtmlParserSharp.Console\HtmlParserSharp.Console.csproj", "{AFAED5E4-D052-416E-80FE-8C7A7A6531FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlParserSharp.Portable", "HtmlParserSharp.Portable\HtmlParserSharp.Portable.csproj", "{B27A7987-002E-4F27-92D6-E95872B45BB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{AFAED5E4-D052-416E-80FE-8C7A7A6531FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFAED5E4-D052-416E-80FE-8C7A7A6531FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFAED5E4-D052-416E-80FE-8C7A7A6531FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B27A7987-002E-4F27-92D6-E95872B45BB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B27A7987-002E-4F27-92D6-E95872B45BB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B27A7987-002E-4F27-92D6-E95872B45BB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B27A7987-002E-4F27-92D6-E95872B45BB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
