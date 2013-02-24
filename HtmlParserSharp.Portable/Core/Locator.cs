@@ -24,16 +24,16 @@
 
 namespace HtmlParserSharp.Portable.Core
 {
-	public class Locator : ILocator
-	{
-		public int ColumnNumber { get; private set; }
+    public class Locator : ILocator
+    {
+        public int ColumnNumber { get; private set; }
 
-		public int LineNumber { get; private set; }
+        public int LineNumber { get; private set; }
 
-		public Locator(ILocator locator)
-		{
-			ColumnNumber = locator.ColumnNumber;
-			LineNumber = locator.LineNumber;
-		}
-	}
+        public Locator(ILocator locator)
+        {
+            ColumnNumber = locator.ColumnNumber;
+            LineNumber = locator.LineNumber;
+        }
+    }
 }
