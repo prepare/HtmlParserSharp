@@ -44,16 +44,16 @@ namespace HtmlParserSharp.Portable.Core
 {
 	public abstract class TreeBuilder<T> : ITokenHandler, ITreeBuilderState<T> where T : class
 	{
-		private InsertionMode mode = InsertionMode.INITIAL;
+		private InsertionMode _mode = InsertionMode.INITIAL;
 
-		private InsertionMode originalMode = InsertionMode.INITIAL;
+		private InsertionMode _originalMode = InsertionMode.INITIAL;
 
 		/// <summary>
 		/// Used only when moving back to IN_BODY.
 		/// </summary>
-		private bool framesetOk = true;
+		private bool _framesetOk = true;
 
-		protected Tokenizer tokenizer;
+		protected Tokenizer _tokenizer;
 
 		// [NOCPP[
 
@@ -65,46 +65,46 @@ namespace HtmlParserSharp.Portable.Core
 
 		public bool IsScriptingEnabled { get; set; }
 
-		private bool needToDropLF;
+		private bool _needToDropLF;
 
 		// [NOCPP[
 
-		private bool wantingComments;
+		private bool _wantingComments;
 
 		// ]NOCPP]
 
-		private bool fragment;
+		private bool _fragment;
 
 		[Local]
-		private string contextName;
+		private string _contextName;
 
 		[NsUri]
-		private string contextNamespace;
+		private string _contextNamespace;
 
-		private T contextNode;
+		private T _contextNode;
 
-		private StackNode<T>[] stack;
+		private StackNode<T>[] _stack;
 
-		private int currentPtr = -1;
+		private int _currentPtr = -1;
 
-		private StackNode<T>[] listOfActiveFormattingElements;
+		private StackNode<T>[] _listOfActiveFormattingElements;
 
-		private int listPtr = -1;
+		private int _listPtr = -1;
 
-		private T formPointer;
+		private T _formPointer;
 
-		private T headPointer;
+		private T _headPointer;
 
 		/**
 		 * Used to work around Gecko limitations. Not used in Java.
 		 */
-		private T deepTreeSurrogateParent;
+		private T _deepTreeSurrogateParent;
 
-		protected char[] charBuffer;
+		protected char[] _charBuffer;
 
-		protected int charBufferLen = 0;
+		protected int _charBufferLen = 0;
 
-		private bool quirks = false;
+		private bool _quirks = false;
 
 		// [NOCPP[
 
@@ -113,15 +113,15 @@ namespace HtmlParserSharp.Portable.Core
 		public XmlViolationPolicy NamePolicy { get; set; }
 
 		// stores the first occurrences of IDs
-		private readonly Dictionary<string, Locator> idLocations = new Dictionary<string, Locator>();
+		private readonly Dictionary<string, Locator> _idLocations = new Dictionary<string, Locator>();
 
-		private bool html4;
+		private bool _html4;
 
 		// ]NOCPP]
 
 		protected TreeBuilder()
 		{
-			fragment = false;
+			_fragment = false;
 			IsReportingDoctype = true;
 			DoctypeExpectation = DoctypeExpectation.Html;
 			NamePolicy = XmlViolationPolicy.AlterInfoset;
@@ -242,9 +242,9 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void ErrListUnclosedStartTags(int eltPos)
 		{
-			if (currentPtr != -1)
+			if (_currentPtr != -1)
 			{
-				for (int i = currentPtr; i > eltPos; i--)
+				for (int i = _currentPtr; i > eltPos; i--)
 				{
 					ReportUnclosedElementNameAndLocation(i);
 				}
@@ -272,7 +272,7 @@ namespace HtmlParserSharp.Portable.Core
 		/// <param name="pos">The position.</param>
 		private void ReportUnclosedElementNameAndLocation(int pos)
 		{
-			StackNode<T> node = stack[pos];
+			StackNode<T> node = _stack[pos];
 			if (node.IsOptionalEndTag)
 			{
 				return;
@@ -307,83 +307,83 @@ namespace HtmlParserSharp.Portable.Core
 
 		public void StartTokenization(Tokenizer self)
 		{
-			tokenizer = self;
-			stack = new StackNode<T>[64];
-			listOfActiveFormattingElements = new StackNode<T>[64];
-			needToDropLF = false;
-			originalMode = InsertionMode.INITIAL;
-			currentPtr = -1;
-			listPtr = -1;
-			formPointer = null;
-			headPointer = null;
-			deepTreeSurrogateParent = null;
+			_tokenizer = self;
+			_stack = new StackNode<T>[64];
+			_listOfActiveFormattingElements = new StackNode<T>[64];
+			_needToDropLF = false;
+			_originalMode = InsertionMode.INITIAL;
+			_currentPtr = -1;
+			_listPtr = -1;
+			_formPointer = null;
+			_headPointer = null;
+			_deepTreeSurrogateParent = null;
 			// [NOCPP[
-			html4 = false;
-			idLocations.Clear();
-			wantingComments = false;
+			_html4 = false;
+			_idLocations.Clear();
+			_wantingComments = false;
 			// ]NOCPP]
-			Start(fragment);
-			charBufferLen = 0;
-			charBuffer = new char[1024];
-			framesetOk = true;
-			if (fragment)
+			Start(_fragment);
+			_charBufferLen = 0;
+			_charBuffer = new char[1024];
+			_framesetOk = true;
+			if (_fragment)
 			{
 				T elt;
-				if (contextNode != null)
+				if (_contextNode != null)
 				{
-					elt = contextNode;
+					elt = _contextNode;
 				}
 				else
 				{
-					elt = CreateHtmlElementSetAsRoot(tokenizer.EmptyAttributes());
+					elt = CreateHtmlElementSetAsRoot(_tokenizer.EmptyAttributes());
 				}
 				StackNode<T> node = new StackNode<T>(ElementName.HTML, elt
 					// [NOCPP[
-						, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+						, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 					// ]NOCPP]
 				);
-				currentPtr++;
-				stack[currentPtr] = node;
+				_currentPtr++;
+				_stack[_currentPtr] = node;
 				ResetTheInsertionMode();
-				if ("title" == contextName || "textarea" == contextName)
+				if ("title" == _contextName || "textarea" == _contextName)
 				{
-					tokenizer.SetStateAndEndTagExpectation(Tokenizer.RCDATA, contextName);
+					_tokenizer.SetStateAndEndTagExpectation(Tokenizer.RCDATA, _contextName);
 				}
-				else if ("style" == contextName || "xmp" == contextName
-					  || "iframe" == contextName || "noembed" == contextName
-					  || "noframes" == contextName
-					  || (IsScriptingEnabled && "noscript" == contextName))
+				else if ("style" == _contextName || "xmp" == _contextName
+					  || "iframe" == _contextName || "noembed" == _contextName
+					  || "noframes" == _contextName
+					  || (IsScriptingEnabled && "noscript" == _contextName))
 				{
-					tokenizer.SetStateAndEndTagExpectation(Tokenizer.RAWTEXT, contextName);
+					_tokenizer.SetStateAndEndTagExpectation(Tokenizer.RAWTEXT, _contextName);
 				}
-				else if ("plaintext" == contextName)
+				else if ("plaintext" == _contextName)
 				{
-					tokenizer.SetStateAndEndTagExpectation(Tokenizer.PLAINTEXT, contextName);
+					_tokenizer.SetStateAndEndTagExpectation(Tokenizer.PLAINTEXT, _contextName);
 				}
-				else if ("script" == contextName)
+				else if ("script" == _contextName)
 				{
-					tokenizer.SetStateAndEndTagExpectation(Tokenizer.SCRIPT_DATA,
-							contextName);
+					_tokenizer.SetStateAndEndTagExpectation(Tokenizer.SCRIPT_DATA,
+							_contextName);
 				}
 				else
 				{
-					tokenizer.SetStateAndEndTagExpectation(Tokenizer.DATA, contextName);
+					_tokenizer.SetStateAndEndTagExpectation(Tokenizer.DATA, _contextName);
 				}
-				contextName = null;
-				contextNode = null;
+				_contextName = null;
+				_contextNode = null;
 			}
 			else
 			{
-				mode = InsertionMode.INITIAL;
+				_mode = InsertionMode.INITIAL;
 			}
 		}
 
 		public void Doctype([Local] string name, string publicIdentifier, string systemIdentifier, bool forceQuirks)
 		{
-			needToDropLF = false;
+			_needToDropLF = false;
 			if (!IsInForeign)
 			{
-				switch (mode)
+				switch (_mode)
 				{
 					case InsertionMode.INITIAL:
 						// [NOCPP[
@@ -448,8 +448,8 @@ namespace HtmlParserSharp.Portable.Core
 								// [NOCPP[
 								break;
 							case DoctypeExpectation.Html401Strict:
-								html4 = true;
-								tokenizer.TurnOnAdditionalHtml4Errors();
+								_html4 = true;
+								_tokenizer.TurnOnAdditionalHtml4Errors();
 								if (IsQuirky(name, publicIdentifier,
 										systemIdentifier, forceQuirks))
 								{
@@ -487,8 +487,8 @@ namespace HtmlParserSharp.Portable.Core
 								}
 								break;
 							case DoctypeExpectation.Html401Transitional:
-								html4 = true;
-								tokenizer.TurnOnAdditionalHtml4Errors();
+								_html4 = true;
+								_tokenizer.TurnOnAdditionalHtml4Errors();
 								if (IsQuirky(name, publicIdentifier,
 										systemIdentifier, forceQuirks))
 								{
@@ -527,10 +527,10 @@ namespace HtmlParserSharp.Portable.Core
 								}
 								break;
 							case DoctypeExpectation.Auto:
-								html4 = IsHtml4Doctype(publicIdentifier);
-								if (html4)
+								_html4 = IsHtml4Doctype(publicIdentifier);
+								if (_html4)
 								{
-									tokenizer.TurnOnAdditionalHtml4Errors();
+									_tokenizer.TurnOnAdditionalHtml4Errors();
 								}
 								if (IsQuirky(name, publicIdentifier,
 										systemIdentifier, forceQuirks))
@@ -538,7 +538,7 @@ namespace HtmlParserSharp.Portable.Core
 									Err("Quirky doctype. Expected e.g. \u201C<!DOCTYPE html>\u201D.");
 									DocumentModeInternal(DocumentMode.QuirksMode,
 											publicIdentifier, systemIdentifier,
-											html4);
+											_html4);
 								}
 								else if (IsAlmostStandards(publicIdentifier,
 									  systemIdentifier))
@@ -557,7 +557,7 @@ namespace HtmlParserSharp.Portable.Core
 									DocumentModeInternal(
 											DocumentMode.AlmostStandardsMode,
 											publicIdentifier, systemIdentifier,
-											html4);
+											_html4);
 								}
 								else
 								{
@@ -578,7 +578,7 @@ namespace HtmlParserSharp.Portable.Core
 									DocumentModeInternal(
 											DocumentMode.StandardsMode,
 											publicIdentifier, systemIdentifier,
-											html4);
+											_html4);
 								}
 								break;
 							case DoctypeExpectation.NoDoctypeErrors:
@@ -613,7 +613,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * Then, switch to the root element mode of the tree
 						 * construction stage.
 						 */
-						mode = InsertionMode.BEFORE_HTML;
+						_mode = InsertionMode.BEFORE_HTML;
 						return;
 					default:
 						break;
@@ -653,16 +653,16 @@ namespace HtmlParserSharp.Portable.Core
 		/// <param name="length">The number of code units to read.</param>
 		public void Comment(char[] buf, int start, int length)
 		{
-			needToDropLF = false;
+			_needToDropLF = false;
 			// [NOCPP[
-			if (!wantingComments)
+			if (!_wantingComments)
 			{
 				return;
 			}
 			// ]NOCPP]
 			if (!IsInForeign)
 			{
-				switch (mode)
+				switch (_mode)
 				{
 					case InsertionMode.INITIAL:
 					case InsertionMode.BEFORE_HTML:
@@ -683,7 +683,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * comment token.
 						 */
 						FlushCharacters();
-						AppendComment(stack[0]._node, buf, start, length);
+						AppendComment(_stack[0]._node, buf, start, length);
 						return;
 					default:
 						break;
@@ -694,7 +694,7 @@ namespace HtmlParserSharp.Portable.Core
 			 * data attribute set to the data given in the comment token.
 			 */
 			FlushCharacters();
-			AppendComment(stack[currentPtr]._node, buf, start, length);
+			AppendComment(_stack[_currentPtr]._node, buf, start, length);
 			return;
 		}
 
@@ -707,9 +707,9 @@ namespace HtmlParserSharp.Portable.Core
 		/// <param name="length">The number of code units to read.</param>
 		public void Characters(char[] buf, int start, int length)
 		{
-			if (needToDropLF)
+			if (_needToDropLF)
 			{
-				needToDropLF = false;
+				_needToDropLF = false;
 				if (buf[start] == '\n')
 				{
 					start++;
@@ -722,7 +722,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 
 			// optimize the most common case
-			switch (mode)
+			switch (_mode)
 			{
 				case InsertionMode.IN_BODY:
 				case InsertionMode.IN_CELL:
@@ -758,7 +758,7 @@ namespace HtmlParserSharp.Portable.Core
 								 * CHARACTER TABULATION, U+000A LINE FEED (LF),
 								 * U+000C FORM FEED (FF), or U+0020 SPACE
 								 */
-								switch (mode)
+								switch (_mode)
 								{
 									case InsertionMode.INITIAL:
 									case InsertionMode.BEFORE_HTML:
@@ -840,7 +840,7 @@ namespace HtmlParserSharp.Portable.Core
 								 * U+0009 CHARACTER TABULATION, U+000A LINE FEED
 								 * (LF), U+000C FORM FEED (FF), or U+0020 SPACE
 								 */
-								switch (mode)
+								switch (_mode)
 								{
 									case InsertionMode.INITIAL:
 										/*
@@ -876,7 +876,7 @@ namespace HtmlParserSharp.Portable.Core
 										 * Then, switch to the root element mode of
 										 * the tree construction stage
 										 */
-										mode = InsertionMode.BEFORE_HTML;
+										_mode = InsertionMode.BEFORE_HTML;
 										/*
 										 * and reprocess the current token.
 										 */
@@ -892,7 +892,7 @@ namespace HtmlParserSharp.Portable.Core
 										// because there's nothing to flush.
 										AppendHtmlElementToDocumentAndPush();
 										/* Switch to the main mode */
-										mode = InsertionMode.BEFORE_HEAD;
+										_mode = InsertionMode.BEFORE_HEAD;
 										/*
 										 * reprocess the current token.
 										 */
@@ -912,7 +912,7 @@ namespace HtmlParserSharp.Portable.Core
 										 */
 										FlushCharacters();
 										AppendToCurrentNodeAndPushHeadElement(HtmlAttributes.EMPTY_ATTRIBUTES);
-										mode = InsertionMode.IN_HEAD;
+										_mode = InsertionMode.IN_HEAD;
 										/*
 										 * then reprocess the current token.
 										 * 
@@ -936,7 +936,7 @@ namespace HtmlParserSharp.Portable.Core
 										 */
 										FlushCharacters();
 										Pop();
-										mode = InsertionMode.AFTER_HEAD;
+										_mode = InsertionMode.AFTER_HEAD;
 										/*
 										 * and reprocess the current token.
 										 */
@@ -956,7 +956,7 @@ namespace HtmlParserSharp.Portable.Core
 										Err("Non-space character inside \u201Cnoscript\u201D inside \u201Chead\u201D.");
 										FlushCharacters();
 										Pop();
-										mode = InsertionMode.IN_HEAD;
+										_mode = InsertionMode.IN_HEAD;
 										/*
 										 * and reprocess the current token.
 										 */
@@ -976,15 +976,15 @@ namespace HtmlParserSharp.Portable.Core
 										 */
 										FlushCharacters();
 										AppendToCurrentNodeAndPushBodyElement();
-										mode = InsertionMode.FRAMESET_OK;
+										_mode = InsertionMode.FRAMESET_OK;
 										/*
 										 * and then reprocess the current token.
 										 */
 										i--;
 										continue;
 									case InsertionMode.FRAMESET_OK:
-										framesetOk = false;
-										mode = InsertionMode.IN_BODY;
+										_framesetOk = false;
+										_mode = InsertionMode.IN_BODY;
 										i--;
 										continue;
 									case InsertionMode.IN_BODY:
@@ -1029,7 +1029,7 @@ namespace HtmlParserSharp.Portable.Core
 										 * that token wasn't ignored, reprocess the
 										 * current token.
 										 */
-										if (currentPtr == 0)
+										if (_currentPtr == 0)
 										{
 											Err("Non-space in \u201Ccolgroup\u201D when parsing fragment.");
 											start = i + 1;
@@ -1037,7 +1037,7 @@ namespace HtmlParserSharp.Portable.Core
 										}
 										FlushCharacters();
 										Pop();
-										mode = InsertionMode.IN_TABLE;
+										_mode = InsertionMode.IN_TABLE;
 										i--;
 										continue;
 									case InsertionMode.IN_SELECT:
@@ -1046,7 +1046,7 @@ namespace HtmlParserSharp.Portable.Core
 									case InsertionMode.AFTER_BODY:
 										Err("Non-space character after body.");
 										Fatal();
-										mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
+										_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
 										i--;
 										continue;
 									case InsertionMode.IN_FRAMESET:
@@ -1090,7 +1090,7 @@ namespace HtmlParserSharp.Portable.Core
 										 * Switch back to the main mode and
 										 * reprocess the token.
 										 */
-										mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
+										_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
 										i--;
 										continue;
 									case InsertionMode.AFTER_AFTER_FRAMESET:
@@ -1102,7 +1102,7 @@ namespace HtmlParserSharp.Portable.Core
 										 * Switch back to the main mode and
 										 * reprocess the token.
 										 */
-										mode = InsertionMode.IN_FRAMESET;
+										_mode = InsertionMode.IN_FRAMESET;
 										i--;
 										continue;
 								}
@@ -1125,14 +1125,14 @@ namespace HtmlParserSharp.Portable.Core
 		/// </summary>
 		public void ZeroOriginatingReplacementCharacter()
 		{
-			if (mode == InsertionMode.TEXT)
+			if (_mode == InsertionMode.TEXT)
 			{
 				AccumulateCharacters(TreeBuilderConstants.REPLACEMENT_CHARACTER, 0, 1);
 				return;
 			}
-			if (currentPtr >= 0)
+			if (_currentPtr >= 0)
 			{
-				StackNode<T> stackNode = stack[currentPtr];
+				StackNode<T> stackNode = _stack[_currentPtr];
 				if (stackNode._ns == "http://www.w3.org/1999/xhtml")
 				{
 					return;
@@ -1164,7 +1164,7 @@ namespace HtmlParserSharp.Portable.Core
 					Err("End of file in a foreign namespace context.");
 					goto continueEofloop; // TODO: endless loop???
 				}
-				switch (mode)
+				switch (_mode)
 				{
 					case InsertionMode.INITIAL:
 						/*
@@ -1199,7 +1199,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * Then, switch to the root element mode of the tree
 						 * construction stage
 						 */
-						mode = InsertionMode.BEFORE_HTML;
+						_mode = InsertionMode.BEFORE_HTML;
 						/*
 						 * and reprocess the current token.
 						 */
@@ -1212,48 +1212,48 @@ namespace HtmlParserSharp.Portable.Core
 						AppendHtmlElementToDocumentAndPush();
 						// XXX application cache manifest
 						/* Switch to the main mode */
-						mode = InsertionMode.BEFORE_HEAD;
+						_mode = InsertionMode.BEFORE_HEAD;
 						/*
 						 * reprocess the current token.
 						 */
 						continue;
 					case InsertionMode.BEFORE_HEAD:
 						AppendToCurrentNodeAndPushHeadElement(HtmlAttributes.EMPTY_ATTRIBUTES);
-						mode = InsertionMode.IN_HEAD;
+						_mode = InsertionMode.IN_HEAD;
 						continue;
 					case InsertionMode.IN_HEAD:
-						if (ErrorEvent != null && currentPtr > 1)
+						if (ErrorEvent != null && _currentPtr > 1)
 						{
 							ErrEndWithUnclosedElements("End of file seen and there were open elements.");
 						}
-						while (currentPtr > 0)
+						while (_currentPtr > 0)
 						{
 							PopOnEof();
 						}
-						mode = InsertionMode.AFTER_HEAD;
+						_mode = InsertionMode.AFTER_HEAD;
 						continue;
 					case InsertionMode.IN_HEAD_NOSCRIPT:
 						ErrEndWithUnclosedElements("End of file seen and there were open elements.");
-						while (currentPtr > 1)
+						while (_currentPtr > 1)
 						{
 							PopOnEof();
 						}
-						mode = InsertionMode.IN_HEAD;
+						_mode = InsertionMode.IN_HEAD;
 						continue;
 					case InsertionMode.AFTER_HEAD:
 						AppendToCurrentNodeAndPushBodyElement();
-						mode = InsertionMode.IN_BODY;
+						_mode = InsertionMode.IN_BODY;
 						continue;
 					case InsertionMode.IN_COLUMN_GROUP:
-						if (currentPtr == 0)
+						if (_currentPtr == 0)
 						{
-							Debug.Assert(fragment);
+							Debug.Assert(_fragment);
 							goto breakEofloop;
 						}
 						else
 						{
 							PopOnEof();
-							mode = InsertionMode.IN_TABLE;
+							_mode = InsertionMode.IN_TABLE;
 							continue;
 						}
 					case InsertionMode.FRAMESET_OK:
@@ -1262,9 +1262,9 @@ namespace HtmlParserSharp.Portable.Core
 					case InsertionMode.IN_BODY:
 						// [NOCPP[
 						/*openelementloop:*/
-						for (int i = currentPtr; i >= 0; i--)
+						for (int i = _currentPtr; i >= 0; i--)
 						{
-							DispatchGroup group = stack[i].Group;
+							DispatchGroup group = _stack[i].Group;
 							switch (group)
 							{
 								case DispatchGroup.DD_OR_DT:
@@ -1291,12 +1291,12 @@ namespace HtmlParserSharp.Portable.Core
 							ErrListUnclosedStartTags(0);
 						}
 						// XXX mark script as already executed
-						if (originalMode == InsertionMode.AFTER_HEAD)
+						if (_originalMode == InsertionMode.AFTER_HEAD)
 						{
 							PopOnEof();
 						}
 						PopOnEof();
-						mode = originalMode;
+						_mode = _originalMode;
 						continue;
 					case InsertionMode.IN_TABLE_BODY:
 					case InsertionMode.IN_ROW:
@@ -1304,7 +1304,7 @@ namespace HtmlParserSharp.Portable.Core
 					case InsertionMode.IN_SELECT:
 					case InsertionMode.IN_SELECT_IN_TABLE:
 					case InsertionMode.IN_FRAMESET:
-						if (ErrorEvent != null && currentPtr > 0)
+						if (ErrorEvent != null && _currentPtr > 0)
 						{
 							ErrEndWithUnclosedElements("End of file seen and there were open elements.");
 						}
@@ -1330,11 +1330,11 @@ namespace HtmlParserSharp.Portable.Core
 
 		breakEofloop:
 
-			while (currentPtr > 0)
+			while (_currentPtr > 0)
 			{
 				PopOnEof();
 			}
-			if (!fragment)
+			if (!_fragment)
 			{
 				PopOnEof();
 			}
@@ -1346,32 +1346,32 @@ namespace HtmlParserSharp.Portable.Core
 		/// </summary>
 		public void EndTokenization()
 		{
-			formPointer = null;
-			headPointer = null;
-			deepTreeSurrogateParent = null;
-			if (stack != null)
+			_formPointer = null;
+			_headPointer = null;
+			_deepTreeSurrogateParent = null;
+			if (_stack != null)
 			{
-				while (currentPtr > -1)
+				while (_currentPtr > -1)
 				{
-					currentPtr--;
+					_currentPtr--;
 				}
-				stack = null;
+				_stack = null;
 			}
-			if (listOfActiveFormattingElements != null)
+			if (_listOfActiveFormattingElements != null)
 			{
-				while (listPtr > -1)
+				while (_listPtr > -1)
 				{
 					//if (listOfActiveFormattingElements[listPtr] != null) {
 					//    listOfActiveFormattingElements[listPtr].Release();
 					//}
-					listPtr--;
+					_listPtr--;
 				}
-				listOfActiveFormattingElements = null;
+				_listOfActiveFormattingElements = null;
 			}
 			// [NOCPP[
-			idLocations.Clear();
+			_idLocations.Clear();
 			// ]NOCPP]
-			charBuffer = null;
+			_charBuffer = null;
 			End();
 		}
 
@@ -1387,7 +1387,7 @@ namespace HtmlParserSharp.Portable.Core
 				if (id != null)
 				{
 					Locator oldLoc;
-					bool success = idLocations.TryGetValue(id, out oldLoc);
+					bool success = _idLocations.TryGetValue(id, out oldLoc);
 					if (success)
 					{
 						Err("Duplicate ID \u201C" + id + "\u201D.");
@@ -1398,14 +1398,14 @@ namespace HtmlParserSharp.Portable.Core
 					}
 					else
 					{
-						idLocations[id] = new Locator(tokenizer);
+						_idLocations[id] = new Locator(_tokenizer);
 					}
 				}
 			}
 			// ]NOCPP]
 
 			int eltPos;
-			needToDropLF = false;
+			_needToDropLF = false;
 			/*starttagloop:*/
 			for (; ; )
 			{
@@ -1414,7 +1414,7 @@ namespace HtmlParserSharp.Portable.Core
 				string name = elementName.name;
 				if (IsInForeign)
 				{
-					StackNode<T> currentNode = stack[currentPtr];
+					StackNode<T> currentNode = _stack[_currentPtr];
 					/*[NsUri]*/
 					string currNs = currentNode._ns;
 					if (!(currentNode.IsHtmlIntegrationPoint || (currNs == "http://www.w3.org/1998/Math/MathML" &&
@@ -1443,7 +1443,7 @@ namespace HtmlParserSharp.Portable.Core
 								Err("HTML start tag \u201C"
 										+ name
 										+ "\u201D in a foreign namespace context.");
-								while (!IsSpecialParentInForeign(stack[currentPtr]))
+								while (!IsSpecialParentInForeign(_stack[_currentPtr]))
 								{
 									Pop();
 								}
@@ -1456,7 +1456,7 @@ namespace HtmlParserSharp.Portable.Core
 									Err("HTML start tag \u201C"
 											+ name
 											+ "\u201D in a foreign namespace context.");
-									while (!IsSpecialParentInForeign(stack[currentPtr]))
+									while (!IsSpecialParentInForeign(_stack[_currentPtr]))
 									{
 										Pop();
 									}
@@ -1505,7 +1505,7 @@ namespace HtmlParserSharp.Portable.Core
 						} // switch
 					} // foreignObject / annotation-xml
 				}
-				switch (mode)
+				switch (_mode)
 				{
 					case InsertionMode.IN_TABLE_BODY:
 						switch (group)
@@ -1515,7 +1515,7 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElement(
 										elementName,
 										attributes);
-								mode = InsertionMode.IN_ROW;
+								_mode = InsertionMode.IN_ROW;
 								attributes = null; // CPP
 								goto breakStarttagloop;
 							case DispatchGroup.TD_OR_TH:
@@ -1525,7 +1525,7 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElement(
 										ElementName.TR,
 										HtmlAttributes.EMPTY_ATTRIBUTES);
-								mode = InsertionMode.IN_ROW;
+								_mode = InsertionMode.IN_ROW;
 								continue;
 							case DispatchGroup.CAPTION:
 							case DispatchGroup.COL:
@@ -1541,7 +1541,7 @@ namespace HtmlParserSharp.Portable.Core
 								{
 									ClearStackBackTo(eltPos);
 									Pop();
-									mode = InsertionMode.IN_TABLE;
+									_mode = InsertionMode.IN_TABLE;
 									continue;
 								}
 							default:
@@ -1557,7 +1557,7 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElement(
 										elementName,
 										attributes);
-								mode = InsertionMode.IN_CELL;
+								_mode = InsertionMode.IN_CELL;
 								InsertMarker();
 								attributes = null; // CPP
 								goto breakStarttagloop;
@@ -1569,13 +1569,13 @@ namespace HtmlParserSharp.Portable.Core
 								eltPos = FindLastOrRoot(DispatchGroup.TR);
 								if (eltPos == 0)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									Err("No table row to close.");
 									goto breakStarttagloop;
 								}
 								ClearStackBackTo(eltPos);
 								Pop();
-								mode = InsertionMode.IN_TABLE_BODY;
+								_mode = InsertionMode.IN_TABLE_BODY;
 								continue;
 							default:
 								// fall through to IN_TABLE
@@ -1594,7 +1594,7 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElement(
 											elementName,
 											attributes);
-									mode = InsertionMode.IN_CAPTION;
+									_mode = InsertionMode.IN_CAPTION;
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								case DispatchGroup.COLGROUP:
@@ -1602,7 +1602,7 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElement(
 											elementName,
 											attributes);
-									mode = InsertionMode.IN_COLUMN_GROUP;
+									_mode = InsertionMode.IN_COLUMN_GROUP;
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								case DispatchGroup.COL:
@@ -1610,14 +1610,14 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElement(
 											ElementName.COLGROUP,
 											HtmlAttributes.EMPTY_ATTRIBUTES);
-									mode = InsertionMode.IN_COLUMN_GROUP;
+									_mode = InsertionMode.IN_COLUMN_GROUP;
 									goto continueStarttagloop;
 								case DispatchGroup.TBODY_OR_THEAD_OR_TFOOT:
 									ClearStackBackTo(FindLastOrRoot(DispatchGroup.TABLE));
 									AppendToCurrentNodeAndPushElement(
 											elementName,
 											attributes);
-									mode = InsertionMode.IN_TABLE_BODY;
+									_mode = InsertionMode.IN_TABLE_BODY;
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								case DispatchGroup.TR:
@@ -1626,14 +1626,14 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElement(
 											ElementName.TBODY,
 											HtmlAttributes.EMPTY_ATTRIBUTES);
-									mode = InsertionMode.IN_TABLE_BODY;
+									_mode = InsertionMode.IN_TABLE_BODY;
 									goto continueStarttagloop;
 								case DispatchGroup.TABLE:
 									Err("Start tag for \u201Ctable\u201D seen but the previous \u201Ctable\u201D is still open.");
 									eltPos = FindLastInTableScope(name);
 									if (eltPos == TreeBuilderConstants.NOT_FOUND_ON_STACK)
 									{
-										Debug.Assert(fragment);
+										Debug.Assert(_fragment);
 										goto breakStarttagloop;
 									}
 									GenerateImpliedEndTags();
@@ -1642,7 +1642,7 @@ namespace HtmlParserSharp.Portable.Core
 									{
 										Err("Unclosed elements on stack.");
 									}
-									while (currentPtr >= eltPos)
+									while (_currentPtr >= eltPos)
 									{
 										Pop();
 									}
@@ -1656,9 +1656,9 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElement(
 											elementName,
 											attributes);
-									originalMode = mode;
-									mode = InsertionMode.TEXT;
-									tokenizer.SetStateAndEndTagExpectation(
+									_originalMode = _mode;
+									_mode = InsertionMode.TEXT;
+									_tokenizer.SetStateAndEndTagExpectation(
 											Tokenizer.SCRIPT_DATA, elementName);
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -1666,9 +1666,9 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElement(
 											elementName,
 											attributes);
-									originalMode = mode;
-									mode = InsertionMode.TEXT;
-									tokenizer.SetStateAndEndTagExpectation(
+									_originalMode = _mode;
+									_mode = InsertionMode.TEXT;
+									_tokenizer.SetStateAndEndTagExpectation(
 											Tokenizer.RAWTEXT, elementName);
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -1681,12 +1681,12 @@ namespace HtmlParserSharp.Portable.Core
 									}
 									AppendVoidElementToCurrent(
 											name, attributes,
-											formPointer);
+											_formPointer);
 									selfClosing = false;
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								case DispatchGroup.FORM:
-									if (formPointer != null)
+									if (_formPointer != null)
 									{
 										Err("Saw a \u201Cform\u201D start tag, but there was already an active \u201Cform\u201D element. Nested forms are not allowed. Ignoring the tag.");
 										goto breakStarttagloop;
@@ -1725,16 +1725,16 @@ namespace HtmlParserSharp.Portable.Core
 									goto breakStarttagloop;
 								}
 								GenerateImpliedEndTags();
-								if (ErrorEvent != null && currentPtr != eltPos)
+								if (ErrorEvent != null && _currentPtr != eltPos)
 								{
 									Err("Unclosed elements on stack.");
 								}
-								while (currentPtr >= eltPos)
+								while (_currentPtr >= eltPos)
 								{
 									Pop();
 								}
 								ClearTheListOfActiveFormattingElementsUpToTheLastMarker();
-								mode = InsertionMode.IN_TABLE;
+								_mode = InsertionMode.IN_TABLE;
 								continue;
 							default:
 								// fall through to IN_BODY (TODO: IN_CELL?)
@@ -1770,26 +1770,26 @@ namespace HtmlParserSharp.Portable.Core
 						switch (group)
 						{
 							case DispatchGroup.FRAMESET:
-								if (mode == InsertionMode.FRAMESET_OK)
+								if (_mode == InsertionMode.FRAMESET_OK)
 								{
-									if (currentPtr == 0 || stack[1].Group != DispatchGroup.BODY)
+									if (_currentPtr == 0 || _stack[1].Group != DispatchGroup.BODY)
 									{
-										Debug.Assert(fragment);
+										Debug.Assert(_fragment);
 										ErrStrayStartTag(name);
 										goto breakStarttagloop;
 									}
 									else
 									{
 										Err("\u201Cframeset\u201D start tag seen.");
-										DetachFromParent(stack[1]._node);
-										while (currentPtr > 0)
+										DetachFromParent(_stack[1]._node);
+										while (_currentPtr > 0)
 										{
 											Pop();
 										}
 										AppendToCurrentNodeAndPushElement(
 												elementName,
 												attributes);
-										mode = InsertionMode.IN_FRAMESET;
+										_mode = InsertionMode.IN_FRAMESET;
 										attributes = null; // CPP
 										goto breakStarttagloop;
 									}
@@ -1817,13 +1817,13 @@ namespace HtmlParserSharp.Portable.Core
 							case DispatchGroup.XMP:
 							case DispatchGroup.IFRAME:
 							case DispatchGroup.SELECT:
-								if (mode == InsertionMode.FRAMESET_OK
+								if (_mode == InsertionMode.FRAMESET_OK
 										&& !(group == DispatchGroup.INPUT && Portability.LowerCaseLiteralEqualsIgnoreAsciiCaseString(
 												"hidden",
 												attributes.GetValue(AttributeName.TYPE))))
 								{
-									framesetOk = false;
-									mode = InsertionMode.IN_BODY;
+									_framesetOk = false;
+									_mode = InsertionMode.IN_BODY;
 								}
 								// fall through to IN_BODY
 								break;
@@ -1840,7 +1840,7 @@ namespace HtmlParserSharp.Portable.Core
 							{
 								case DispatchGroup.HTML:
 									ErrStrayStartTag(name);
-									if (!fragment)
+									if (!_fragment)
 									{
 										AddAttributesToHtml(attributes);
 										attributes = null; // CPP
@@ -1856,18 +1856,18 @@ namespace HtmlParserSharp.Portable.Core
 									// Fall through to IN_HEAD
 									goto breakInbodyloop;
 								case DispatchGroup.BODY:
-									if (currentPtr == 0
-											|| stack[1].Group != DispatchGroup.BODY)
+									if (_currentPtr == 0
+											|| _stack[1].Group != DispatchGroup.BODY)
 									{
-										Debug.Assert(fragment);
+										Debug.Assert(_fragment);
 										ErrStrayStartTag(name);
 										goto breakStarttagloop;
 									}
 									Err("\u201Cbody\u201D start tag found but the \u201Cbody\u201D element is already open.");
-									framesetOk = false;
-									if (mode == InsertionMode.FRAMESET_OK)
+									_framesetOk = false;
+									if (_mode == InsertionMode.FRAMESET_OK)
 									{
-										mode = InsertionMode.IN_BODY;
+										_mode = InsertionMode.IN_BODY;
 									}
 									if (AddAttributesToBody(attributes))
 									{
@@ -1886,7 +1886,7 @@ namespace HtmlParserSharp.Portable.Core
 									goto breakStarttagloop;
 								case DispatchGroup.H1_OR_H2_OR_H3_OR_H4_OR_H5_OR_H6:
 									ImplicitlyCloseP();
-									if (stack[currentPtr].Group == DispatchGroup.H1_OR_H2_OR_H3_OR_H4_OR_H5_OR_H6)
+									if (_stack[_currentPtr].Group == DispatchGroup.H1_OR_H2_OR_H3_OR_H4_OR_H5_OR_H6)
 									{
 										Err("Heading cannot be a child of another heading.");
 										Pop();
@@ -1900,7 +1900,7 @@ namespace HtmlParserSharp.Portable.Core
 									ImplicitlyCloseP();
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
-											attributes, formPointer);
+											attributes, _formPointer);
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								case DispatchGroup.PRE_OR_LISTING:
@@ -1908,11 +1908,11 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
 											attributes);
-									needToDropLF = true;
+									_needToDropLF = true;
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								case DispatchGroup.FORM:
-									if (formPointer != null)
+									if (_formPointer != null)
 									{
 										Err("Saw a \u201Cform\u201D start tag, but there was already an active \u201Cform\u201D element. Nested forms are not allowed. Ignoring the tag.");
 										goto breakStarttagloop;
@@ -1926,21 +1926,21 @@ namespace HtmlParserSharp.Portable.Core
 									}
 								case DispatchGroup.LI:
 								case DispatchGroup.DD_OR_DT:
-									eltPos = currentPtr;
+									eltPos = _currentPtr;
 									for (; ; )
 									{
-										StackNode<T> node = stack[eltPos]; // weak
+										StackNode<T> node = _stack[eltPos]; // weak
 										// ref
 										if (node.Group == group)
 										{ // LI or
 											// DD_OR_DT
 											GenerateImpliedEndTagsExceptFor(node._name);
 											if (ErrorEvent != null
-													&& eltPos != currentPtr)
+													&& eltPos != _currentPtr)
 											{
 												ErrUnclosedElementsImplied(eltPos, name);
 											}
-											while (currentPtr >= eltPos)
+											while (_currentPtr >= eltPos)
 											{
 												Pop();
 											}
@@ -1966,7 +1966,7 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
 											attributes);
-									tokenizer.SetStateAndEndTagExpectation(
+									_tokenizer.SetStateAndEndTagExpectation(
 											Tokenizer.PLAINTEXT, elementName);
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -1975,7 +1975,7 @@ namespace HtmlParserSharp.Portable.Core
 									if (activeAPos != -1)
 									{
 										Err("An \u201Ca\u201D start tag seen with already an active \u201Ca\u201D element.");
-										StackNode<T> activeA = listOfActiveFormattingElements[activeAPos];
+										StackNode<T> activeA = _listOfActiveFormattingElements[activeAPos];
 										AdoptionAgencyEndTag("a");
 										RemoveFromStack(activeA);
 										activeAPos = FindInListOfActiveFormattingElements(activeA);
@@ -2023,7 +2023,7 @@ namespace HtmlParserSharp.Portable.Core
 										{
 											ErrUnclosedElementsImplied(eltPos, name);
 										}
-										while (currentPtr >= eltPos)
+										while (_currentPtr >= eltPos)
 										{
 											Pop();
 										}
@@ -2034,7 +2034,7 @@ namespace HtmlParserSharp.Portable.Core
 										ReconstructTheActiveFormattingElements();
 										AppendToCurrentNodeAndPushElementMayFoster(
 												elementName,
-												attributes, formPointer);
+												attributes, _formPointer);
 										attributes = null; // CPP
 										goto breakStarttagloop;
 									}
@@ -2042,7 +2042,7 @@ namespace HtmlParserSharp.Portable.Core
 									ReconstructTheActiveFormattingElements();
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
-											attributes, formPointer);
+											attributes, _formPointer);
 									InsertMarker();
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -2057,14 +2057,14 @@ namespace HtmlParserSharp.Portable.Core
 								case DispatchGroup.TABLE:
 									// The only quirk. Blame Hixie and
 									// Acid2.
-									if (!quirks)
+									if (!_quirks)
 									{
 										ImplicitlyCloseP();
 									}
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
 											attributes);
-									mode = InsertionMode.IN_TABLE;
+									_mode = InsertionMode.IN_TABLE;
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								case DispatchGroup.BR:
@@ -2097,13 +2097,13 @@ namespace HtmlParserSharp.Portable.Core
 									ReconstructTheActiveFormattingElements();
 									AppendVoidElementToCurrentMayFoster(
 											name, attributes,
-											formPointer);
+											_formPointer);
 									selfClosing = false;
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								case DispatchGroup.ISINDEX:
 									Err("\u201Cisindex\u201D seen.");
-									if (formPointer != null)
+									if (_formPointer != null)
 									{
 										goto breakStarttagloop;
 									}
@@ -2131,12 +2131,12 @@ namespace HtmlParserSharp.Portable.Core
 									if (promptIndex > -1)
 									{
 										char[] prompt = attributes.GetValue(promptIndex).ToCharArray();
-										AppendCharacters(stack[currentPtr]._node,
+										AppendCharacters(_stack[_currentPtr]._node,
 												prompt, 0, prompt.Length);
 									}
 									else
 									{
-										AppendIsindexPrompt(stack[currentPtr]._node);
+										AppendIsindexPrompt(_stack[_currentPtr]._node);
 									}
 									HtmlAttributes inputAttributes = new HtmlAttributes(
 											0);
@@ -2170,7 +2170,7 @@ namespace HtmlParserSharp.Portable.Core
 									attributes.ClearWithoutReleasingContents();
 									AppendVoidElementToCurrentMayFoster(
 											"input",
-											inputAttributes, formPointer);
+											inputAttributes, _formPointer);
 									Pop(); // label
 									AppendVoidElementToCurrentMayFoster(
 											ElementName.HR,
@@ -2185,12 +2185,12 @@ namespace HtmlParserSharp.Portable.Core
 								case DispatchGroup.TEXTAREA:
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
-											attributes, formPointer);
-									tokenizer.SetStateAndEndTagExpectation(
+											attributes, _formPointer);
+									_tokenizer.SetStateAndEndTagExpectation(
 											Tokenizer.RCDATA, elementName);
-									originalMode = mode;
-									mode = InsertionMode.TEXT;
-									needToDropLF = true;
+									_originalMode = _mode;
+									_mode = InsertionMode.TEXT;
+									_needToDropLF = true;
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								case DispatchGroup.XMP:
@@ -2199,9 +2199,9 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
 											attributes);
-									originalMode = mode;
-									mode = InsertionMode.TEXT;
-									tokenizer.SetStateAndEndTagExpectation(
+									_originalMode = _mode;
+									_mode = InsertionMode.TEXT;
+									_tokenizer.SetStateAndEndTagExpectation(
 											Tokenizer.RAWTEXT, elementName);
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -2226,9 +2226,9 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
 											attributes);
-									originalMode = mode;
-									mode = InsertionMode.TEXT;
-									tokenizer.SetStateAndEndTagExpectation(
+									_originalMode = _mode;
+									_mode = InsertionMode.TEXT;
+									_tokenizer.SetStateAndEndTagExpectation(
 											Tokenizer.RAWTEXT, elementName);
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -2236,8 +2236,8 @@ namespace HtmlParserSharp.Portable.Core
 									ReconstructTheActiveFormattingElements();
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
-											attributes, formPointer);
-									switch (mode)
+											attributes, _formPointer);
+									switch (_mode)
 									{
 										case InsertionMode.IN_TABLE:
 										case InsertionMode.IN_CAPTION:
@@ -2245,10 +2245,10 @@ namespace HtmlParserSharp.Portable.Core
 										case InsertionMode.IN_TABLE_BODY:
 										case InsertionMode.IN_ROW:
 										case InsertionMode.IN_CELL:
-											mode = InsertionMode.IN_SELECT_IN_TABLE;
+											_mode = InsertionMode.IN_SELECT_IN_TABLE;
 											break;
 										default:
-											mode = InsertionMode.IN_SELECT;
+											_mode = InsertionMode.IN_SELECT;
 											break;
 									}
 									attributes = null; // CPP
@@ -2282,7 +2282,7 @@ namespace HtmlParserSharp.Portable.Core
 									{
 										GenerateImpliedEndTags();
 									}
-									if (eltPos != currentPtr)
+									if (eltPos != _currentPtr)
 									{
 										if (ErrorEvent != null)
 										{
@@ -2298,7 +2298,7 @@ namespace HtmlParserSharp.Portable.Core
 												Err("Unclosed children in \u201Cruby\u201D.");
 											}
 										}
-										while (currentPtr > eltPos)
+										while (_currentPtr > eltPos)
 										{
 											Pop();
 										}
@@ -2356,7 +2356,7 @@ namespace HtmlParserSharp.Portable.Core
 									ReconstructTheActiveFormattingElements();
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
-											attributes, formPointer);
+											attributes, _formPointer);
 									attributes = null; // CPP
 									goto breakStarttagloop;
 								default:
@@ -2380,7 +2380,7 @@ namespace HtmlParserSharp.Portable.Core
 							{
 								case DispatchGroup.HTML:
 									ErrStrayStartTag(name);
-									if (!fragment)
+									if (!_fragment)
 									{
 										AddAttributesToHtml(attributes);
 										attributes = null; // CPP
@@ -2402,9 +2402,9 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
 											attributes);
-									originalMode = mode;
-									mode = InsertionMode.TEXT;
-									tokenizer.SetStateAndEndTagExpectation(
+									_originalMode = _mode;
+									_mode = InsertionMode.TEXT;
+									_tokenizer.SetStateAndEndTagExpectation(
 											Tokenizer.RCDATA, elementName);
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -2414,9 +2414,9 @@ namespace HtmlParserSharp.Portable.Core
 										AppendToCurrentNodeAndPushElement(
 												elementName,
 												attributes);
-										originalMode = mode;
-										mode = InsertionMode.TEXT;
-										tokenizer.SetStateAndEndTagExpectation(
+										_originalMode = _mode;
+										_mode = InsertionMode.TEXT;
+										_tokenizer.SetStateAndEndTagExpectation(
 												Tokenizer.RAWTEXT, elementName);
 									}
 									else
@@ -2424,7 +2424,7 @@ namespace HtmlParserSharp.Portable.Core
 										AppendToCurrentNodeAndPushElementMayFoster(
 												elementName,
 												attributes);
-										mode = InsertionMode.IN_HEAD_NOSCRIPT;
+										_mode = InsertionMode.IN_HEAD_NOSCRIPT;
 									}
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -2436,9 +2436,9 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
 											attributes);
-									originalMode = mode;
-									mode = InsertionMode.TEXT;
-									tokenizer.SetStateAndEndTagExpectation(
+									_originalMode = _mode;
+									_mode = InsertionMode.TEXT;
+									_tokenizer.SetStateAndEndTagExpectation(
 											Tokenizer.SCRIPT_DATA, elementName);
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -2447,9 +2447,9 @@ namespace HtmlParserSharp.Portable.Core
 									AppendToCurrentNodeAndPushElementMayFoster(
 											elementName,
 											attributes);
-									originalMode = mode;
-									mode = InsertionMode.TEXT;
-									tokenizer.SetStateAndEndTagExpectation(
+									_originalMode = _mode;
+									_mode = InsertionMode.TEXT;
+									_tokenizer.SetStateAndEndTagExpectation(
 											Tokenizer.RAWTEXT, elementName);
 									attributes = null; // CPP
 									goto breakStarttagloop;
@@ -2460,7 +2460,7 @@ namespace HtmlParserSharp.Portable.Core
 									goto breakStarttagloop;
 								default:
 									Pop();
-									mode = InsertionMode.AFTER_HEAD;
+									_mode = InsertionMode.AFTER_HEAD;
 									goto continueStarttagloop;
 							}
 						}
@@ -2475,7 +2475,7 @@ namespace HtmlParserSharp.Portable.Core
 								// XXX did Hixie really mean to omit "base"
 								// here?
 								ErrStrayStartTag(name);
-								if (!fragment)
+								if (!_fragment)
 								{
 									AddAttributesToHtml(attributes);
 									attributes = null; // CPP
@@ -2501,9 +2501,9 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElement(
 										elementName,
 										attributes);
-								originalMode = mode;
-								mode = InsertionMode.TEXT;
-								tokenizer.SetStateAndEndTagExpectation(
+								_originalMode = _mode;
+								_mode = InsertionMode.TEXT;
+								_tokenizer.SetStateAndEndTagExpectation(
 										Tokenizer.RAWTEXT, elementName);
 								attributes = null; // CPP
 								goto breakStarttagloop;
@@ -2517,7 +2517,7 @@ namespace HtmlParserSharp.Portable.Core
 								Err("Bad start tag in \u201C" + name
 										+ "\u201D in \u201Chead\u201D.");
 								Pop();
-								mode = InsertionMode.IN_HEAD;
+								_mode = InsertionMode.IN_HEAD;
 								continue;
 						}
 					case InsertionMode.IN_COLUMN_GROUP:
@@ -2525,7 +2525,7 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.HTML:
 								ErrStrayStartTag(name);
-								if (!fragment)
+								if (!_fragment)
 								{
 									AddAttributesToHtml(attributes);
 									attributes = null; // CPP
@@ -2539,14 +2539,14 @@ namespace HtmlParserSharp.Portable.Core
 								attributes = null; // CPP
 								goto breakStarttagloop;
 							default:
-								if (currentPtr == 0)
+								if (_currentPtr == 0)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									Err("Garbage in \u201Ccolgroup\u201D fragment.");
 									goto breakStarttagloop;
 								}
 								Pop();
-								mode = InsertionMode.IN_TABLE;
+								_mode = InsertionMode.IN_TABLE;
 								continue;
 						}
 					case InsertionMode.IN_SELECT_IN_TABLE:
@@ -2563,10 +2563,10 @@ namespace HtmlParserSharp.Portable.Core
 								eltPos = FindLastInTableScope("select");
 								if (eltPos == TreeBuilderConstants.NOT_FOUND_ON_STACK)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									goto breakStarttagloop; // http://www.w3.org/Bugs/Public/show_bug.cgi?id=8375
 								}
-								while (currentPtr >= eltPos)
+								while (_currentPtr >= eltPos)
 								{
 									Pop();
 								}
@@ -2582,7 +2582,7 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.HTML:
 								ErrStrayStartTag(name);
-								if (!fragment)
+								if (!_fragment)
 								{
 									AddAttributesToHtml(attributes);
 									attributes = null; // CPP
@@ -2617,13 +2617,13 @@ namespace HtmlParserSharp.Portable.Core
 								eltPos = FindLastInTableScope(name);
 								if (eltPos == TreeBuilderConstants.NOT_FOUND_ON_STACK)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									Err("No \u201Cselect\u201D in table scope.");
 									goto breakStarttagloop;
 								}
 								else
 								{
-									while (currentPtr >= eltPos)
+									while (_currentPtr >= eltPos)
 									{
 										Pop();
 									}
@@ -2639,10 +2639,10 @@ namespace HtmlParserSharp.Portable.Core
 								eltPos = FindLastInTableScope("select");
 								if (eltPos == TreeBuilderConstants.NOT_FOUND_ON_STACK)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									goto breakStarttagloop;
 								}
-								while (currentPtr >= eltPos)
+								while (_currentPtr >= eltPos)
 								{
 									Pop();
 								}
@@ -2656,9 +2656,9 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElementMayFoster(
 										elementName,
 										attributes);
-								originalMode = mode;
-								mode = InsertionMode.TEXT;
-								tokenizer.SetStateAndEndTagExpectation(
+								_originalMode = _mode;
+								_mode = InsertionMode.TEXT;
+								_tokenizer.SetStateAndEndTagExpectation(
 										Tokenizer.SCRIPT_DATA, elementName);
 								attributes = null; // CPP
 								goto breakStarttagloop;
@@ -2671,7 +2671,7 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.HTML:
 								ErrStrayStartTag(name);
-								if (!fragment)
+								if (!_fragment)
 								{
 									AddAttributesToHtml(attributes);
 									attributes = null; // CPP
@@ -2679,7 +2679,7 @@ namespace HtmlParserSharp.Portable.Core
 								goto breakStarttagloop;
 							default:
 								ErrStrayStartTag(name);
-								mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
+								_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
 								continue;
 						}
 					case InsertionMode.IN_FRAMESET:
@@ -2708,7 +2708,7 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.HTML:
 								ErrStrayStartTag(name);
-								if (!fragment)
+								if (!_fragment)
 								{
 									AddAttributesToHtml(attributes);
 									attributes = null; // CPP
@@ -2718,9 +2718,9 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElement(
 										elementName,
 										attributes);
-								originalMode = mode;
-								mode = InsertionMode.TEXT;
-								tokenizer.SetStateAndEndTagExpectation(
+								_originalMode = _mode;
+								_mode = InsertionMode.TEXT;
+								_tokenizer.SetStateAndEndTagExpectation(
 										Tokenizer.RAWTEXT, elementName);
 								attributes = null; // CPP
 								goto breakStarttagloop;
@@ -2761,7 +2761,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * Then, switch to the root element mode of the tree
 						 * construction stage
 						 */
-						mode = InsertionMode.BEFORE_HTML;
+						_mode = InsertionMode.BEFORE_HTML;
 						/*
 						 * and reprocess the current token.
 						 */
@@ -2786,7 +2786,7 @@ namespace HtmlParserSharp.Portable.Core
 									AppendHtmlElementToDocumentAndPush(attributes);
 								}
 								// XXX application cache should fire here
-								mode = InsertionMode.BEFORE_HEAD;
+								_mode = InsertionMode.BEFORE_HEAD;
 								attributes = null; // CPP
 								goto breakStarttagloop;
 							default:
@@ -2797,7 +2797,7 @@ namespace HtmlParserSharp.Portable.Core
 								 */
 								AppendHtmlElementToDocumentAndPush();
 								/* Switch to the main mode */
-								mode = InsertionMode.BEFORE_HEAD;
+								_mode = InsertionMode.BEFORE_HEAD;
 								/*
 								 * reprocess the current token.
 								 */
@@ -2808,7 +2808,7 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.HTML:
 								ErrStrayStartTag(name);
-								if (!fragment)
+								if (!_fragment)
 								{
 									AddAttributesToHtml(attributes);
 									attributes = null; // CPP
@@ -2830,7 +2830,7 @@ namespace HtmlParserSharp.Portable.Core
 								/*
 								 * Change the insertion mode to "in head".
 								 */
-								mode = InsertionMode.IN_HEAD;
+								_mode = InsertionMode.IN_HEAD;
 								attributes = null; // CPP
 								goto breakStarttagloop;
 							default:
@@ -2841,7 +2841,7 @@ namespace HtmlParserSharp.Portable.Core
 								 * "head" and no attributes had been seen,
 								 */
 								AppendToCurrentNodeAndPushHeadElement(HtmlAttributes.EMPTY_ATTRIBUTES);
-								mode = InsertionMode.IN_HEAD;
+								_mode = InsertionMode.IN_HEAD;
 								/*
 								 * then reprocess the current token.
 								 * 
@@ -2856,7 +2856,7 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.HTML:
 								ErrStrayStartTag(name);
-								if (!fragment)
+								if (!_fragment)
 								{
 									AddAttributesToHtml(attributes);
 									attributes = null; // CPP
@@ -2875,15 +2875,15 @@ namespace HtmlParserSharp.Portable.Core
 								{
 									AppendToCurrentNodeAndPushBodyElement(attributes);
 								}
-								framesetOk = false;
-								mode = InsertionMode.IN_BODY;
+								_framesetOk = false;
+								_mode = InsertionMode.IN_BODY;
 								attributes = null; // CPP
 								goto breakStarttagloop;
 							case DispatchGroup.FRAMESET:
 								AppendToCurrentNodeAndPushElement(
 										elementName,
 										attributes);
-								mode = InsertionMode.IN_FRAMESET;
+								_mode = InsertionMode.IN_FRAMESET;
 								attributes = null; // CPP
 								goto breakStarttagloop;
 							case DispatchGroup.BASE:
@@ -2923,9 +2923,9 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElement(
 										elementName,
 										attributes);
-								originalMode = mode;
-								mode = InsertionMode.TEXT;
-								tokenizer.SetStateAndEndTagExpectation(
+								_originalMode = _mode;
+								_mode = InsertionMode.TEXT;
+								_tokenizer.SetStateAndEndTagExpectation(
 										Tokenizer.SCRIPT_DATA, elementName);
 								attributes = null; // CPP
 								goto breakStarttagloop;
@@ -2938,9 +2938,9 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElement(
 										elementName,
 										attributes);
-								originalMode = mode;
-								mode = InsertionMode.TEXT;
-								tokenizer.SetStateAndEndTagExpectation(
+								_originalMode = _mode;
+								_mode = InsertionMode.TEXT;
+								_tokenizer.SetStateAndEndTagExpectation(
 										Tokenizer.RAWTEXT, elementName);
 								attributes = null; // CPP
 								goto breakStarttagloop;
@@ -2950,9 +2950,9 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElement(
 										elementName,
 										attributes);
-								originalMode = mode;
-								mode = InsertionMode.TEXT;
-								tokenizer.SetStateAndEndTagExpectation(
+								_originalMode = _mode;
+								_mode = InsertionMode.TEXT;
+								_tokenizer.SetStateAndEndTagExpectation(
 										Tokenizer.RCDATA, elementName);
 								attributes = null; // CPP
 								goto breakStarttagloop;
@@ -2961,7 +2961,7 @@ namespace HtmlParserSharp.Portable.Core
 								goto breakStarttagloop;
 							default:
 								AppendToCurrentNodeAndPushBodyElement();
-								mode = InsertionMode.FRAMESET_OK;
+								_mode = InsertionMode.FRAMESET_OK;
 								continue;
 						}
 					case InsertionMode.AFTER_AFTER_BODY:
@@ -2969,7 +2969,7 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.HTML:
 								ErrStrayStartTag(name);
-								if (!fragment)
+								if (!_fragment)
 								{
 									AddAttributesToHtml(attributes);
 									attributes = null; // CPP
@@ -2978,7 +2978,7 @@ namespace HtmlParserSharp.Portable.Core
 							default:
 								ErrStrayStartTag(name);
 								Fatal();
-								mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
+								_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
 								continue;
 						}
 					case InsertionMode.AFTER_AFTER_FRAMESET:
@@ -2986,7 +2986,7 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.HTML:
 								ErrStrayStartTag(name);
-								if (!fragment)
+								if (!_fragment)
 								{
 									AddAttributesToHtml(attributes);
 									attributes = null; // CPP
@@ -2996,9 +2996,9 @@ namespace HtmlParserSharp.Portable.Core
 								AppendToCurrentNodeAndPushElementMayFoster(
 										elementName,
 										attributes);
-								originalMode = mode;
-								mode = InsertionMode.TEXT;
-								tokenizer.SetStateAndEndTagExpectation(
+								_originalMode = _mode;
+								_mode = InsertionMode.TEXT;
+								_tokenizer.SetStateAndEndTagExpectation(
 										Tokenizer.SCRIPT_DATA, elementName);
 								attributes = null; // CPP
 								goto breakStarttagloop;
@@ -3213,7 +3213,7 @@ namespace HtmlParserSharp.Portable.Core
 			string charset = attributes.GetValue(AttributeName.CHARSET);
 			if (charset != null)
 			{
-				if (tokenizer.InternalEncodingDeclaration(charset))
+				if (_tokenizer.InternalEncodingDeclaration(charset))
 				{
 					RequestSuspension();
 					return;
@@ -3233,7 +3233,7 @@ namespace HtmlParserSharp.Portable.Core
 				// remember not to return early without releasing the string
 				if (extract != null)
 				{
-					if (tokenizer.InternalEncodingDeclaration(extract))
+					if (_tokenizer.InternalEncodingDeclaration(extract))
 					{
 						RequestSuspension();
 					}
@@ -3244,7 +3244,7 @@ namespace HtmlParserSharp.Portable.Core
 		public void EndTag(ElementName elementName)
 		{
 			FlushCharacters();
-			needToDropLF = false;
+			_needToDropLF = false;
 			int eltPos;
 			DispatchGroup group = elementName.Group;
 			/*[Local]*/
@@ -3254,31 +3254,31 @@ namespace HtmlParserSharp.Portable.Core
 			{
 				if (IsInForeign)
 				{
-					if (ErrorEvent != null && stack[currentPtr]._name != name)
+					if (ErrorEvent != null && _stack[_currentPtr]._name != name)
 					{
 						Err("End tag \u201C"
 								+ name
 								+ "\u201D did not match the name of the current open element (\u201C"
-								+ stack[currentPtr]._popName + "\u201D).");
+								+ _stack[_currentPtr]._popName + "\u201D).");
 					}
-					eltPos = currentPtr;
+					eltPos = _currentPtr;
 					for (; ; )
 					{
-						if (stack[eltPos]._name == name)
+						if (_stack[eltPos]._name == name)
 						{
-							while (currentPtr >= eltPos)
+							while (_currentPtr >= eltPos)
 							{
 								Pop();
 							}
 							goto breakEndtagloop;
 						}
-						if (stack[--eltPos]._ns == "http://www.w3.org/1999/xhtml")
+						if (_stack[--eltPos]._ns == "http://www.w3.org/1999/xhtml")
 						{
 							break;
 						}
 					}
 				}
-				switch (mode)
+				switch (_mode)
 				{
 					case InsertionMode.IN_ROW:
 						switch (group)
@@ -3287,25 +3287,25 @@ namespace HtmlParserSharp.Portable.Core
 								eltPos = FindLastOrRoot(DispatchGroup.TR);
 								if (eltPos == 0)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									Err("No table row to close.");
 									goto breakEndtagloop;
 								}
 								ClearStackBackTo(eltPos);
 								Pop();
-								mode = InsertionMode.IN_TABLE_BODY;
+								_mode = InsertionMode.IN_TABLE_BODY;
 								goto breakEndtagloop;
 							case DispatchGroup.TABLE:
 								eltPos = FindLastOrRoot(DispatchGroup.TR);
 								if (eltPos == 0)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									Err("No table row to close.");
 									goto breakEndtagloop;
 								}
 								ClearStackBackTo(eltPos);
 								Pop();
-								mode = InsertionMode.IN_TABLE_BODY;
+								_mode = InsertionMode.IN_TABLE_BODY;
 								continue;
 							case DispatchGroup.TBODY_OR_THEAD_OR_TFOOT:
 								if (FindLastInTableScope(name) == TreeBuilderConstants.NOT_FOUND_ON_STACK)
@@ -3316,13 +3316,13 @@ namespace HtmlParserSharp.Portable.Core
 								eltPos = FindLastOrRoot(DispatchGroup.TR);
 								if (eltPos == 0)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									Err("No table row to close.");
 									goto breakEndtagloop;
 								}
 								ClearStackBackTo(eltPos);
 								Pop();
-								mode = InsertionMode.IN_TABLE_BODY;
+								_mode = InsertionMode.IN_TABLE_BODY;
 								continue;
 							case DispatchGroup.BODY:
 							case DispatchGroup.CAPTION:
@@ -3350,19 +3350,19 @@ namespace HtmlParserSharp.Portable.Core
 								}
 								ClearStackBackTo(eltPos);
 								Pop();
-								mode = InsertionMode.IN_TABLE;
+								_mode = InsertionMode.IN_TABLE;
 								goto breakEndtagloop;
 							case DispatchGroup.TABLE:
 								eltPos = FindLastInTableScopeOrRootTbodyTheadTfoot();
 								if (eltPos == 0)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									ErrStrayEndTag(name);
 									goto breakEndtagloop;
 								}
 								ClearStackBackTo(eltPos);
 								Pop();
-								mode = InsertionMode.IN_TABLE;
+								_mode = InsertionMode.IN_TABLE;
 								continue;
 							case DispatchGroup.BODY:
 							case DispatchGroup.CAPTION:
@@ -3385,11 +3385,11 @@ namespace HtmlParserSharp.Portable.Core
 								eltPos = FindLast("table");
 								if (eltPos == TreeBuilderConstants.NOT_FOUND_ON_STACK)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									ErrStrayEndTag(name);
 									goto breakEndtagloop;
 								}
-								while (currentPtr >= eltPos)
+								while (_currentPtr >= eltPos)
 								{
 									Pop();
 								}
@@ -3421,16 +3421,16 @@ namespace HtmlParserSharp.Portable.Core
 									goto breakEndtagloop;
 								}
 								GenerateImpliedEndTags();
-								if (ErrorEvent != null && currentPtr != eltPos)
+								if (ErrorEvent != null && _currentPtr != eltPos)
 								{
 									ErrUnclosedElements(eltPos, name);
 								}
-								while (currentPtr >= eltPos)
+								while (_currentPtr >= eltPos)
 								{
 									Pop();
 								}
 								ClearTheListOfActiveFormattingElementsUpToTheLastMarker();
-								mode = InsertionMode.IN_TABLE;
+								_mode = InsertionMode.IN_TABLE;
 								goto breakEndtagloop;
 							case DispatchGroup.TABLE:
 								Err("\u201Ctable\u201D closed but \u201Ccaption\u201D was still open.");
@@ -3440,16 +3440,16 @@ namespace HtmlParserSharp.Portable.Core
 									goto breakEndtagloop;
 								}
 								GenerateImpliedEndTags();
-								if (ErrorEvent != null && currentPtr != eltPos)
+								if (ErrorEvent != null && _currentPtr != eltPos)
 								{
 									ErrUnclosedElements(eltPos, name);
 								}
-								while (currentPtr >= eltPos)
+								while (_currentPtr >= eltPos)
 								{
 									Pop();
 								}
 								ClearTheListOfActiveFormattingElementsUpToTheLastMarker();
-								mode = InsertionMode.IN_TABLE;
+								_mode = InsertionMode.IN_TABLE;
 								continue;
 							case DispatchGroup.BODY:
 							case DispatchGroup.COL:
@@ -3480,12 +3480,12 @@ namespace HtmlParserSharp.Portable.Core
 								{
 									ErrUnclosedElements(eltPos, name);
 								}
-								while (currentPtr >= eltPos)
+								while (_currentPtr >= eltPos)
 								{
 									Pop();
 								}
 								ClearTheListOfActiveFormattingElementsUpToTheLastMarker();
-								mode = InsertionMode.IN_ROW;
+								_mode = InsertionMode.IN_ROW;
 								goto breakEndtagloop;
 							case DispatchGroup.TABLE:
 							case DispatchGroup.TBODY_OR_THEAD_OR_TFOOT:
@@ -3516,17 +3516,17 @@ namespace HtmlParserSharp.Portable.Core
 							case DispatchGroup.BODY:
 								if (!IsSecondOnStackBody())
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									ErrStrayEndTag(name);
 									goto breakEndtagloop;
 								}
-								Debug.Assert(currentPtr >= 1);
+								Debug.Assert(_currentPtr >= 1);
 								if (ErrorEvent != null)
 								{
 									/*uncloseloop1:*/
-									for (int i = 2; i <= currentPtr; i++)
+									for (int i = 2; i <= _currentPtr; i++)
 									{
-										switch (stack[i].Group)
+										switch (_stack[i].Group)
 										{
 											case DispatchGroup.DD_OR_DT:
 											case DispatchGroup.LI:
@@ -3544,21 +3544,21 @@ namespace HtmlParserSharp.Portable.Core
 									}
 								}
 							breakUncloseloop1:
-								mode = InsertionMode.AFTER_BODY;
+								_mode = InsertionMode.AFTER_BODY;
 								goto breakEndtagloop;
 							case DispatchGroup.HTML:
 								if (!IsSecondOnStackBody())
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									ErrStrayEndTag(name);
 									goto breakEndtagloop;
 								}
 								if (ErrorEvent != null)
 								{
 									/*uncloseloop2:*/
-									for (int i = 0; i <= currentPtr; i++)
+									for (int i = 0; i <= _currentPtr; i++)
 									{
-										switch (stack[i].Group)
+										switch (_stack[i].Group)
 										{
 											case DispatchGroup.DD_OR_DT:
 											case DispatchGroup.LI:
@@ -3576,7 +3576,7 @@ namespace HtmlParserSharp.Portable.Core
 								}
 
 							breakUncloseloop2:
-								mode = InsertionMode.AFTER_BODY;
+								_mode = InsertionMode.AFTER_BODY;
 								continue;
 							case DispatchGroup.DIV_OR_BLOCKQUOTE_OR_CENTER_OR_MENU:
 							case DispatchGroup.UL_OR_OL_OR_DL:
@@ -3596,19 +3596,19 @@ namespace HtmlParserSharp.Portable.Core
 									{
 										ErrUnclosedElements(eltPos, name);
 									}
-									while (currentPtr >= eltPos)
+									while (_currentPtr >= eltPos)
 									{
 										Pop();
 									}
 								}
 								goto breakEndtagloop;
 							case DispatchGroup.FORM:
-								if (formPointer == null)
+								if (_formPointer == null)
 								{
 									ErrStrayEndTag(name);
 									goto breakEndtagloop;
 								}
-								formPointer = null;
+								_formPointer = null;
 								eltPos = FindLastInScope(name);
 								if (eltPos == TreeBuilderConstants.NOT_FOUND_ON_STACK)
 								{
@@ -3633,7 +3633,7 @@ namespace HtmlParserSharp.Portable.Core
 										Err("HTML start tag \u201C"
 												+ name
 												+ "\u201D in a foreign namespace context.");
-										while (stack[currentPtr]._ns != "http://www.w3.org/1999/xhtml")
+										while (_stack[_currentPtr]._ns != "http://www.w3.org/1999/xhtml")
 										{
 											Pop();
 										}
@@ -3645,11 +3645,11 @@ namespace HtmlParserSharp.Portable.Core
 								}
 								GenerateImpliedEndTagsExceptFor("p");
 								Debug.Assert(eltPos != TreeBuilderConstants.NOT_FOUND_ON_STACK);
-								if (ErrorEvent != null && eltPos != currentPtr)
+								if (ErrorEvent != null && eltPos != _currentPtr)
 								{
 									ErrUnclosedElements(eltPos, name);
 								}
-								while (currentPtr >= eltPos)
+								while (_currentPtr >= eltPos)
 								{
 									Pop();
 								}
@@ -3663,11 +3663,11 @@ namespace HtmlParserSharp.Portable.Core
 								else
 								{
 									GenerateImpliedEndTagsExceptFor(name);
-									if (ErrorEvent != null && eltPos != currentPtr)
+									if (ErrorEvent != null && eltPos != _currentPtr)
 									{
 										ErrUnclosedElements(eltPos, name);
 									}
-									while (currentPtr >= eltPos)
+									while (_currentPtr >= eltPos)
 									{
 										Pop();
 									}
@@ -3686,11 +3686,11 @@ namespace HtmlParserSharp.Portable.Core
 								{
 									GenerateImpliedEndTagsExceptFor(name);
 									if (ErrorEvent != null
-											&& eltPos != currentPtr)
+											&& eltPos != _currentPtr)
 									{
 										ErrUnclosedElements(eltPos, name);
 									}
-									while (currentPtr >= eltPos)
+									while (_currentPtr >= eltPos)
 									{
 										Pop();
 									}
@@ -3709,7 +3709,7 @@ namespace HtmlParserSharp.Portable.Core
 									{
 										ErrUnclosedElements(eltPos, name);
 									}
-									while (currentPtr >= eltPos)
+									while (_currentPtr >= eltPos)
 									{
 										Pop();
 									}
@@ -3729,7 +3729,7 @@ namespace HtmlParserSharp.Portable.Core
 									{
 										ErrUnclosedElements(eltPos, name);
 									}
-									while (currentPtr >= eltPos)
+									while (_currentPtr >= eltPos)
 									{
 										Pop();
 									}
@@ -3743,7 +3743,7 @@ namespace HtmlParserSharp.Portable.Core
 									Err("HTML start tag \u201C"
 											+ name
 											+ "\u201D in a foreign namespace context.");
-									while (stack[currentPtr]._ns != "http://www.w3.org/1999/xhtml")
+									while (_stack[_currentPtr]._ns != "http://www.w3.org/1999/xhtml")
 									{
 										Pop();
 									}
@@ -3800,10 +3800,10 @@ namespace HtmlParserSharp.Portable.Core
 									goto breakEndtagloop;
 								}
 
-								eltPos = currentPtr;
+								eltPos = _currentPtr;
 								for (; ; )
 								{
-									StackNode<T> node = stack[eltPos];
+									StackNode<T> node = _stack[eltPos];
 									if (node._name == name)
 									{
 										GenerateImpliedEndTags();
@@ -3812,7 +3812,7 @@ namespace HtmlParserSharp.Portable.Core
 										{
 											ErrUnclosedElements(eltPos, name);
 										}
-										while (currentPtr >= eltPos)
+										while (_currentPtr >= eltPos)
 										{
 											Pop();
 										}
@@ -3830,27 +3830,27 @@ namespace HtmlParserSharp.Portable.Core
 						switch (group)
 						{
 							case DispatchGroup.COLGROUP:
-								if (currentPtr == 0)
+								if (_currentPtr == 0)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									Err("Garbage in \u201Ccolgroup\u201D fragment.");
 									goto breakEndtagloop;
 								}
 								Pop();
-								mode = InsertionMode.IN_TABLE;
+								_mode = InsertionMode.IN_TABLE;
 								goto breakEndtagloop;
 							case DispatchGroup.COL:
 								ErrStrayEndTag(name);
 								goto breakEndtagloop;
 							default:
-								if (currentPtr == 0)
+								if (_currentPtr == 0)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									Err("Garbage in \u201Ccolgroup\u201D fragment.");
 									goto breakEndtagloop;
 								}
 								Pop();
-								mode = InsertionMode.IN_TABLE;
+								_mode = InsertionMode.IN_TABLE;
 								continue;
 						}
 					case InsertionMode.IN_SELECT_IN_TABLE:
@@ -3869,10 +3869,10 @@ namespace HtmlParserSharp.Portable.Core
 									eltPos = FindLastInTableScope("select");
 									if (eltPos == TreeBuilderConstants.NOT_FOUND_ON_STACK)
 									{
-										Debug.Assert(fragment);
+										Debug.Assert(_fragment);
 										goto breakEndtagloop; // http://www.w3.org/Bugs/Public/show_bug.cgi?id=8375
 									}
-									while (currentPtr >= eltPos)
+									while (_currentPtr >= eltPos)
 									{
 										Pop();
 									}
@@ -3904,7 +3904,7 @@ namespace HtmlParserSharp.Portable.Core
 								}
 							case DispatchGroup.OPTGROUP:
 								if (IsCurrent("option")
-										&& "optgroup" == stack[currentPtr - 1]._name)
+										&& "optgroup" == _stack[_currentPtr - 1]._name)
 								{
 									Pop();
 								}
@@ -3921,11 +3921,11 @@ namespace HtmlParserSharp.Portable.Core
 								eltPos = FindLastInTableScope("select");
 								if (eltPos == TreeBuilderConstants.NOT_FOUND_ON_STACK)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									ErrStrayEndTag(name);
 									goto breakEndtagloop;
 								}
-								while (currentPtr >= eltPos)
+								while (_currentPtr >= eltPos)
 								{
 									Pop();
 								}
@@ -3939,35 +3939,35 @@ namespace HtmlParserSharp.Portable.Core
 						switch (group)
 						{
 							case DispatchGroup.HTML:
-								if (fragment)
+								if (_fragment)
 								{
 									ErrStrayEndTag(name);
 									goto breakEndtagloop;
 								}
 								else
 								{
-									mode = InsertionMode.AFTER_AFTER_BODY;
+									_mode = InsertionMode.AFTER_AFTER_BODY;
 									goto breakEndtagloop;
 								}
 							default:
 								Err("Saw an end tag after \u201Cbody\u201D had been closed.");
-								mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
+								_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
 								continue;
 						}
 					case InsertionMode.IN_FRAMESET:
 						switch (group)
 						{
 							case DispatchGroup.FRAMESET:
-								if (currentPtr == 0)
+								if (_currentPtr == 0)
 								{
-									Debug.Assert(fragment);
+									Debug.Assert(_fragment);
 									ErrStrayEndTag(name);
 									goto breakEndtagloop;
 								}
 								Pop();
-								if ((!fragment) && !IsCurrent("frameset"))
+								if ((!_fragment) && !IsCurrent("frameset"))
 								{
-									mode = InsertionMode.AFTER_FRAMESET;
+									_mode = InsertionMode.AFTER_FRAMESET;
 								}
 								goto breakEndtagloop;
 							default:
@@ -3978,7 +3978,7 @@ namespace HtmlParserSharp.Portable.Core
 						switch (group)
 						{
 							case DispatchGroup.HTML:
-								mode = InsertionMode.AFTER_AFTER_FRAMESET;
+								_mode = InsertionMode.AFTER_AFTER_FRAMESET;
 								goto breakEndtagloop;
 							default:
 								ErrStrayEndTag(name);
@@ -4017,7 +4017,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * Then, switch to the root element mode of the tree
 						 * construction stage
 						 */
-						mode = InsertionMode.BEFORE_HTML;
+						_mode = InsertionMode.BEFORE_HTML;
 						/*
 						 * and reprocess the current token.
 						 */
@@ -4036,7 +4036,7 @@ namespace HtmlParserSharp.Portable.Core
 								 */
 								AppendHtmlElementToDocumentAndPush();
 								/* Switch to the main mode */
-								mode = InsertionMode.BEFORE_HEAD;
+								_mode = InsertionMode.BEFORE_HEAD;
 								/*
 								 * reprocess the current token.
 								 */
@@ -4053,7 +4053,7 @@ namespace HtmlParserSharp.Portable.Core
 							case DispatchGroup.HTML:
 							case DispatchGroup.BODY:
 								AppendToCurrentNodeAndPushHeadElement(HtmlAttributes.EMPTY_ATTRIBUTES);
-								mode = InsertionMode.IN_HEAD;
+								_mode = InsertionMode.IN_HEAD;
 								continue;
 							default:
 								ErrStrayEndTag(name);
@@ -4064,13 +4064,13 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.HEAD:
 								Pop();
-								mode = InsertionMode.AFTER_HEAD;
+								_mode = InsertionMode.AFTER_HEAD;
 								goto breakEndtagloop;
 							case DispatchGroup.BR:
 							case DispatchGroup.HTML:
 							case DispatchGroup.BODY:
 								Pop();
-								mode = InsertionMode.AFTER_HEAD;
+								_mode = InsertionMode.AFTER_HEAD;
 								continue;
 							default:
 								ErrStrayEndTag(name);
@@ -4081,12 +4081,12 @@ namespace HtmlParserSharp.Portable.Core
 						{
 							case DispatchGroup.NOSCRIPT:
 								Pop();
-								mode = InsertionMode.IN_HEAD;
+								_mode = InsertionMode.IN_HEAD;
 								goto breakEndtagloop;
 							case DispatchGroup.BR:
 								ErrStrayEndTag(name);
 								Pop();
-								mode = InsertionMode.IN_HEAD;
+								_mode = InsertionMode.IN_HEAD;
 								continue;
 							default:
 								ErrStrayEndTag(name);
@@ -4099,7 +4099,7 @@ namespace HtmlParserSharp.Portable.Core
 							case DispatchGroup.BODY:
 							case DispatchGroup.BR:
 								AppendToCurrentNodeAndPushBodyElement();
-								mode = InsertionMode.FRAMESET_OK;
+								_mode = InsertionMode.FRAMESET_OK;
 								continue;
 							default:
 								ErrStrayEndTag(name);
@@ -4107,20 +4107,20 @@ namespace HtmlParserSharp.Portable.Core
 						}
 					case InsertionMode.AFTER_AFTER_BODY:
 						ErrStrayEndTag(name);
-						mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
+						_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
 						continue;
 					case InsertionMode.AFTER_AFTER_FRAMESET:
 						ErrStrayEndTag(name);
-						mode = InsertionMode.IN_FRAMESET;
+						_mode = InsertionMode.IN_FRAMESET;
 						continue;
 					case InsertionMode.TEXT:
 						// XXX need to manage insertion point here
 						Pop();
-						if (originalMode == InsertionMode.AFTER_HEAD)
+						if (_originalMode == InsertionMode.AFTER_HEAD)
 						{
 							SilentPop();
 						}
-						mode = originalMode;
+						_mode = _originalMode;
 						goto breakEndtagloop;
 				}
 			} // endtagloop
@@ -4131,9 +4131,9 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindLastInTableScopeOrRootTbodyTheadTfoot()
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
-				if (stack[i].Group == DispatchGroup.TBODY_OR_THEAD_OR_TFOOT)
+				if (_stack[i].Group == DispatchGroup.TBODY_OR_THEAD_OR_TFOOT)
 				{
 					return i;
 				}
@@ -4143,9 +4143,9 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindLast([Local] string name)
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
-				if (stack[i]._name == name)
+				if (_stack[i]._name == name)
 				{
 					return i;
 				}
@@ -4155,13 +4155,13 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindLastInTableScope([Local] string name)
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
-				if (stack[i]._name == name)
+				if (_stack[i]._name == name)
 				{
 					return i;
 				}
-				else if (stack[i]._name == "table")
+				else if (_stack[i]._name == "table")
 				{
 					return TreeBuilderConstants.NOT_FOUND_ON_STACK;
 				}
@@ -4171,13 +4171,13 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindLastInButtonScope([Local] string name)
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
-				if (stack[i]._name == name)
+				if (_stack[i]._name == name)
 				{
 					return i;
 				}
-				else if (stack[i].IsScoping || stack[i]._name == "button")
+				else if (_stack[i].IsScoping || _stack[i]._name == "button")
 				{
 					return TreeBuilderConstants.NOT_FOUND_ON_STACK;
 				}
@@ -4187,13 +4187,13 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindLastInScope([Local] string name)
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
-				if (stack[i]._name == name)
+				if (_stack[i]._name == name)
 				{
 					return i;
 				}
-				else if (stack[i].IsScoping)
+				else if (_stack[i].IsScoping)
 				{
 					return TreeBuilderConstants.NOT_FOUND_ON_STACK;
 				}
@@ -4203,13 +4203,13 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindLastInListScope([Local] string name)
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
-				if (stack[i]._name == name)
+				if (_stack[i]._name == name)
 				{
 					return i;
 				}
-				else if (stack[i].IsScoping || stack[i]._name == "ul" || stack[i]._name == "ol")
+				else if (_stack[i].IsScoping || _stack[i]._name == "ul" || _stack[i]._name == "ol")
 				{
 					return TreeBuilderConstants.NOT_FOUND_ON_STACK;
 				}
@@ -4219,13 +4219,13 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindLastInScopeHn()
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
-				if (stack[i].Group == DispatchGroup.H1_OR_H2_OR_H3_OR_H4_OR_H5_OR_H6)
+				if (_stack[i].Group == DispatchGroup.H1_OR_H2_OR_H3_OR_H4_OR_H5_OR_H6)
 				{
 					return i;
 				}
-				else if (stack[i].IsScoping)
+				else if (_stack[i].IsScoping)
 				{
 					return TreeBuilderConstants.NOT_FOUND_ON_STACK;
 				}
@@ -4237,7 +4237,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			for (; ; )
 			{
-				StackNode<T> node = stack[currentPtr];
+				StackNode<T> node = _stack[_currentPtr];
 				switch (node.Group)
 				{
 					case DispatchGroup.P:
@@ -4262,7 +4262,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			for (; ; )
 			{
-				switch (stack[currentPtr].Group)
+				switch (_stack[_currentPtr].Group)
 				{
 					case DispatchGroup.P:
 					case DispatchGroup.LI:
@@ -4280,13 +4280,13 @@ namespace HtmlParserSharp.Portable.Core
 
 		private bool IsSecondOnStackBody()
 		{
-			return currentPtr >= 1 && stack[1].Group == DispatchGroup.BODY;
+			return _currentPtr >= 1 && _stack[1].Group == DispatchGroup.BODY;
 		}
 
 		private void DocumentModeInternal(DocumentMode m, string publicIdentifier,
 				string systemIdentifier, bool html4SpecificAdditionalErrorChecks)
 		{
-			quirks = (m == DocumentMode.QuirksMode);
+			_quirks = (m == DocumentMode.QuirksMode);
 			if (DocumentModeDetected != null)
 			{
 				DocumentModeDetected(this, new DocumentModeEventArgs(
@@ -4387,25 +4387,25 @@ namespace HtmlParserSharp.Portable.Core
 		private void CloseTheCell(int eltPos)
 		{
 			GenerateImpliedEndTags();
-			if (ErrorEvent != null && eltPos != currentPtr)
+			if (ErrorEvent != null && eltPos != _currentPtr)
 			{
 				ErrUnclosedElementsCell(eltPos);
 			}
-			while (currentPtr >= eltPos)
+			while (_currentPtr >= eltPos)
 			{
 				Pop();
 			}
 			ClearTheListOfActiveFormattingElementsUpToTheLastMarker();
-			mode = InsertionMode.IN_ROW;
+			_mode = InsertionMode.IN_ROW;
 			return;
 		}
 
 		private int FindLastInTableScopeTdTh()
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
 				/*[Local]*/
-				string name = stack[i]._name;
+				string name = _stack[i]._name;
 				if ("td" == name || "th" == name)
 				{
 					return i;
@@ -4420,7 +4420,7 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void ClearStackBackTo(int eltPos)
 		{
-			while (currentPtr > eltPos)
+			while (_currentPtr > eltPos)
 			{ // > not >= intentional
 				Pop();
 			}
@@ -4433,94 +4433,94 @@ namespace HtmlParserSharp.Portable.Core
 			string name;
 			/*[NsUri]*/
 			string ns;
-			for (int i = currentPtr; i >= 0; i--)
+			for (int i = _currentPtr; i >= 0; i--)
 			{
-				node = stack[i];
+				node = _stack[i];
 				name = node._name;
 				ns = node._ns;
 				if (i == 0)
 				{
-					if (!(contextNamespace == "http://www.w3.org/1999/xhtml" && (contextName == "td" || contextName == "th")))
+					if (!(_contextNamespace == "http://www.w3.org/1999/xhtml" && (_contextName == "td" || _contextName == "th")))
 					{
-						name = contextName;
-						ns = contextNamespace;
+						name = _contextName;
+						ns = _contextNamespace;
 					}
 					else
 					{
-						mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY; // XXX from Hixie's email
+						_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY; // XXX from Hixie's email
 						return;
 					}
 				}
 				if ("select" == name)
 				{
-					mode = InsertionMode.IN_SELECT;
+					_mode = InsertionMode.IN_SELECT;
 					return;
 				}
 				else if ("td" == name || "th" == name)
 				{
-					mode = InsertionMode.IN_CELL;
+					_mode = InsertionMode.IN_CELL;
 					return;
 				}
 				else if ("tr" == name)
 				{
-					mode = InsertionMode.IN_ROW;
+					_mode = InsertionMode.IN_ROW;
 					return;
 				}
 				else if ("tbody" == name || "thead" == name || "tfoot" == name)
 				{
-					mode = InsertionMode.IN_TABLE_BODY;
+					_mode = InsertionMode.IN_TABLE_BODY;
 					return;
 				}
 				else if ("caption" == name)
 				{
-					mode = InsertionMode.IN_CAPTION;
+					_mode = InsertionMode.IN_CAPTION;
 					return;
 				}
 				else if ("colgroup" == name)
 				{
-					mode = InsertionMode.IN_COLUMN_GROUP;
+					_mode = InsertionMode.IN_COLUMN_GROUP;
 					return;
 				}
 				else if ("table" == name)
 				{
-					mode = InsertionMode.IN_TABLE;
+					_mode = InsertionMode.IN_TABLE;
 					return;
 				}
 				else if ("http://www.w3.org/1999/xhtml" != ns)
 				{
-					mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
+					_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
 					return;
 				}
 				else if ("head" == name)
 				{
-					mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY; // really
+					_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY; // really
 					return;
 				}
 				else if ("body" == name)
 				{
-					mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
+					_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
 					return;
 				}
 				else if ("frameset" == name)
 				{
-					mode = InsertionMode.IN_FRAMESET;
+					_mode = InsertionMode.IN_FRAMESET;
 					return;
 				}
 				else if ("html" == name)
 				{
-					if (headPointer == null)
+					if (_headPointer == null)
 					{
-						mode = InsertionMode.BEFORE_HEAD;
+						_mode = InsertionMode.BEFORE_HEAD;
 					}
 					else
 					{
-						mode = InsertionMode.AFTER_HEAD;
+						_mode = InsertionMode.AFTER_HEAD;
 					}
 					return;
 				}
 				else if (i == 0)
 				{
-					mode = framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
+					_mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
 					return;
 				}
 			}
@@ -4534,11 +4534,11 @@ namespace HtmlParserSharp.Portable.Core
 				return;
 			}
 			GenerateImpliedEndTagsExceptFor("p");
-			if (ErrorEvent != null && eltPos != currentPtr)
+			if (ErrorEvent != null && eltPos != _currentPtr)
 			{
 				ErrUnclosedElementsImplied(eltPos, "p");
 			}
-			while (currentPtr >= eltPos)
+			while (_currentPtr >= eltPos)
 			{
 				Pop();
 			}
@@ -4546,51 +4546,51 @@ namespace HtmlParserSharp.Portable.Core
 
 		private bool ClearLastStackSlot()
 		{
-			stack[currentPtr] = null;
+			_stack[_currentPtr] = null;
 			return true;
 		}
 
 		private bool ClearLastListSlot()
 		{
-			listOfActiveFormattingElements[listPtr] = null;
+			_listOfActiveFormattingElements[_listPtr] = null;
 			return true;
 		}
 
 		private void Push(StackNode<T> node)
 		{
-			currentPtr++;
-			if (currentPtr == stack.Length)
+			_currentPtr++;
+			if (_currentPtr == _stack.Length)
 			{
-				StackNode<T>[] newStack = new StackNode<T>[stack.Length + 64];
-				Array.Copy(stack, newStack, stack.Length);
-				stack = newStack;
+				StackNode<T>[] newStack = new StackNode<T>[_stack.Length + 64];
+				Array.Copy(_stack, newStack, _stack.Length);
+				_stack = newStack;
 			}
-			stack[currentPtr] = node;
+			_stack[_currentPtr] = node;
 			ElementPushed(node._ns, node._popName, node._node);
 		}
 
 		private void SilentPush(StackNode<T> node)
 		{
-			currentPtr++;
-			if (currentPtr == stack.Length)
+			_currentPtr++;
+			if (_currentPtr == _stack.Length)
 			{
-				StackNode<T>[] newStack = new StackNode<T>[stack.Length + 64];
-				Array.Copy(stack, newStack, stack.Length);
-				stack = newStack;
+				StackNode<T>[] newStack = new StackNode<T>[_stack.Length + 64];
+				Array.Copy(_stack, newStack, _stack.Length);
+				_stack = newStack;
 			}
-			stack[currentPtr] = node;
+			_stack[_currentPtr] = node;
 		}
 
 		private void Append(StackNode<T> node)
 		{
-			listPtr++;
-			if (listPtr == listOfActiveFormattingElements.Length)
+			_listPtr++;
+			if (_listPtr == _listOfActiveFormattingElements.Length)
 			{
-				StackNode<T>[] newList = new StackNode<T>[listOfActiveFormattingElements.Length + 64];
-				Array.Copy(listOfActiveFormattingElements, newList, listOfActiveFormattingElements.Length);
-				listOfActiveFormattingElements = newList;
+				StackNode<T>[] newList = new StackNode<T>[_listOfActiveFormattingElements.Length + 64];
+				Array.Copy(_listOfActiveFormattingElements, newList, _listOfActiveFormattingElements.Length);
+				_listOfActiveFormattingElements = newList;
 			}
-			listOfActiveFormattingElements[listPtr] = node;
+			_listOfActiveFormattingElements[_listPtr] = node;
 		}
 
 		private void InsertMarker()
@@ -4600,47 +4600,47 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void ClearTheListOfActiveFormattingElementsUpToTheLastMarker()
 		{
-			while (listPtr > -1)
+			while (_listPtr > -1)
 			{
-				if (listOfActiveFormattingElements[listPtr] == null)
+				if (_listOfActiveFormattingElements[_listPtr] == null)
 				{
-					--listPtr;
+					--_listPtr;
 					return;
 				}
-				--listPtr;
+				--_listPtr;
 			}
 		}
 
 		private bool IsCurrent([Local] string name)
 		{
-			return name == stack[currentPtr]._name;
+			return name == _stack[_currentPtr]._name;
 		}
 
 		private void RemoveFromStack(int pos)
 		{
-			if (currentPtr == pos)
+			if (_currentPtr == pos)
 			{
 				Pop();
 			}
 			else
 			{
 				Fatal();
-				Array.Copy(stack, pos + 1, stack, pos, currentPtr - pos);
+				Array.Copy(_stack, pos + 1, _stack, pos, _currentPtr - pos);
 				Debug.Assert(ClearLastStackSlot());
-				currentPtr--;
+				_currentPtr--;
 			}
 		}
 
 		private void RemoveFromStack(StackNode<T> node)
 		{
-			if (stack[currentPtr] == node)
+			if (_stack[_currentPtr] == node)
 			{
 				Pop();
 			}
 			else
 			{
-				int pos = currentPtr - 1;
-				while (pos >= 0 && stack[pos] != node)
+				int pos = _currentPtr - 1;
+				while (pos >= 0 && _stack[pos] != node)
 				{
 					pos--;
 				}
@@ -4650,24 +4650,24 @@ namespace HtmlParserSharp.Portable.Core
 					return;
 				}
 				Fatal();
-				Array.Copy(stack, pos + 1, stack, pos, currentPtr - pos);
-				currentPtr--;
+				Array.Copy(_stack, pos + 1, _stack, pos, _currentPtr - pos);
+				_currentPtr--;
 			}
 		}
 
 		private void RemoveFromListOfActiveFormattingElements(int pos)
 		{
-			Debug.Assert(listOfActiveFormattingElements[pos] != null);
-			if (pos == listPtr)
+			Debug.Assert(_listOfActiveFormattingElements[pos] != null);
+			if (pos == _listPtr)
 			{
 				Debug.Assert(ClearLastListSlot());
-				listPtr--;
+				_listPtr--;
 				return;
 			}
-			Debug.Assert(pos < listPtr);
-			Array.Copy(listOfActiveFormattingElements, pos + 1, listOfActiveFormattingElements, pos, listPtr - pos);
+			Debug.Assert(pos < _listPtr);
+			Array.Copy(_listOfActiveFormattingElements, pos + 1, _listOfActiveFormattingElements, pos, _listPtr - pos);
 			Debug.Assert(ClearLastListSlot());
-			listPtr--;
+			_listPtr--;
 		}
 
 		private bool AdoptionAgencyEndTag([Local] string name)
@@ -4676,10 +4676,10 @@ namespace HtmlParserSharp.Portable.Core
 			// be a weak ref isn't.
 			for (int i = 0; i < 8; ++i)
 			{
-				int formattingEltListPos = listPtr;
+				int formattingEltListPos = _listPtr;
 				while (formattingEltListPos > -1)
 				{
-					StackNode<T> listNode = listOfActiveFormattingElements[formattingEltListPos]; // weak
+					StackNode<T> listNode = _listOfActiveFormattingElements[formattingEltListPos]; // weak
 					// ref
 					if (listNode == null)
 					{
@@ -4696,7 +4696,7 @@ namespace HtmlParserSharp.Portable.Core
 				{
 					return false;
 				}
-				StackNode<T> formattingElt = listOfActiveFormattingElements[formattingEltListPos]; // this
+				StackNode<T> formattingElt = _listOfActiveFormattingElements[formattingEltListPos]; // this
 				// *looks*
 				// like
 				// a
@@ -4708,11 +4708,11 @@ namespace HtmlParserSharp.Portable.Core
 				// of
 				// formatting
 				// elements
-				int formattingEltStackPos = currentPtr;
+				int formattingEltStackPos = _currentPtr;
 				bool inScope = true;
 				while (formattingEltStackPos > -1)
 				{
-					StackNode<T> node = stack[formattingEltStackPos]; // weak ref
+					StackNode<T> node = _stack[formattingEltStackPos]; // weak ref
 					if (node == formattingElt)
 					{
 						break;
@@ -4735,33 +4735,33 @@ namespace HtmlParserSharp.Portable.Core
 					return true;
 				}
 				// stackPos now points to the formatting element and it is in scope
-				if (ErrorEvent != null && formattingEltStackPos != currentPtr)
+				if (ErrorEvent != null && formattingEltStackPos != _currentPtr)
 				{
 					Err("End tag \u201C" + name + "\u201D violates nesting rules.");
 				}
 				int furthestBlockPos = formattingEltStackPos + 1;
-				while (furthestBlockPos <= currentPtr)
+				while (furthestBlockPos <= _currentPtr)
 				{
-					StackNode<T> node = stack[furthestBlockPos]; // weak ref
+					StackNode<T> node = _stack[furthestBlockPos]; // weak ref
 					if (node.IsSpecial)
 					{
 						break;
 					}
 					furthestBlockPos++;
 				}
-				if (furthestBlockPos > currentPtr)
+				if (furthestBlockPos > _currentPtr)
 				{
 					// no furthest block
-					while (currentPtr >= formattingEltStackPos)
+					while (_currentPtr >= formattingEltStackPos)
 					{
 						Pop();
 					}
 					RemoveFromListOfActiveFormattingElements(formattingEltListPos);
 					return true;
 				}
-				StackNode<T> commonAncestor = stack[formattingEltStackPos - 1]; // weak
+				StackNode<T> commonAncestor = _stack[formattingEltStackPos - 1]; // weak
 				// ref
-				StackNode<T> furthestBlock = stack[furthestBlockPos]; // weak ref
+				StackNode<T> furthestBlock = _stack[furthestBlockPos]; // weak ref
 				// detachFromParent(furthestBlock.node); XXX AAA CHANGE
 				int bookmark = formattingEltListPos;
 				int nodePos = furthestBlockPos;
@@ -4769,7 +4769,7 @@ namespace HtmlParserSharp.Portable.Core
 				for (int j = 0; j < 3; ++j)
 				{
 					nodePos--;
-					StackNode<T> node = stack[nodePos]; // weak ref
+					StackNode<T> node = _stack[nodePos]; // weak ref
 					int nodeListPos = FindInListOfActiveFormattingElements(node);
 					if (nodeListPos == -1)
 					{
@@ -4791,8 +4791,8 @@ namespace HtmlParserSharp.Portable.Core
 						bookmark = nodeListPos + 1;
 					}
 					// if (hasChildren(node.node)) { XXX AAA CHANGE
-					Debug.Assert(node == listOfActiveFormattingElements[nodeListPos]);
-					Debug.Assert(node == stack[nodePos]);
+					Debug.Assert(node == _listOfActiveFormattingElements[nodeListPos]);
+					Debug.Assert(node == _stack[nodePos]);
 					T clone = CreateElement("http://www.w3.org/1999/xhtml",
 							node._name, node._attributes.CloneAttributes());
 					StackNode<T> newNode = new StackNode<T>(node.Flags, node._ns,
@@ -4806,8 +4806,8 @@ namespace HtmlParserSharp.Portable.Core
 					// to
 					// stack
 					node.DropAttributes(); // adopt ownership to newNode
-					stack[nodePos] = newNode;
-					listOfActiveFormattingElements[nodeListPos] = newNode;
+					_stack[nodePos] = newNode;
+					_listOfActiveFormattingElements[nodeListPos] = newNode;
 					node = newNode;
 					// } XXX AAA CHANGE
 					DetachFromParent(lastNode._node);
@@ -4833,7 +4833,7 @@ namespace HtmlParserSharp.Portable.Core
 						formattingElt._name, clone2, formattingElt._popName,
 						formattingElt._attributes
 					// [NOCPP[
-						, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+						, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 					// ]NOCPP]
 				); // Ownership
 				// transfers
@@ -4855,40 +4855,40 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void InsertIntoStack(StackNode<T> node, int position)
 		{
-			Debug.Assert(currentPtr + 1 < stack.Length);
-			Debug.Assert(position <= currentPtr + 1);
-			if (position == currentPtr + 1)
+			Debug.Assert(_currentPtr + 1 < _stack.Length);
+			Debug.Assert(position <= _currentPtr + 1);
+			if (position == _currentPtr + 1)
 			{
 				Push(node);
 			}
 			else
 			{
-				Array.Copy(stack, position, stack, position + 1,
-						(currentPtr - position) + 1);
-				currentPtr++;
-				stack[position] = node;
+				Array.Copy(_stack, position, _stack, position + 1,
+						(_currentPtr - position) + 1);
+				_currentPtr++;
+				_stack[position] = node;
 			}
 		}
 
 		private void InsertIntoListOfActiveFormattingElements(
 				StackNode<T> formattingClone, int bookmark)
 		{
-			Debug.Assert(listPtr + 1 < listOfActiveFormattingElements.Length);
-			if (bookmark <= listPtr)
+			Debug.Assert(_listPtr + 1 < _listOfActiveFormattingElements.Length);
+			if (bookmark <= _listPtr)
 			{
-				Array.Copy(listOfActiveFormattingElements, bookmark,
-						listOfActiveFormattingElements, bookmark + 1,
-						(listPtr - bookmark) + 1);
+				Array.Copy(_listOfActiveFormattingElements, bookmark,
+						_listOfActiveFormattingElements, bookmark + 1,
+						(_listPtr - bookmark) + 1);
 			}
-			listPtr++;
-			listOfActiveFormattingElements[bookmark] = formattingClone;
+			_listPtr++;
+			_listOfActiveFormattingElements[bookmark] = formattingClone;
 		}
 
 		private int FindInListOfActiveFormattingElements(StackNode<T> node)
 		{
-			for (int i = listPtr; i >= 0; i--)
+			for (int i = _listPtr; i >= 0; i--)
 			{
-				if (node == listOfActiveFormattingElements[i])
+				if (node == _listOfActiveFormattingElements[i])
 				{
 					return i;
 				}
@@ -4898,9 +4898,9 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindInListOfActiveFormattingElementsContainsBetweenEndAndLastMarker([Local] string name)
 		{
-			for (int i = listPtr; i >= 0; i--)
+			for (int i = _listPtr; i >= 0; i--)
 			{
-				StackNode<T> node = listOfActiveFormattingElements[i];
+				StackNode<T> node = _listOfActiveFormattingElements[i];
 				if (node == null)
 				{
 					return -1;
@@ -4918,9 +4918,9 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			int candidate = -1;
 			int count = 0;
-			for (int i = listPtr; i >= 0; i--)
+			for (int i = _listPtr; i >= 0; i--)
 			{
-				StackNode<T> node = listOfActiveFormattingElements[i];
+				StackNode<T> node = _listOfActiveFormattingElements[i];
 				if (node == null)
 				{
 					break;
@@ -4939,9 +4939,9 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindLastOrRoot([Local] string name)
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
-				if (stack[i]._name == name)
+				if (_stack[i]._name == name)
 				{
 					return i;
 				}
@@ -4951,9 +4951,9 @@ namespace HtmlParserSharp.Portable.Core
 
 		private int FindLastOrRoot(DispatchGroup group)
 		{
-			for (int i = currentPtr; i > 0; i--)
+			for (int i = _currentPtr; i > 0; i--)
 			{
-				if (stack[i].Group == group)
+				if (_stack[i].Group == group)
 				{
 					return i;
 				}
@@ -4971,9 +4971,9 @@ namespace HtmlParserSharp.Portable.Core
 			// [NOCPP[
 			CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
 			// ]NOCPP]
-			if (currentPtr >= 1)
+			if (_currentPtr >= 1)
 			{
-				StackNode<T> body = stack[1];
+				StackNode<T> body = _stack[1];
 				if (body.Group == DispatchGroup.BODY)
 				{
 					AddAttributesToElement(body._node, attributes);
@@ -4988,34 +4988,34 @@ namespace HtmlParserSharp.Portable.Core
 			// [NOCPP[
 			CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
 			// ]NOCPP]
-			AddAttributesToElement(stack[0]._node, attributes);
+			AddAttributesToElement(_stack[0]._node, attributes);
 		}
 
 		private void PushHeadPointerOntoStack()
 		{
-			Debug.Assert(headPointer != null);
-			Debug.Assert(!fragment);
-			Debug.Assert(mode == InsertionMode.AFTER_HEAD);
+			Debug.Assert(_headPointer != null);
+			Debug.Assert(!_fragment);
+			Debug.Assert(_mode == InsertionMode.AFTER_HEAD);
 			Fatal();
-			SilentPush(new StackNode<T>(ElementName.HEAD, headPointer
+			SilentPush(new StackNode<T>(ElementName.HEAD, _headPointer
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			));
 		}
 
 		private void ReconstructTheActiveFormattingElements()
 		{
-			if (listPtr == -1)
+			if (_listPtr == -1)
 			{
 				return;
 			}
-			StackNode<T> mostRecent = listOfActiveFormattingElements[listPtr];
+			StackNode<T> mostRecent = _listOfActiveFormattingElements[_listPtr];
 			if (mostRecent == null || IsInStack(mostRecent))
 			{
 				return;
 			}
-			int entryPos = listPtr;
+			int entryPos = _listPtr;
 			for (; ; )
 			{
 				entryPos--;
@@ -5023,19 +5023,19 @@ namespace HtmlParserSharp.Portable.Core
 				{
 					break;
 				}
-				if (listOfActiveFormattingElements[entryPos] == null)
+				if (_listOfActiveFormattingElements[entryPos] == null)
 				{
 					break;
 				}
-				if (IsInStack(listOfActiveFormattingElements[entryPos]))
+				if (IsInStack(_listOfActiveFormattingElements[entryPos]))
 				{
 					break;
 				}
 			}
-			while (entryPos < listPtr)
+			while (entryPos < _listPtr)
 			{
 				entryPos++;
-				StackNode<T> entry = listOfActiveFormattingElements[entryPos];
+				StackNode<T> entry = _listOfActiveFormattingElements[entryPos];
 				T clone = CreateElement("http://www.w3.org/1999/xhtml", entry._name,
 						entry._attributes.CloneAttributes());
 				StackNode<T> entryClone = new StackNode<T>(entry.Flags,
@@ -5046,7 +5046,7 @@ namespace HtmlParserSharp.Portable.Core
 					// ]NOCPP]
 				);
 				entry.DropAttributes(); // transfer ownership to entryClone
-				StackNode<T> currentNode = stack[currentPtr];
+				StackNode<T> currentNode = _stack[_currentPtr];
 				if (currentNode.IsFosterParenting)
 				{
 					InsertIntoFosterParent(clone);
@@ -5057,7 +5057,7 @@ namespace HtmlParserSharp.Portable.Core
 				}
 				Push(entryClone);
 				// stack takes ownership of the local variable
-				listOfActiveFormattingElements[entryPos] = entryClone;
+				_listOfActiveFormattingElements[entryPos] = entryClone;
 				// overwriting the old entry on the list, so release & retain
 			}
 		}
@@ -5065,21 +5065,21 @@ namespace HtmlParserSharp.Portable.Core
 		private void InsertIntoFosterParent(T child)
 		{
 			int eltPos = FindLastOrRoot(DispatchGroup.TABLE);
-			StackNode<T> node = stack[eltPos];
+			StackNode<T> node = _stack[eltPos];
 			T elt = node._node;
 			if (eltPos == 0)
 			{
 				AppendElement(child, elt);
 				return;
 			}
-			InsertFosterParentedChild(child, elt, stack[eltPos - 1]._node);
+			InsertFosterParentedChild(child, elt, _stack[eltPos - 1]._node);
 		}
 
 		private bool IsInStack(StackNode<T> node)
 		{
-			for (int i = currentPtr; i >= 0; i--)
+			for (int i = _currentPtr; i >= 0; i--)
 			{
-				if (stack[i] == node)
+				if (_stack[i] == node)
 				{
 					return true;
 				}
@@ -5089,24 +5089,24 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void Pop()
 		{
-			StackNode<T> node = stack[currentPtr];
+			StackNode<T> node = _stack[_currentPtr];
 			Debug.Assert(ClearLastStackSlot());
-			currentPtr--;
+			_currentPtr--;
 			ElementPopped(node._ns, node._popName, node._node);
 		}
 
 		private void SilentPop()
 		{
-			StackNode<T> node = stack[currentPtr];
+			StackNode<T> node = _stack[_currentPtr];
 			Debug.Assert(ClearLastStackSlot());
-			currentPtr--;
+			_currentPtr--;
 		}
 
 		private void PopOnEof()
 		{
-			StackNode<T> node = stack[currentPtr];
+			StackNode<T> node = _stack[_currentPtr];
 			Debug.Assert(ClearLastStackSlot());
-			currentPtr--;
+			_currentPtr--;
 			MarkMalformedIfScript(node._node);
 			ElementPopped(node._ns, node._popName, node._node);
 		}
@@ -5122,7 +5122,7 @@ namespace HtmlParserSharp.Portable.Core
 					AttributeName name = attributes.GetXmlnsAttributeName(i);
 					if (name == AttributeName.XMLNS)
 					{
-						if (html4)
+						if (_html4)
 						{
 							Err("Attribute \u201Cxmlns\u201D not allowed here. (HTML4-only error.)");
 						}
@@ -5234,7 +5234,7 @@ namespace HtmlParserSharp.Portable.Core
 			StackNode<T> node = new StackNode<T>(ElementName.HTML,
 					elt
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			);
 			Push(node);
@@ -5242,7 +5242,7 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void AppendHtmlElementToDocumentAndPush()
 		{
-			AppendHtmlElementToDocumentAndPush(tokenizer.EmptyAttributes());
+			AppendHtmlElementToDocumentAndPush(_tokenizer.EmptyAttributes());
 		}
 
 		private void AppendToCurrentNodeAndPushHeadElement(HtmlAttributes attributes)
@@ -5252,12 +5252,12 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", "head",
 					attributes);
-			AppendElement(elt, stack[currentPtr]._node);
-			headPointer = elt;
+			AppendElement(elt, _stack[_currentPtr]._node);
+			_headPointer = elt;
 			StackNode<T> node = new StackNode<T>(ElementName.HEAD,
 					elt
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			);
 			Push(node);
@@ -5271,7 +5271,7 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void AppendToCurrentNodeAndPushBodyElement()
 		{
-			AppendToCurrentNodeAndPushBodyElement(tokenizer.EmptyAttributes());
+			AppendToCurrentNodeAndPushBodyElement(_tokenizer.EmptyAttributes());
 		}
 
 		private void AppendToCurrentNodeAndPushFormElementMayFoster(
@@ -5282,8 +5282,8 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", "form",
 					attributes);
-			formPointer = elt;
-			StackNode<T> current = stack[currentPtr];
+			_formPointer = elt;
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5296,7 +5296,7 @@ namespace HtmlParserSharp.Portable.Core
 			StackNode<T> node = new StackNode<T>(ElementName.FORM,
 					elt
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			);
 			Push(node);
@@ -5309,7 +5309,7 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 			// This method can't be called for custom elements
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", elementName.name, attributes);
-			StackNode<T> current = stack[currentPtr];
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5321,7 +5321,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			StackNode<T> node = new StackNode<T>(elementName, elt, attributes.CloneAttributes()
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			);
 			Push(node);
@@ -5335,10 +5335,10 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 			// This method can't be called for custom elements
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", elementName.name, attributes);
-			AppendElement(elt, stack[currentPtr]._node);
+			AppendElement(elt, _stack[_currentPtr]._node);
 			StackNode<T> node = new StackNode<T>(elementName, elt
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			);
 			Push(node);
@@ -5357,7 +5357,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", popName, attributes);
-			StackNode<T> current = stack[currentPtr];
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5369,7 +5369,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			StackNode<T> node = new StackNode<T>(elementName, elt, popName
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			);
 			Push(node);
@@ -5389,7 +5389,7 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/1998/Math/MathML", popName,
 					attributes);
-			StackNode<T> current = stack[currentPtr];
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5408,7 +5408,7 @@ namespace HtmlParserSharp.Portable.Core
 			StackNode<T> node = new StackNode<T>(elementName, elt, popName,
 					markAsHtmlIntegrationPoint
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			);
 			Push(node);
@@ -5440,7 +5440,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/2000/svg", popName, attributes);
-			StackNode<T> current = stack[currentPtr];
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5452,7 +5452,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			StackNode<T> node = new StackNode<T>(elementName, popName, elt
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			);
 			Push(node);
@@ -5464,9 +5464,9 @@ namespace HtmlParserSharp.Portable.Core
 			CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
 			// ]NOCPP]
 			// Can't be called for custom elements
-			T elt = CreateElement("http://www.w3.org/1999/xhtml", elementName.name, attributes, fragment ? null
+			T elt = CreateElement("http://www.w3.org/1999/xhtml", elementName.name, attributes, _fragment ? null
 					: form);
-			StackNode<T> current = stack[currentPtr];
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5478,7 +5478,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			StackNode<T> node = new StackNode<T>(elementName, elt
 				// [NOCPP[
-					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
+					, ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
 				// ]NOCPP]
 			);
 			Push(node);
@@ -5491,8 +5491,8 @@ namespace HtmlParserSharp.Portable.Core
 			CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
 			// ]NOCPP]
 			// Can't be called for custom elements
-			T elt = CreateElement("http://www.w3.org/1999/xhtml", name, attributes, fragment ? null : form);
-			StackNode<T> current = stack[currentPtr];
+			T elt = CreateElement("http://www.w3.org/1999/xhtml", name, attributes, _fragment ? null : form);
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5519,7 +5519,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", popName, attributes);
-			StackNode<T> current = stack[currentPtr];
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5546,7 +5546,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/2000/svg", popName, attributes);
-			StackNode<T> current = stack[currentPtr];
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5572,7 +5572,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/1998/Math/MathML", popName, attributes);
-			StackNode<T> current = stack[currentPtr];
+			StackNode<T> current = _stack[_currentPtr];
 			if (current.IsFosterParenting)
 			{
 				Fatal();
@@ -5593,8 +5593,8 @@ namespace HtmlParserSharp.Portable.Core
 			CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
 			// ]NOCPP]
 			// Can't be called for custom elements
-			T elt = CreateElement("http://www.w3.org/1999/xhtml", name, attributes, fragment ? null : form);
-			StackNode<T> current = stack[currentPtr];
+			T elt = CreateElement("http://www.w3.org/1999/xhtml", name, attributes, _fragment ? null : form);
+			StackNode<T> current = _stack[_currentPtr];
 			AppendElement(elt, current._node);
 			ElementPushed("http://www.w3.org/1999/xhtml", name, elt);
 			ElementPopped("http://www.w3.org/1999/xhtml", name, elt);
@@ -5607,9 +5607,9 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", "form",
 					attributes);
-			formPointer = elt;
+			_formPointer = elt;
 			// ownership transferred to form pointer
-			StackNode<T> current = stack[currentPtr];
+			StackNode<T> current = _stack[_currentPtr];
 			AppendElement(elt, current._node);
 			ElementPushed("http://www.w3.org/1999/xhtml", "form", elt);
 			ElementPopped("http://www.w3.org/1999/xhtml", "form", elt);
@@ -5619,29 +5619,29 @@ namespace HtmlParserSharp.Portable.Core
 
 		private void AccumulateCharactersForced(char[] buf, int start, int length)
 		{
-			int newLen = charBufferLen + length;
-			if (newLen > charBuffer.Length)
+			int newLen = _charBufferLen + length;
+			if (newLen > _charBuffer.Length)
 			{
 				char[] newBuf = new char[newLen];
-				Array.Copy(charBuffer, newBuf, charBufferLen);
-				charBuffer = newBuf;
+				Array.Copy(_charBuffer, newBuf, _charBufferLen);
+				_charBuffer = newBuf;
 			}
-			Array.Copy(buf, start, charBuffer, charBufferLen, length);
-			charBufferLen = newLen;
+			Array.Copy(buf, start, _charBuffer, _charBufferLen, length);
+			_charBufferLen = newLen;
 		}
 
 		// ]NOCPP]
 
 		protected virtual void AccumulateCharacters(char[] buf, int start, int length)
 		{
-			AppendCharacters(stack[currentPtr]._node, buf, start, length);
+			AppendCharacters(_stack[_currentPtr]._node, buf, start, length);
 		}
 
 		// ------------------------------- //
 
 		protected void RequestSuspension()
 		{
-			tokenizer.RequestSuspension();
+			_tokenizer.RequestSuspension();
 		}
 
 		protected abstract T CreateElement([NsUri] string ns, [Local] string name,
@@ -5729,7 +5729,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return wantingComments;
+				return _wantingComments;
 			}
 		}
 
@@ -5737,11 +5737,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return !wantingComments;
+				return !_wantingComments;
 			}
 			set
 			{
-				wantingComments = !value;
+				_wantingComments = !value;
 			}
 		}
 
@@ -5752,11 +5752,11 @@ namespace HtmlParserSharp.Portable.Core
 		 */
 		public void SetFragmentContext([Local] string context)
 		{
-			this.contextName = context;
-			this.contextNamespace = "http://www.w3.org/1999/xhtml";
-			this.contextNode = null;
-			this.fragment = (contextName != null);
-			this.quirks = false;
+			this._contextName = context;
+			this._contextNamespace = "http://www.w3.org/1999/xhtml";
+			this._contextNode = null;
+			this._fragment = (_contextName != null);
+			this._quirks = false;
 		}
 
 		// ]NOCPP]
@@ -5779,7 +5779,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return currentPtr >= 0 && stack[currentPtr]._ns != "http://www.w3.org/1999/xhtml";
+				return _currentPtr >= 0 && _stack[_currentPtr]._ns != "http://www.w3.org/1999/xhtml";
 			}
 		}
 
@@ -5787,9 +5787,9 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return currentPtr >= 0
-					&& stack[currentPtr]._ns != "http://www.w3.org/1999/xhtml"
-					&& !stack[currentPtr].IsHtmlIntegrationPoint;
+				return _currentPtr >= 0
+					&& _stack[_currentPtr]._ns != "http://www.w3.org/1999/xhtml"
+					&& !_stack[_currentPtr].IsHtmlIntegrationPoint;
 			}
 		}
 
@@ -5801,16 +5801,16 @@ namespace HtmlParserSharp.Portable.Core
 		public void SetFragmentContext([Local] string context,
 				[NsUri] string ns, T node, bool quirks)
 		{
-			this.contextName = context;
-			this.contextNamespace = ns;
-			this.contextNode = node;
-			this.fragment = (contextName != null);
-			this.quirks = quirks;
+			this._contextName = context;
+			this._contextNamespace = ns;
+			this._contextNode = node;
+			this._fragment = (_contextName != null);
+			this._quirks = quirks;
 		}
 
 		protected T CurrentNode()
 		{
-			return stack[currentPtr]._node;
+			return _stack[_currentPtr]._node;
 		}
 
 		/// <summary>
@@ -5818,45 +5818,45 @@ namespace HtmlParserSharp.Portable.Core
 		/// </summary>
 		public void FlushCharacters()
 		{
-			if (charBufferLen > 0)
+			if (_charBufferLen > 0)
 			{
-				if ((mode == InsertionMode.IN_TABLE || mode == InsertionMode.IN_TABLE_BODY || mode == InsertionMode.IN_ROW)
+				if ((_mode == InsertionMode.IN_TABLE || _mode == InsertionMode.IN_TABLE_BODY || _mode == InsertionMode.IN_ROW)
 						&& CharBufferContainsNonWhitespace())
 				{
 					Err("Misplaced non-space characters insided a table.");
 					ReconstructTheActiveFormattingElements();
-					if (!stack[currentPtr].IsFosterParenting)
+					if (!_stack[_currentPtr].IsFosterParenting)
 					{
 						// reconstructing gave us a new current node
-						AppendCharacters(CurrentNode(), charBuffer, 0,
-								charBufferLen);
-						charBufferLen = 0;
+						AppendCharacters(CurrentNode(), _charBuffer, 0,
+								_charBufferLen);
+						_charBufferLen = 0;
 						return;
 					}
 					int eltPos = FindLastOrRoot(DispatchGroup.TABLE);
-					StackNode<T> node = stack[eltPos];
+					StackNode<T> node = _stack[eltPos];
 					T elt = node._node;
 					if (eltPos == 0)
 					{
-						AppendCharacters(elt, charBuffer, 0, charBufferLen);
-						charBufferLen = 0;
+						AppendCharacters(elt, _charBuffer, 0, _charBufferLen);
+						_charBufferLen = 0;
 						return;
 					}
-					InsertFosterParentedCharacters(charBuffer, 0, charBufferLen,
-							elt, stack[eltPos - 1]._node);
-					charBufferLen = 0;
+					InsertFosterParentedCharacters(_charBuffer, 0, _charBufferLen,
+							elt, _stack[eltPos - 1]._node);
+					_charBufferLen = 0;
 					return;
 				}
-				AppendCharacters(CurrentNode(), charBuffer, 0, charBufferLen);
-				charBufferLen = 0;
+				AppendCharacters(CurrentNode(), _charBuffer, 0, _charBufferLen);
+				_charBufferLen = 0;
 			}
 		}
 
 		private bool CharBufferContainsNonWhitespace()
 		{
-			for (int i = 0; i < charBufferLen; i++)
+			for (int i = 0; i < _charBufferLen; i++)
 			{
-				switch (charBuffer[i])
+				switch (_charBuffer[i])
 				{
 					case ' ':
 					case '\t':
@@ -5882,10 +5882,10 @@ namespace HtmlParserSharp.Portable.Core
 		/// <returns>A snapshot</returns>
 		public ITreeBuilderState<T> NewSnapshot()
 		{
-			StackNode<T>[] listCopy = new StackNode<T>[listPtr + 1];
+			StackNode<T>[] listCopy = new StackNode<T>[_listPtr + 1];
 			for (int i = 0; i < listCopy.Length; i++)
 			{
-				StackNode<T> node = listOfActiveFormattingElements[i];
+				StackNode<T> node = _listOfActiveFormattingElements[i];
 				if (node != null)
 				{
 					StackNode<T> newNode = new StackNode<T>(node.Flags, node._ns,
@@ -5902,10 +5902,10 @@ namespace HtmlParserSharp.Portable.Core
 					listCopy[i] = null;
 				}
 			}
-			StackNode<T>[] stackCopy = new StackNode<T>[currentPtr + 1];
+			StackNode<T>[] stackCopy = new StackNode<T>[_currentPtr + 1];
 			for (int i = 0; i < stackCopy.Length; i++)
 			{
-				StackNode<T> node = stack[i];
+				StackNode<T> node = _stack[i];
 				int listIndex = FindInListOfActiveFormattingElements(node);
 				if (listIndex == -1)
 				{
@@ -5923,7 +5923,7 @@ namespace HtmlParserSharp.Portable.Core
 					stackCopy[i] = listCopy[listIndex];
 				}
 			}
-			return new StateSnapshot<T>(stackCopy, listCopy, formPointer, headPointer, deepTreeSurrogateParent, mode, originalMode, framesetOk, needToDropLF, quirks);
+			return new StateSnapshot<T>(stackCopy, listCopy, _formPointer, _headPointer, _deepTreeSurrogateParent, _mode, _originalMode, _framesetOk, _needToDropLF, _quirks);
 		}
 
 		public bool SnapshotMatches(ITreeBuilderState<T> snapshot)
@@ -5933,32 +5933,32 @@ namespace HtmlParserSharp.Portable.Core
 			StackNode<T>[] listCopy = snapshot.ListOfActiveFormattingElements;
 			int listLen = snapshot.ListOfActiveFormattingElements.Length;
 
-			if (stackLen != currentPtr + 1
-					|| listLen != listPtr + 1
-					|| formPointer != snapshot.FormPointer
-					|| headPointer != snapshot.HeadPointer
-					|| deepTreeSurrogateParent != snapshot.DeepTreeSurrogateParent
-					|| mode != snapshot.Mode
-					|| originalMode != snapshot.OriginalMode
-					|| framesetOk != snapshot.IsFramesetOk
-					|| needToDropLF != snapshot.IsNeedToDropLF
-					|| quirks != snapshot.IsQuirks)
+			if (stackLen != _currentPtr + 1
+					|| listLen != _listPtr + 1
+					|| _formPointer != snapshot.FormPointer
+					|| _headPointer != snapshot.HeadPointer
+					|| _deepTreeSurrogateParent != snapshot.DeepTreeSurrogateParent
+					|| _mode != snapshot.Mode
+					|| _originalMode != snapshot.OriginalMode
+					|| _framesetOk != snapshot.IsFramesetOk
+					|| _needToDropLF != snapshot.IsNeedToDropLF
+					|| _quirks != snapshot.IsQuirks)
 			{ // maybe just assert quirks
 				return false;
 			}
 			for (int i = listLen - 1; i >= 0; i--)
 			{
 				if (listCopy[i] == null
-						&& listOfActiveFormattingElements[i] == null)
+						&& _listOfActiveFormattingElements[i] == null)
 				{
 					continue;
 				}
 				else if (listCopy[i] == null
-					  || listOfActiveFormattingElements[i] == null)
+					  || _listOfActiveFormattingElements[i] == null)
 				{
 					return false;
 				}
-				if (listCopy[i]._node != listOfActiveFormattingElements[i]._node)
+				if (listCopy[i]._node != _listOfActiveFormattingElements[i]._node)
 				{
 					return false; // it's possible that this condition is overly
 					// strict
@@ -5966,7 +5966,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			for (int i = stackLen - 1; i >= 0; i--)
 			{
-				if (stackCopy[i]._node != stack[i]._node)
+				if (stackCopy[i]._node != _stack[i]._node)
 				{
 					return false;
 				}
@@ -5981,17 +5981,17 @@ namespace HtmlParserSharp.Portable.Core
 			StackNode<T>[] listCopy = snapshot.ListOfActiveFormattingElements;
 			int listLen = snapshot.ListOfActiveFormattingElements.Length;
 
-			if (listOfActiveFormattingElements.Length < listLen)
+			if (_listOfActiveFormattingElements.Length < listLen)
 			{
-				listOfActiveFormattingElements = new StackNode<T>[listLen];
+				_listOfActiveFormattingElements = new StackNode<T>[listLen];
 			}
-			listPtr = listLen - 1;
+			_listPtr = listLen - 1;
 
-			if (stack.Length < stackLen)
+			if (_stack.Length < stackLen)
 			{
-				stack = new StackNode<T>[stackLen];
+				_stack = new StackNode<T>[stackLen];
 			}
-			currentPtr = stackLen - 1;
+			_currentPtr = stackLen - 1;
 
 			for (int i = 0; i < listLen; i++)
 			{
@@ -6006,11 +6006,11 @@ namespace HtmlParserSharp.Portable.Core
 							, node.Locator
 						// ]NOCPP]
 					);
-					listOfActiveFormattingElements[i] = newNode;
+					_listOfActiveFormattingElements[i] = newNode;
 				}
 				else
 				{
-					listOfActiveFormattingElements[i] = null;
+					_listOfActiveFormattingElements[i] = null;
 				}
 			}
 			for (int i = 0; i < stackLen; i++)
@@ -6027,26 +6027,26 @@ namespace HtmlParserSharp.Portable.Core
 							, node.Locator
 						// ]NOCPP]       
 					);
-					stack[i] = newNode;
+					_stack[i] = newNode;
 				}
 				else
 				{
-					stack[i] = listOfActiveFormattingElements[listIndex];
+					_stack[i] = _listOfActiveFormattingElements[listIndex];
 				}
 			}
-			formPointer = snapshot.FormPointer;
-			headPointer = snapshot.HeadPointer;
-			deepTreeSurrogateParent = snapshot.DeepTreeSurrogateParent;
-			mode = snapshot.Mode;
-			originalMode = snapshot.OriginalMode;
-			framesetOk = snapshot.IsFramesetOk;
-			needToDropLF = snapshot.IsNeedToDropLF;
-			quirks = snapshot.IsQuirks;
+			_formPointer = snapshot.FormPointer;
+			_headPointer = snapshot.HeadPointer;
+			_deepTreeSurrogateParent = snapshot.DeepTreeSurrogateParent;
+			_mode = snapshot.Mode;
+			_originalMode = snapshot.OriginalMode;
+			_framesetOk = snapshot.IsFramesetOk;
+			_needToDropLF = snapshot.IsNeedToDropLF;
+			_quirks = snapshot.IsQuirks;
 		}
 
 		private int FindInArray(StackNode<T> node, StackNode<T>[] arr)
 		{
-			for (int i = listPtr; i >= 0; i--)
+			for (int i = _listPtr; i >= 0; i--)
 			{
 				if (node == arr[i])
 				{
@@ -6060,7 +6060,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return formPointer;
+				return _formPointer;
 			}
 		}
 
@@ -6068,7 +6068,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return headPointer;
+				return _headPointer;
 			}
 		}
 
@@ -6076,7 +6076,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return deepTreeSurrogateParent;
+				return _deepTreeSurrogateParent;
 			}
 		}
 
@@ -6087,7 +6087,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return listOfActiveFormattingElements;
+				return _listOfActiveFormattingElements;
 			}
 		}
 
@@ -6098,7 +6098,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return stack;
+				return _stack;
 			}
 		}
 
@@ -6106,7 +6106,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return mode;
+				return _mode;
 			}
 		}
 
@@ -6114,7 +6114,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return originalMode;
+				return _originalMode;
 			}
 		}
 
@@ -6122,7 +6122,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return framesetOk;
+				return _framesetOk;
 			}
 		}
 
@@ -6130,7 +6130,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return needToDropLF;
+				return _needToDropLF;
 			}
 		}
 
@@ -6138,11 +6138,10 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return quirks;
+				return _quirks;
 			}
 		}
 
 		#endregion
 	}
-
 }

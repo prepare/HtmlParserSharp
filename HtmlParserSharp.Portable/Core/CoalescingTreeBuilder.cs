@@ -32,16 +32,16 @@ namespace HtmlParserSharp.Portable.Core
     {
         protected override void AccumulateCharacters(char[] buf, int start, int length)
         {
-            int newLen = charBufferLen + length;
-            if (newLen > charBuffer.Length)
+            int newLen = _charBufferLen + length;
+            if (newLen > _charBuffer.Length)
             {
                 var newBuf = new char[newLen];
-                Array.Copy(charBuffer, newBuf, charBufferLen);
-                charBuffer = null; // release the old buffer in C++
-                charBuffer = newBuf;
+                Array.Copy(_charBuffer, newBuf, _charBufferLen);
+                _charBuffer = null; // release the old buffer in C++
+                _charBuffer = newBuf;
             }
-            Array.Copy(buf, start, charBuffer, charBufferLen, length);
-            charBufferLen = newLen;
+            Array.Copy(buf, start, _charBuffer, _charBufferLen, length);
+            _charBufferLen = newLen;
         }
 
         protected override void AppendCharacters(T parent, char[] buf, int start, int length)
