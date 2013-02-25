@@ -23,67 +23,64 @@
 
 namespace HtmlParserSharp.Portable.Core
 {
-	/// <summary>
-	/// An UTF-16 buffer that knows the start and end indeces of its unconsumed
-	/// content.
-	/// </summary>
-	public sealed class UTF16Buffer
-	{
-		/// <summary>
-		/// Gets the backing store of the buffer. May be larger than the logical content
-		/// of this <code>UTF16Buffer</code>.
-		/// </summary>
-		public char[] Buffer { get; private set; }
+    /// <summary>
+    ///     An UTF-16 buffer that knows the start and end indeces of its unconsumed
+    ///     content.
+    /// </summary>
+    public sealed class UTF16Buffer
+    {
+        /// <summary>
+        ///     Gets the backing store of the buffer. May be larger than the logical content
+        ///     of this <code>UTF16Buffer</code>.
+        /// </summary>
+        public char[] Buffer { get; private set; }
 
-		/// <summary>
-		/// Gets or sets the index of the first unconsumed character in the backing buffer.
-		/// </summary>
-		public int Start { get; set; }
+        /// <summary>
+        ///     Gets or sets the index of the first unconsumed character in the backing buffer.
+        /// </summary>
+        public int Start { get; set; }
 
-		/// <summary>
-		/// Gets or sets the index of the slot immediately after the last character in the backing
-		/// buffer that is part of the logical content of this <code>UTF16Buffer</code>.
-		/// </summary>
-		public int End { get; set; }
+        /// <summary>
+        ///     Gets or sets the index of the slot immediately after the last character in the backing
+        ///     buffer that is part of the logical content of this <code>UTF16Buffer</code>.
+        /// </summary>
+        public int End { get; set; }
 
-		/// <summary>
-		/// Constructor for wrapping an existing UTF-16 code unit array.
-		/// </summary>
-		/// <param name="buffer">The backing buffer.</param>
-		/// <param name="start">The index of the first character to consume.</param>
-		/// <param name="end">The index immediately after the last character to consume.</param>
-		public UTF16Buffer(char[] buffer, int start, int end)
-		{
-			Buffer = buffer;
-			Start = start;
-			End = end;
-		}
+        /// <summary>
+        ///     Constructor for wrapping an existing UTF-16 code unit array.
+        /// </summary>
+        /// <param name="buffer">The backing buffer.</param>
+        /// <param name="start">The index of the first character to consume.</param>
+        /// <param name="end">The index immediately after the last character to consume.</param>
+        public UTF16Buffer(char[] buffer, int start, int end)
+        {
+            Buffer = buffer;
+            Start = start;
+            End = end;
+        }
 
-		/// <summary>
-		/// Determines whether this instance has data left.
-		/// </summary>
-		/// <returns>
-		///   <c>true</c> if there's data left; otherwise, <c>false</c>.
-		/// </returns>
-		public bool HasMore
-		{
-			get
-			{
-				return Start < End;
-			}
-		}
+        /// <summary>
+        ///     Determines whether this instance has data left.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if there's data left; otherwise, <c>false</c>.
+        /// </returns>
+        public bool HasMore
+        {
+            get { return Start < End; }
+        }
 
-		/// <summary>
-		/// Adjusts the start index to skip over the first character if it is a line
-		/// feed and the previous character was a carriage return.
-		/// </summary>
-		/// <param name="lastWasCR">Whether the previous character was a carriage return.</param>
-		public void Adjust(bool lastWasCR)
-		{
-			if (lastWasCR && Buffer[Start] == '\n')
-			{
-				Start++;
-			}
-		}
-	}
+        /// <summary>
+        ///     Adjusts the start index to skip over the first character if it is a line
+        ///     feed and the previous character was a carriage return.
+        /// </summary>
+        /// <param name="lastWasCR">Whether the previous character was a carriage return.</param>
+        public void Adjust(bool lastWasCR)
+        {
+            if (lastWasCR && Buffer[Start] == '\n')
+            {
+                Start++;
+            }
+        }
+    }
 }
