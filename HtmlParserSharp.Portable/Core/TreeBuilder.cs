@@ -37,6 +37,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HtmlParserSharp.Portable.Common;
 
 namespace HtmlParserSharp.Portable.Core
@@ -331,8 +332,7 @@ namespace HtmlParserSharp.Portable.Core
             _framesetOk = true;
             if (_fragment)
             {
-                T elt;
-                elt = _contextNode ?? CreateHtmlElementSetAsRoot(_tokenizer.EmptyAttributes());
+                T elt = _contextNode ?? CreateHtmlElementSetAsRoot(_tokenizer.EmptyAttributes());
                 var node = new StackNode<T>(ElementName.HTML, elt
                                             // [NOCPP[
                                             , ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
@@ -4224,13 +4224,10 @@ namespace HtmlParserSharp.Portable.Core
             }
             if (publicIdentifier != null)
             {
-                for (int i = 0; i < TreeBuilderConstants.QUIRKY_PUBLIC_IDS.Length; i++)
+                if (TreeBuilderConstants.QUIRKY_PUBLIC_IDS.Any(t => Portability.LowerCaseLiteralIsPrefixOfIgnoreAsciiCaseString(
+                    t, publicIdentifier)))
                 {
-                    if (Portability.LowerCaseLiteralIsPrefixOfIgnoreAsciiCaseString(
-                        TreeBuilderConstants.QUIRKY_PUBLIC_IDS[i], publicIdentifier))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
                 if (Portability.LowerCaseLiteralEqualsIgnoreAsciiCaseString(
                     "-//w3o//dtd w3 html strict 3.0//en//", publicIdentifier)
@@ -4311,12 +4308,11 @@ namespace HtmlParserSharp.Portable.Core
         {
             /*[Local]*/
             /*[NsUri]*/
-            string ns;
             for (int i = _currentPtr; i >= 0; i--)
             {
                 StackNode<T> node = _stack[i];
                 string name = node._name;
-                ns = node._ns;
+                string ns = node._ns;
                 if (i == 0)
                 {
                     if (

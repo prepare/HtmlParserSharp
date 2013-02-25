@@ -4300,7 +4300,7 @@ namespace HtmlParserSharp.Portable.Core
                 843809551,
                 878105336,
                 908643300,
-                945213471,
+                945213471
             };
     }
 }
