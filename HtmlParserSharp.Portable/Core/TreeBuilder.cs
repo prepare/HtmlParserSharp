@@ -101,7 +101,7 @@ namespace HtmlParserSharp.Portable.Core
 
         protected int _charBufferLen = 0;
 
-        private bool _quirks = false;
+        private bool _quirks;
 
         // [NOCPP[
 
@@ -332,14 +332,7 @@ namespace HtmlParserSharp.Portable.Core
             if (_fragment)
             {
                 T elt;
-                if (_contextNode != null)
-                {
-                    elt = _contextNode;
-                }
-                else
-                {
-                    elt = CreateHtmlElementSetAsRoot(_tokenizer.EmptyAttributes());
-                }
+                elt = _contextNode ?? CreateHtmlElementSetAsRoot(_tokenizer.EmptyAttributes());
                 var node = new StackNode<T>(ElementName.HTML, elt
                                             // [NOCPP[
                                             , ErrorEvent == null ? null : new TaintableLocator(_tokenizer)
@@ -393,13 +386,9 @@ namespace HtmlParserSharp.Portable.Core
                         if (IsReportingDoctype)
                         {
                             // ]NOCPP]
-                            AppendDoctypeToDocument(name == null ? "" : name,
-                                                    publicIdentifier == null
-                                                        ? String.Empty
-                                                        : publicIdentifier,
-                                                    systemIdentifier == null
-                                                        ? String.Empty
-                                                        : systemIdentifier);
+                            AppendDoctypeToDocument(name ?? String.Empty,
+                                                    publicIdentifier ?? String.Empty,
+                                                    systemIdentifier ?? String.Empty);
                             // [NOCPP[
                         }
                         switch (DoctypeExpectation)
@@ -631,8 +620,6 @@ namespace HtmlParserSharp.Portable.Core
 						 */
                         _mode = InsertionMode.BEFORE_HTML;
                         return;
-                    default:
-                        break;
                 }
             }
             /*
@@ -642,7 +629,6 @@ namespace HtmlParserSharp.Portable.Core
             /*
 			 * Ignore the token.
 			 */
-            return;
         }
 
         // [NOCPP[
@@ -650,7 +636,7 @@ namespace HtmlParserSharp.Portable.Core
         private bool IsHtml4Doctype(string publicIdentifier)
         {
             if (publicIdentifier != null
-                && (Array.BinarySearch<string>(TreeBuilderConstants.HTML4_PUBLIC_IDS,
+                && (Array.BinarySearch(TreeBuilderConstants.HTML4_PUBLIC_IDS,
                                                publicIdentifier) > -1))
             {
                 return true;
@@ -701,8 +687,6 @@ namespace HtmlParserSharp.Portable.Core
                         FlushCharacters();
                         AppendComment(_stack[0]._node, buf, start, length);
                         return;
-                    default:
-                        break;
                 }
             }
             /*
@@ -711,7 +695,6 @@ namespace HtmlParserSharp.Portable.Core
 			 */
             FlushCharacters();
             AppendComment(_stack[_currentPtr]._node, buf, start, length);
-            return;
         }
 
         /// <summary>
@@ -1072,9 +1055,10 @@ namespace HtmlParserSharp.Portable.Core
                                     case InsertionMode.IN_FRAMESET:
                                         if (start < i)
                                         {
-                                            AccumulateCharacters(buf, start, i
-                                                                             - start);
+                                            AccumulateCharacters(buf, start, i - start);
+/*
                                             start = i;
+*/
                                         }
                                         /*
 										 * Parse error.
@@ -1090,7 +1074,9 @@ namespace HtmlParserSharp.Portable.Core
                                         {
                                             AccumulateCharacters(buf, start, i
                                                                              - start);
+/*
                                             start = i;
+*/
                                         }
                                         /*
 										 * Parse error.
@@ -1130,7 +1116,7 @@ namespace HtmlParserSharp.Portable.Core
                         }
 
                         continueCharactersloop:
-                        continue;
+                        ;
                     }
                     if (start < end)
                     {
@@ -1274,12 +1260,9 @@ namespace HtmlParserSharp.Portable.Core
                             Debug.Assert(_fragment);
                             goto breakEofloop;
                         }
-                        else
-                        {
-                            PopOnEof();
-                            _mode = InsertionMode.IN_TABLE;
-                            continue;
-                        }
+                        PopOnEof();
+                        _mode = InsertionMode.IN_TABLE;
+                        continue;
                     case InsertionMode.FRAMESET_OK:
                     case InsertionMode.IN_CAPTION:
                     case InsertionMode.IN_CELL:
@@ -1333,10 +1316,6 @@ namespace HtmlParserSharp.Portable.Core
                             ErrEndWithUnclosedElements("End of file seen and there were open elements.");
                         }
                         goto breakEofloop;
-                    case InsertionMode.AFTER_BODY:
-                    case InsertionMode.AFTER_FRAMESET:
-                    case InsertionMode.AFTER_AFTER_BODY:
-                    case InsertionMode.AFTER_AFTER_FRAMESET:
                     default:
                         // [NOCPP[
                         //if (currentPtr == 0) { // This silliness is here to poison
@@ -1349,7 +1328,7 @@ namespace HtmlParserSharp.Portable.Core
                 }
 
                 continueEofloop:
-                continue;
+                ;
             }
 
             breakEofloop:
@@ -1428,7 +1407,6 @@ namespace HtmlParserSharp.Portable.Core
             }
             // ]NOCPP]
 
-            int eltPos;
             _needToDropLF = false;
             /*starttagloop:*/
             for (;;)
@@ -1488,11 +1466,8 @@ namespace HtmlParserSharp.Portable.Core
                                     }
                                     goto continueStarttagloop;
                                 }
-                                else
-                                {
-                                    // else fall through
-                                    goto default;
-                                }
+                                // else fall through
+                                goto default;
                             default:
                                 if ("http://www.w3.org/2000/svg" == currNs)
                                 {
@@ -1508,29 +1483,25 @@ namespace HtmlParserSharp.Portable.Core
                                         AppendToCurrentNodeAndPushElementMayFosterSVG(
                                             elementName, attributes);
                                     }
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
+                                }
+                                attributes.AdjustForMath();
+                                if (selfClosing)
+                                {
+                                    AppendVoidElementToCurrentMayFosterMathML(
+                                        elementName, attributes);
+                                    selfClosing = false;
                                 }
                                 else
                                 {
-                                    attributes.AdjustForMath();
-                                    if (selfClosing)
-                                    {
-                                        AppendVoidElementToCurrentMayFosterMathML(
-                                            elementName, attributes);
-                                        selfClosing = false;
-                                    }
-                                    else
-                                    {
-                                        AppendToCurrentNodeAndPushElementMayFosterMathML(
-                                            elementName, attributes);
-                                    }
-                                    attributes = null; // CPP
-                                    goto breakStarttagloop;
+                                    AppendToCurrentNodeAndPushElementMayFosterMathML(
+                                        elementName, attributes);
                                 }
+                                goto breakStarttagloop;
                         } // switch
                     } // foreignObject / annotation-xml
                 }
+                int eltPos;
                 switch (_mode)
                 {
                     case InsertionMode.IN_TABLE_BODY:
@@ -1542,7 +1513,6 @@ namespace HtmlParserSharp.Portable.Core
                                     elementName,
                                     attributes);
                                 _mode = InsertionMode.IN_ROW;
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.TD_OR_TH:
                                 Err("\u201C" + name
@@ -1563,16 +1533,11 @@ namespace HtmlParserSharp.Portable.Core
                                     ErrStrayStartTag(name);
                                     goto breakStarttagloop;
                                 }
-                                else
-                                {
-                                    ClearStackBackTo(eltPos);
-                                    Pop();
-                                    _mode = InsertionMode.IN_TABLE;
-                                    continue;
-                                }
-                            default:
+                                ClearStackBackTo(eltPos);
+                                Pop();
+                                _mode = InsertionMode.IN_TABLE;
+                                continue;
                                 // fall through to IN_TABLE (TODO: IN_ROW?)
-                                break;
                         }
                         goto case InsertionMode.IN_ROW;
                     case InsertionMode.IN_ROW:
@@ -1585,7 +1550,6 @@ namespace HtmlParserSharp.Portable.Core
                                     attributes);
                                 _mode = InsertionMode.IN_CELL;
                                 InsertMarker();
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.CAPTION:
                             case DispatchGroup.COL:
@@ -1603,9 +1567,7 @@ namespace HtmlParserSharp.Portable.Core
                                 Pop();
                                 _mode = InsertionMode.IN_TABLE_BODY;
                                 continue;
-                            default:
                                 // fall through to IN_TABLE
-                                break;
                         }
                         goto case InsertionMode.IN_TABLE;
                     case InsertionMode.IN_TABLE:
@@ -1621,7 +1583,6 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     _mode = InsertionMode.IN_CAPTION;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.COLGROUP:
                                     ClearStackBackTo(FindLastOrRoot(DispatchGroup.TABLE));
@@ -1629,7 +1590,6 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     _mode = InsertionMode.IN_COLUMN_GROUP;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.COL:
                                     ClearStackBackTo(FindLastOrRoot(DispatchGroup.TABLE));
@@ -1644,7 +1604,6 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     _mode = InsertionMode.IN_TABLE_BODY;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.TR:
                                 case DispatchGroup.TD_OR_TH:
@@ -1687,7 +1646,6 @@ namespace HtmlParserSharp.Portable.Core
                                     _mode = InsertionMode.TEXT;
                                     _tokenizer.SetStateAndEndTagExpectation(
                                         Tokenizer.SCRIPT_DATA, elementName);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.STYLE:
                                     AppendToCurrentNodeAndPushElement(
@@ -1697,7 +1655,6 @@ namespace HtmlParserSharp.Portable.Core
                                     _mode = InsertionMode.TEXT;
                                     _tokenizer.SetStateAndEndTagExpectation(
                                         Tokenizer.RAWTEXT, elementName);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.INPUT:
                                     if (!Portability.LowerCaseLiteralEqualsIgnoreAsciiCaseString(
@@ -1710,7 +1667,6 @@ namespace HtmlParserSharp.Portable.Core
                                         name, attributes,
                                         _formPointer);
                                     selfClosing = false;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.FORM:
                                     if (_formPointer != null)
@@ -1719,13 +1675,9 @@ namespace HtmlParserSharp.Portable.Core
                                             "Saw a \u201Cform\u201D start tag, but there was already an active \u201Cform\u201D element. Nested forms are not allowed. Ignoring the tag.");
                                         goto breakStarttagloop;
                                     }
-                                    else
-                                    {
-                                        Err("Start tag \u201Cform\u201D seen in \u201Ctable\u201D.");
-                                        AppendVoidFormToCurrent(attributes);
-                                        attributes = null; // CPP
-                                        goto breakStarttagloop;
-                                    }
+                                    Err("Start tag \u201Cform\u201D seen in \u201Ctable\u201D.");
+                                    AppendVoidFormToCurrent(attributes);
+                                    goto breakStarttagloop;
                                 default:
                                     Err("Start tag \u201C" + name
                                         + "\u201D seen in \u201Ctable\u201D.");
@@ -1764,9 +1716,7 @@ namespace HtmlParserSharp.Portable.Core
                                 ClearTheListOfActiveFormattingElementsUpToTheLastMarker();
                                 _mode = InsertionMode.IN_TABLE;
                                 continue;
-                            default:
                                 // fall through to IN_BODY (TODO: IN_CELL?)
-                                break;
                         }
                         goto case InsertionMode.IN_CELL;
                     case InsertionMode.IN_CELL:
@@ -1784,14 +1734,9 @@ namespace HtmlParserSharp.Portable.Core
                                     Err("No cell to close.");
                                     goto breakStarttagloop;
                                 }
-                                else
-                                {
-                                    CloseTheCell(eltPos);
-                                    continue;
-                                }
-                            default:
+                                CloseTheCell(eltPos);
+                                continue;
                                 // fall through to IN_BODY (TODO: FRAMESET_OK?)
-                                break;
                         }
                         goto case InsertionMode.FRAMESET_OK;
                     case InsertionMode.FRAMESET_OK:
@@ -1806,27 +1751,20 @@ namespace HtmlParserSharp.Portable.Core
                                         ErrStrayStartTag(name);
                                         goto breakStarttagloop;
                                     }
-                                    else
+                                    Err("\u201Cframeset\u201D start tag seen.");
+                                    DetachFromParent(_stack[1]._node);
+                                    while (_currentPtr > 0)
                                     {
-                                        Err("\u201Cframeset\u201D start tag seen.");
-                                        DetachFromParent(_stack[1]._node);
-                                        while (_currentPtr > 0)
-                                        {
-                                            Pop();
-                                        }
-                                        AppendToCurrentNodeAndPushElement(
-                                            elementName,
-                                            attributes);
-                                        _mode = InsertionMode.IN_FRAMESET;
-                                        attributes = null; // CPP
-                                        goto breakStarttagloop;
+                                        Pop();
                                     }
-                                }
-                                else
-                                {
-                                    ErrStrayStartTag(name);
+                                    AppendToCurrentNodeAndPushElement(
+                                        elementName,
+                                        attributes);
+                                    _mode = InsertionMode.IN_FRAMESET;
                                     goto breakStarttagloop;
                                 }
+                                ErrStrayStartTag(name);
+                                goto breakStarttagloop;
                                 // NOT falling through!
                             case DispatchGroup.PRE_OR_LISTING:
                             case DispatchGroup.LI:
@@ -1857,9 +1795,7 @@ namespace HtmlParserSharp.Portable.Core
                                 }
                                 // fall through to IN_BODY
                                 break;
-                            default:
                                 // fall through to IN_BODY
-                                break;
                         }
                         goto case InsertionMode.IN_BODY;
                     case InsertionMode.IN_BODY:
@@ -1873,7 +1809,6 @@ namespace HtmlParserSharp.Portable.Core
                                     if (!_fragment)
                                     {
                                         AddAttributesToHtml(attributes);
-                                        attributes = null; // CPP
                                     }
                                     goto breakStarttagloop;
                                 case DispatchGroup.BASE:
@@ -1900,10 +1835,6 @@ namespace HtmlParserSharp.Portable.Core
                                     {
                                         _mode = InsertionMode.IN_BODY;
                                     }
-                                    if (AddAttributesToBody(attributes))
-                                    {
-                                        attributes = null; // CPP
-                                    }
                                     goto breakStarttagloop;
                                 case DispatchGroup.P:
                                 case DispatchGroup.DIV_OR_BLOCKQUOTE_OR_CENTER_OR_MENU:
@@ -1916,7 +1847,6 @@ namespace HtmlParserSharp.Portable.Core
                                     AppendToCurrentNodeAndPushElementMayFoster(
                                         elementName,
                                         attributes);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.H1_OR_H2_OR_H3_OR_H4_OR_H5_OR_H6:
                                     ImplicitlyCloseP();
@@ -1928,14 +1858,12 @@ namespace HtmlParserSharp.Portable.Core
                                     AppendToCurrentNodeAndPushElementMayFoster(
                                         elementName,
                                         attributes);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.FIELDSET:
                                     ImplicitlyCloseP();
                                     AppendToCurrentNodeAndPushElementMayFoster(
                                         elementName,
                                         attributes, _formPointer);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.PRE_OR_LISTING:
                                     ImplicitlyCloseP();
@@ -1943,7 +1871,6 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     _needToDropLF = true;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.FORM:
                                     if (_formPointer != null)
@@ -1952,13 +1879,9 @@ namespace HtmlParserSharp.Portable.Core
                                             "Saw a \u201Cform\u201D start tag, but there was already an active \u201Cform\u201D element. Nested forms are not allowed. Ignoring the tag.");
                                         goto breakStarttagloop;
                                     }
-                                    else
-                                    {
-                                        ImplicitlyCloseP();
-                                        AppendToCurrentNodeAndPushFormElementMayFoster(attributes);
-                                        attributes = null; // CPP
-                                        goto breakStarttagloop;
-                                    }
+                                    ImplicitlyCloseP();
+                                    AppendToCurrentNodeAndPushFormElementMayFoster(attributes);
+                                    goto breakStarttagloop;
                                 case DispatchGroup.LI:
                                 case DispatchGroup.DD_OR_DT:
                                     eltPos = _currentPtr;
@@ -1982,10 +1905,10 @@ namespace HtmlParserSharp.Portable.Core
                                             }
                                             break;
                                         }
-                                        else if (node.IsScoping
-                                                 || (node.IsSpecial
-                                                     && node._name != "p"
-                                                     && node._name != "address" && node._name != "div"))
+                                        if (node.IsScoping
+                                            || (node.IsSpecial
+                                                && node._name != "p"
+                                                && node._name != "address" && node._name != "div"))
                                         {
                                             break;
                                         }
@@ -1995,7 +1918,6 @@ namespace HtmlParserSharp.Portable.Core
                                     AppendToCurrentNodeAndPushElementMayFoster(
                                         elementName,
                                         attributes);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.PLAINTEXT:
                                     ImplicitlyCloseP();
@@ -2004,7 +1926,6 @@ namespace HtmlParserSharp.Portable.Core
                                         attributes);
                                     _tokenizer.SetStateAndEndTagExpectation(
                                         Tokenizer.PLAINTEXT, elementName);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.A:
                                     int activeAPos =
@@ -2026,7 +1947,6 @@ namespace HtmlParserSharp.Portable.Core
                                     AppendToCurrentNodeAndPushFormattingElementMayFoster(
                                         elementName,
                                         attributes);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case
                                     DispatchGroup
@@ -2037,7 +1957,6 @@ namespace HtmlParserSharp.Portable.Core
                                     AppendToCurrentNodeAndPushFormattingElementMayFoster(
                                         elementName,
                                         attributes);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.NOBR:
                                     ReconstructTheActiveFormattingElements();
@@ -2051,7 +1970,6 @@ namespace HtmlParserSharp.Portable.Core
                                     AppendToCurrentNodeAndPushFormattingElementMayFoster(
                                         elementName,
                                         attributes);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.BUTTON:
                                     eltPos = FindLastInScope(name);
@@ -2071,22 +1989,17 @@ namespace HtmlParserSharp.Portable.Core
                                         }
                                         goto continueStarttagloop;
                                     }
-                                    else
-                                    {
-                                        ReconstructTheActiveFormattingElements();
-                                        AppendToCurrentNodeAndPushElementMayFoster(
-                                            elementName,
-                                            attributes, _formPointer);
-                                        attributes = null; // CPP
-                                        goto breakStarttagloop;
-                                    }
+                                    ReconstructTheActiveFormattingElements();
+                                    AppendToCurrentNodeAndPushElementMayFoster(
+                                        elementName,
+                                        attributes, _formPointer);
+                                    goto breakStarttagloop;
                                 case DispatchGroup.OBJECT:
                                     ReconstructTheActiveFormattingElements();
                                     AppendToCurrentNodeAndPushElementMayFoster(
                                         elementName,
                                         attributes, _formPointer);
                                     InsertMarker();
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.MARQUEE_OR_APPLET:
                                     ReconstructTheActiveFormattingElements();
@@ -2094,7 +2007,6 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     InsertMarker();
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.TABLE:
                                     // The only quirk. Blame Hixie and
@@ -2107,7 +2019,6 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     _mode = InsertionMode.IN_TABLE;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.BR:
                                 case DispatchGroup.EMBED_OR_IMG:
@@ -2120,7 +2031,6 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     selfClosing = false;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.HR:
                                     ImplicitlyCloseP();
@@ -2128,7 +2038,6 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     selfClosing = false;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.IMAGE:
                                     Err("Saw a start tag \u201Cimage\u201D.");
@@ -2141,7 +2050,6 @@ namespace HtmlParserSharp.Portable.Core
                                         name, attributes,
                                         _formPointer);
                                     selfClosing = false;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.ISINDEX:
                                     Err("\u201Cisindex\u201D seen.");
@@ -2232,7 +2140,6 @@ namespace HtmlParserSharp.Portable.Core
                                     _originalMode = _mode;
                                     _mode = InsertionMode.TEXT;
                                     _needToDropLF = true;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.XMP:
                                     ImplicitlyCloseP();
@@ -2244,7 +2151,6 @@ namespace HtmlParserSharp.Portable.Core
                                     _mode = InsertionMode.TEXT;
                                     _tokenizer.SetStateAndEndTagExpectation(
                                         Tokenizer.RAWTEXT, elementName);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.NOSCRIPT:
                                     if (!IsScriptingEnabled)
@@ -2253,14 +2159,10 @@ namespace HtmlParserSharp.Portable.Core
                                         AppendToCurrentNodeAndPushElementMayFoster(
                                             elementName,
                                             attributes);
-                                        attributes = null; // CPP
                                         goto breakStarttagloop;
                                     }
-                                    else
-                                    {
-                                        // fall through
-                                        goto case DispatchGroup.NOFRAMES;
-                                    }
+                                    // fall through
+                                    goto case DispatchGroup.NOFRAMES;
                                 case DispatchGroup.NOFRAMES:
                                 case DispatchGroup.IFRAME:
                                 case DispatchGroup.NOEMBED:
@@ -2271,7 +2173,6 @@ namespace HtmlParserSharp.Portable.Core
                                     _mode = InsertionMode.TEXT;
                                     _tokenizer.SetStateAndEndTagExpectation(
                                         Tokenizer.RAWTEXT, elementName);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.SELECT:
                                     ReconstructTheActiveFormattingElements();
@@ -2292,7 +2193,6 @@ namespace HtmlParserSharp.Portable.Core
                                             _mode = InsertionMode.IN_SELECT;
                                             break;
                                     }
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.OPTGROUP:
                                 case DispatchGroup.OPTION:
@@ -2304,7 +2204,6 @@ namespace HtmlParserSharp.Portable.Core
                                     AppendToCurrentNodeAndPushElementMayFoster(
                                         elementName,
                                         attributes);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.RT_OR_RP:
                                     /*
@@ -2346,7 +2245,6 @@ namespace HtmlParserSharp.Portable.Core
                                     AppendToCurrentNodeAndPushElementMayFoster(
                                         elementName,
                                         attributes);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.MATH:
                                     ReconstructTheActiveFormattingElements();
@@ -2362,7 +2260,6 @@ namespace HtmlParserSharp.Portable.Core
                                         AppendToCurrentNodeAndPushElementMayFosterMathML(
                                             elementName, attributes);
                                     }
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.SVG:
                                     ReconstructTheActiveFormattingElements();
@@ -2379,7 +2276,6 @@ namespace HtmlParserSharp.Portable.Core
                                         AppendToCurrentNodeAndPushElementMayFosterSVG(
                                             elementName, attributes);
                                     }
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.CAPTION:
                                 case DispatchGroup.COL:
@@ -2397,14 +2293,12 @@ namespace HtmlParserSharp.Portable.Core
                                     AppendToCurrentNodeAndPushElementMayFoster(
                                         elementName,
                                         attributes, _formPointer);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 default:
                                     ReconstructTheActiveFormattingElements();
                                     AppendToCurrentNodeAndPushElementMayFoster(
                                         elementName,
                                         attributes);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                             }
                         }
@@ -2423,7 +2317,6 @@ namespace HtmlParserSharp.Portable.Core
                                     if (!_fragment)
                                     {
                                         AddAttributesToHtml(attributes);
-                                        attributes = null; // CPP
                                     }
                                     goto breakStarttagloop;
                                 case DispatchGroup.BASE:
@@ -2432,7 +2325,6 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     selfClosing = false;
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.META:
                                 case DispatchGroup.LINK_OR_BASEFONT_OR_BGSOUND:
@@ -2446,7 +2338,6 @@ namespace HtmlParserSharp.Portable.Core
                                     _mode = InsertionMode.TEXT;
                                     _tokenizer.SetStateAndEndTagExpectation(
                                         Tokenizer.RCDATA, elementName);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.NOSCRIPT:
                                     if (IsScriptingEnabled)
@@ -2466,7 +2357,6 @@ namespace HtmlParserSharp.Portable.Core
                                             attributes);
                                         _mode = InsertionMode.IN_HEAD_NOSCRIPT;
                                     }
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.SCRIPT:
                                     // XXX need to manage much more stuff
@@ -2480,7 +2370,6 @@ namespace HtmlParserSharp.Portable.Core
                                     _mode = InsertionMode.TEXT;
                                     _tokenizer.SetStateAndEndTagExpectation(
                                         Tokenizer.SCRIPT_DATA, elementName);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.STYLE:
                                 case DispatchGroup.NOFRAMES:
@@ -2491,7 +2380,6 @@ namespace HtmlParserSharp.Portable.Core
                                     _mode = InsertionMode.TEXT;
                                     _tokenizer.SetStateAndEndTagExpectation(
                                         Tokenizer.RAWTEXT, elementName);
-                                    attributes = null; // CPP
                                     goto breakStarttagloop;
                                 case DispatchGroup.HEAD:
                                     /* Parse error. */
@@ -2518,7 +2406,6 @@ namespace HtmlParserSharp.Portable.Core
                                 if (!_fragment)
                                 {
                                     AddAttributesToHtml(attributes);
-                                    attributes = null; // CPP
                                 }
                                 goto breakStarttagloop;
                             case DispatchGroup.LINK_OR_BASEFONT_OR_BGSOUND:
@@ -2526,7 +2413,6 @@ namespace HtmlParserSharp.Portable.Core
                                     elementName,
                                     attributes);
                                 selfClosing = false;
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.META:
                                 CheckMetaCharset(attributes);
@@ -2534,7 +2420,6 @@ namespace HtmlParserSharp.Portable.Core
                                     elementName,
                                     attributes);
                                 selfClosing = false;
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.STYLE:
                             case DispatchGroup.NOFRAMES:
@@ -2545,7 +2430,6 @@ namespace HtmlParserSharp.Portable.Core
                                 _mode = InsertionMode.TEXT;
                                 _tokenizer.SetStateAndEndTagExpectation(
                                     Tokenizer.RAWTEXT, elementName);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.HEAD:
                                 Err("Start tag for \u201Chead\u201D seen when \u201Chead\u201D was already open.");
@@ -2569,7 +2453,6 @@ namespace HtmlParserSharp.Portable.Core
                                 if (!_fragment)
                                 {
                                     AddAttributesToHtml(attributes);
-                                    attributes = null; // CPP
                                 }
                                 goto breakStarttagloop;
                             case DispatchGroup.COL:
@@ -2577,7 +2460,6 @@ namespace HtmlParserSharp.Portable.Core
                                     elementName,
                                     attributes);
                                 selfClosing = false;
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             default:
                                 if (_currentPtr == 0)
@@ -2613,9 +2495,7 @@ namespace HtmlParserSharp.Portable.Core
                                 }
                                 ResetTheInsertionMode();
                                 continue;
-                            default:
                                 // fall through to IN_SELECT
-                                break;
                         }
                         goto case InsertionMode.IN_SELECT;
                     case InsertionMode.IN_SELECT:
@@ -2626,7 +2506,6 @@ namespace HtmlParserSharp.Portable.Core
                                 if (!_fragment)
                                 {
                                     AddAttributesToHtml(attributes);
-                                    attributes = null; // CPP
                                 }
                                 goto breakStarttagloop;
                             case DispatchGroup.OPTION:
@@ -2637,7 +2516,6 @@ namespace HtmlParserSharp.Portable.Core
                                 AppendToCurrentNodeAndPushElement(
                                     elementName,
                                     attributes);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.OPTGROUP:
                                 if (IsCurrent("option"))
@@ -2651,7 +2529,6 @@ namespace HtmlParserSharp.Portable.Core
                                 AppendToCurrentNodeAndPushElement(
                                     elementName,
                                     attributes);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.SELECT:
                                 Err("\u201Cselect\u201D start tag where end tag expected.");
@@ -2662,15 +2539,12 @@ namespace HtmlParserSharp.Portable.Core
                                     Err("No \u201Cselect\u201D in table scope.");
                                     goto breakStarttagloop;
                                 }
-                                else
+                                while (_currentPtr >= eltPos)
                                 {
-                                    while (_currentPtr >= eltPos)
-                                    {
-                                        Pop();
-                                    }
-                                    ResetTheInsertionMode();
-                                    goto breakStarttagloop;
+                                    Pop();
                                 }
+                                ResetTheInsertionMode();
+                                goto breakStarttagloop;
                             case DispatchGroup.INPUT:
                             case DispatchGroup.TEXTAREA:
                             case DispatchGroup.KEYGEN:
@@ -2701,7 +2575,6 @@ namespace HtmlParserSharp.Portable.Core
                                 _mode = InsertionMode.TEXT;
                                 _tokenizer.SetStateAndEndTagExpectation(
                                     Tokenizer.SCRIPT_DATA, elementName);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             default:
                                 ErrStrayStartTag(name);
@@ -2715,7 +2588,6 @@ namespace HtmlParserSharp.Portable.Core
                                 if (!_fragment)
                                 {
                                     AddAttributesToHtml(attributes);
-                                    attributes = null; // CPP
                                 }
                                 goto breakStarttagloop;
                             default:
@@ -2730,18 +2602,14 @@ namespace HtmlParserSharp.Portable.Core
                                 AppendToCurrentNodeAndPushElement(
                                     elementName,
                                     attributes);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.FRAME:
                                 AppendVoidElementToCurrentMayFoster(
                                     elementName,
                                     attributes);
                                 selfClosing = false;
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
-                            default:
                                 // fall through to AFTER_FRAMESET
-                                break;
                         }
                         goto case InsertionMode.AFTER_FRAMESET;
                     case InsertionMode.AFTER_FRAMESET:
@@ -2752,7 +2620,6 @@ namespace HtmlParserSharp.Portable.Core
                                 if (!_fragment)
                                 {
                                     AddAttributesToHtml(attributes);
-                                    attributes = null; // CPP
                                 }
                                 goto breakStarttagloop;
                             case DispatchGroup.NOFRAMES:
@@ -2763,7 +2630,6 @@ namespace HtmlParserSharp.Portable.Core
                                 _mode = InsertionMode.TEXT;
                                 _tokenizer.SetStateAndEndTagExpectation(
                                     Tokenizer.RAWTEXT, elementName);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             default:
                                 ErrStrayStartTag(name);
@@ -2832,7 +2698,6 @@ namespace HtmlParserSharp.Portable.Core
                                 }
                                 // XXX application cache should fire here
                                 _mode = InsertionMode.BEFORE_HEAD;
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             default:
                                 /*
@@ -2856,7 +2721,6 @@ namespace HtmlParserSharp.Portable.Core
                                 if (!_fragment)
                                 {
                                     AddAttributesToHtml(attributes);
-                                    attributes = null; // CPP
                                 }
                                 goto breakStarttagloop;
                             case DispatchGroup.HEAD:
@@ -2876,7 +2740,6 @@ namespace HtmlParserSharp.Portable.Core
 								 * Change the insertion mode to "in head".
 								 */
                                 _mode = InsertionMode.IN_HEAD;
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             default:
                                 /*
@@ -2904,7 +2767,6 @@ namespace HtmlParserSharp.Portable.Core
                                 if (!_fragment)
                                 {
                                     AddAttributesToHtml(attributes);
-                                    attributes = null; // CPP
                                 }
                                 goto breakStarttagloop;
                             case DispatchGroup.BODY:
@@ -2922,14 +2784,12 @@ namespace HtmlParserSharp.Portable.Core
                                 }
                                 _framesetOk = false;
                                 _mode = InsertionMode.IN_BODY;
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.FRAMESET:
                                 AppendToCurrentNodeAndPushElement(
                                     elementName,
                                     attributes);
                                 _mode = InsertionMode.IN_FRAMESET;
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.BASE:
                                 Err("\u201Cbase\u201D element outside \u201Chead\u201D.");
@@ -2939,7 +2799,6 @@ namespace HtmlParserSharp.Portable.Core
                                     attributes);
                                 selfClosing = false;
                                 Pop(); // head
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.LINK_OR_BASEFONT_OR_BGSOUND:
                                 Err("\u201Clink\u201D element outside \u201Chead\u201D.");
@@ -2949,7 +2808,6 @@ namespace HtmlParserSharp.Portable.Core
                                     attributes);
                                 selfClosing = false;
                                 Pop(); // head
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.META:
                                 Err("\u201Cmeta\u201D element outside \u201Chead\u201D.");
@@ -2960,7 +2818,6 @@ namespace HtmlParserSharp.Portable.Core
                                     attributes);
                                 selfClosing = false;
                                 Pop(); // head
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.SCRIPT:
                                 Err("\u201Cscript\u201D element between \u201Chead\u201D and \u201Cbody\u201D.");
@@ -2972,7 +2829,6 @@ namespace HtmlParserSharp.Portable.Core
                                 _mode = InsertionMode.TEXT;
                                 _tokenizer.SetStateAndEndTagExpectation(
                                     Tokenizer.SCRIPT_DATA, elementName);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.STYLE:
                             case DispatchGroup.NOFRAMES:
@@ -2987,7 +2843,6 @@ namespace HtmlParserSharp.Portable.Core
                                 _mode = InsertionMode.TEXT;
                                 _tokenizer.SetStateAndEndTagExpectation(
                                     Tokenizer.RAWTEXT, elementName);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.TITLE:
                                 Err("\u201Ctitle\u201D element outside \u201Chead\u201D.");
@@ -2999,7 +2854,6 @@ namespace HtmlParserSharp.Portable.Core
                                 _mode = InsertionMode.TEXT;
                                 _tokenizer.SetStateAndEndTagExpectation(
                                     Tokenizer.RCDATA, elementName);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             case DispatchGroup.HEAD:
                                 ErrStrayStartTag(name);
@@ -3017,7 +2871,6 @@ namespace HtmlParserSharp.Portable.Core
                                 if (!_fragment)
                                 {
                                     AddAttributesToHtml(attributes);
-                                    attributes = null; // CPP
                                 }
                                 goto breakStarttagloop;
                             default:
@@ -3034,7 +2887,6 @@ namespace HtmlParserSharp.Portable.Core
                                 if (!_fragment)
                                 {
                                     AddAttributesToHtml(attributes);
-                                    attributes = null; // CPP
                                 }
                                 goto breakStarttagloop;
                             case DispatchGroup.NOFRAMES:
@@ -3045,7 +2897,6 @@ namespace HtmlParserSharp.Portable.Core
                                 _mode = InsertionMode.TEXT;
                                 _tokenizer.SetStateAndEndTagExpectation(
                                     Tokenizer.SCRIPT_DATA, elementName);
-                                attributes = null; // CPP
                                 goto breakStarttagloop;
                             default:
                                 ErrStrayStartTag(name);
@@ -3057,7 +2908,7 @@ namespace HtmlParserSharp.Portable.Core
                 }
 
                 continueStarttagloop:
-                continue;
+                ;
             }
 
             breakStarttagloop:
@@ -3292,13 +3143,13 @@ namespace HtmlParserSharp.Portable.Core
         {
             FlushCharacters();
             _needToDropLF = false;
-            int eltPos;
             DispatchGroup group = elementName.Group;
             /*[Local]*/
             string name = elementName.name;
             /*endtagloop:*/
             for (;;)
             {
+                int eltPos;
                 if (IsInForeign)
                 {
                     if (ErrorEvent != null && _stack[_currentPtr]._name != name)
@@ -3379,9 +3230,7 @@ namespace HtmlParserSharp.Portable.Core
                             case DispatchGroup.TD_OR_TH:
                                 ErrStrayEndTag(name);
                                 goto breakEndtagloop;
-                            default:
                                 // fall through to IN_TABLE (TODO: IN_TABLE_BODY?)
-                                break;
                         }
 
                         goto case InsertionMode.IN_TABLE_BODY;
@@ -3420,9 +3269,7 @@ namespace HtmlParserSharp.Portable.Core
                             case DispatchGroup.TR:
                                 ErrStrayEndTag(name);
                                 goto breakEndtagloop;
-                            default:
                                 // fall through to IN_TABLE
-                                break;
                         }
                         goto case InsertionMode.IN_TABLE;
                     case InsertionMode.IN_TABLE:
@@ -3507,9 +3354,7 @@ namespace HtmlParserSharp.Portable.Core
                             case DispatchGroup.TR:
                                 ErrStrayEndTag(name);
                                 goto breakEndtagloop;
-                            default:
                                 // fall through to IN_BODY (TODO: IN_CELL?)
-                                break;
                         }
                         goto case InsertionMode.IN_CELL;
                     case InsertionMode.IN_CELL:
@@ -3551,9 +3396,7 @@ namespace HtmlParserSharp.Portable.Core
                             case DispatchGroup.HTML:
                                 ErrStrayEndTag(name);
                                 goto breakEndtagloop;
-                            default:
                                 // fall through to IN_BODY
-                                break;
                         }
                         goto case InsertionMode.IN_BODY;
                     case InsertionMode.FRAMESET_OK:
@@ -3827,11 +3670,8 @@ namespace HtmlParserSharp.Portable.Core
                                     ErrStrayEndTag(name);
                                     goto breakEndtagloop;
                                 }
-                                else
-                                {
-                                    // fall through
-                                    goto case DispatchGroup.A;
-                                }
+                                // fall through
+                                goto case DispatchGroup.A;
                             case DispatchGroup.A:
                             case DispatchGroup.B_OR_BIG_OR_CODE_OR_EM_OR_I_OR_S_OR_SMALL_OR_STRIKE_OR_STRONG_OR_TT_OR_U:
                             case DispatchGroup.FONT:
@@ -3840,11 +3680,8 @@ namespace HtmlParserSharp.Portable.Core
                                 {
                                     goto breakEndtagloop;
                                 }
-                                else
-                                {
-                                    // else handle like any other tag
-                                    goto default;
-                                }
+                                // else handle like any other tag
+                                goto default;
                             default:
                                 if (IsCurrent(name))
                                 {
@@ -3870,7 +3707,7 @@ namespace HtmlParserSharp.Portable.Core
                                         }
                                         goto breakEndtagloop;
                                     }
-                                    else if (node.IsSpecial)
+                                    if (node.IsSpecial)
                                     {
                                         ErrStrayEndTag(name);
                                         goto breakEndtagloop;
@@ -3931,12 +3768,7 @@ namespace HtmlParserSharp.Portable.Core
                                     ResetTheInsertionMode();
                                     continue;
                                 }
-                                else
-                                {
-                                    goto breakEndtagloop;
-                                }
-                            default:
-                                break;
+                                goto breakEndtagloop;
                                 // fall through to IN_SELECT
                         }
                         goto case InsertionMode.IN_SELECT;
@@ -3949,11 +3781,8 @@ namespace HtmlParserSharp.Portable.Core
                                     Pop();
                                     goto breakEndtagloop;
                                 }
-                                else
-                                {
-                                    ErrStrayEndTag(name);
-                                    goto breakEndtagloop;
-                                }
+                                ErrStrayEndTag(name);
+                                goto breakEndtagloop;
                             case DispatchGroup.OPTGROUP:
                                 if (IsCurrent("option")
                                     && "optgroup" == _stack[_currentPtr - 1]._name)
@@ -3996,11 +3825,8 @@ namespace HtmlParserSharp.Portable.Core
                                     ErrStrayEndTag(name);
                                     goto breakEndtagloop;
                                 }
-                                else
-                                {
-                                    _mode = InsertionMode.AFTER_AFTER_BODY;
-                                    goto breakEndtagloop;
-                                }
+                                _mode = InsertionMode.AFTER_AFTER_BODY;
+                                goto breakEndtagloop;
                             default:
                                 Err("Saw an end tag after \u201Cbody\u201D had been closed.");
                                 _mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
@@ -4181,7 +4007,7 @@ namespace HtmlParserSharp.Portable.Core
             } // endtagloop
 
             breakEndtagloop:
-            return;
+            ;
         }
 
         private int FindLastInTableScopeOrRootTbodyTheadTfoot()
@@ -4216,7 +4042,7 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     return i;
                 }
-                else if (_stack[i]._name == "table")
+                if (_stack[i]._name == "table")
                 {
                     return TreeBuilderConstants.NOT_FOUND_ON_STACK;
                 }
@@ -4232,7 +4058,7 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     return i;
                 }
-                else if (_stack[i].IsScoping || _stack[i]._name == "button")
+                if (_stack[i].IsScoping || _stack[i]._name == "button")
                 {
                     return TreeBuilderConstants.NOT_FOUND_ON_STACK;
                 }
@@ -4248,7 +4074,7 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     return i;
                 }
-                else if (_stack[i].IsScoping)
+                if (_stack[i].IsScoping)
                 {
                     return TreeBuilderConstants.NOT_FOUND_ON_STACK;
                 }
@@ -4264,7 +4090,7 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     return i;
                 }
-                else if (_stack[i].IsScoping || _stack[i]._name == "ul" || _stack[i]._name == "ol")
+                if (_stack[i].IsScoping || _stack[i]._name == "ul" || _stack[i]._name == "ol")
                 {
                     return TreeBuilderConstants.NOT_FOUND_ON_STACK;
                 }
@@ -4280,7 +4106,7 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     return i;
                 }
-                else if (_stack[i].IsScoping)
+                if (_stack[i].IsScoping)
                 {
                     return TreeBuilderConstants.NOT_FOUND_ON_STACK;
                 }
@@ -4424,7 +4250,7 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     return true;
                 }
-                else if (Portability.LowerCaseLiteralEqualsIgnoreAsciiCaseString(
+                if (Portability.LowerCaseLiteralEqualsIgnoreAsciiCaseString(
                     "-//w3c//dtd html 4.01 frameset//en", publicIdentifier))
                 {
                     return true;
@@ -4452,7 +4278,6 @@ namespace HtmlParserSharp.Portable.Core
             }
             ClearTheListOfActiveFormattingElementsUpToTheLastMarker();
             _mode = InsertionMode.IN_ROW;
-            return;
         }
 
         private int FindLastInTableScopeTdTh()
@@ -4465,7 +4290,7 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     return i;
                 }
-                else if (name == "table")
+                if (name == "table")
                 {
                     return TreeBuilderConstants.NOT_FOUND_ON_STACK;
                 }
@@ -4484,15 +4309,13 @@ namespace HtmlParserSharp.Portable.Core
 
         private void ResetTheInsertionMode()
         {
-            StackNode<T> node;
             /*[Local]*/
-            string name;
             /*[NsUri]*/
             string ns;
             for (int i = _currentPtr; i >= 0; i--)
             {
-                node = _stack[i];
-                name = node._name;
+                StackNode<T> node = _stack[i];
+                string name = node._name;
                 ns = node._ns;
                 if (i == 0)
                 {
@@ -4515,69 +4338,62 @@ namespace HtmlParserSharp.Portable.Core
                     _mode = InsertionMode.IN_SELECT;
                     return;
                 }
-                else if ("td" == name || "th" == name)
+                if ("td" == name || "th" == name)
                 {
                     _mode = InsertionMode.IN_CELL;
                     return;
                 }
-                else if ("tr" == name)
+                if ("tr" == name)
                 {
                     _mode = InsertionMode.IN_ROW;
                     return;
                 }
-                else if ("tbody" == name || "thead" == name || "tfoot" == name)
+                if ("tbody" == name || "thead" == name || "tfoot" == name)
                 {
                     _mode = InsertionMode.IN_TABLE_BODY;
                     return;
                 }
-                else if ("caption" == name)
+                if ("caption" == name)
                 {
                     _mode = InsertionMode.IN_CAPTION;
                     return;
                 }
-                else if ("colgroup" == name)
+                if ("colgroup" == name)
                 {
                     _mode = InsertionMode.IN_COLUMN_GROUP;
                     return;
                 }
-                else if ("table" == name)
+                if ("table" == name)
                 {
                     _mode = InsertionMode.IN_TABLE;
                     return;
                 }
-                else if ("http://www.w3.org/1999/xhtml" != ns)
+                if ("http://www.w3.org/1999/xhtml" != ns)
                 {
                     _mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
                     return;
                 }
-                else if ("head" == name)
+                if ("head" == name)
                 {
                     _mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY; // really
                     return;
                 }
-                else if ("body" == name)
+                if ("body" == name)
                 {
                     _mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
                     return;
                 }
-                else if ("frameset" == name)
+                if ("frameset" == name)
                 {
                     _mode = InsertionMode.IN_FRAMESET;
                     return;
                 }
-                else if ("html" == name)
+                if ("html" == name)
                 {
-                    if (_headPointer == null)
-                    {
-                        _mode = InsertionMode.BEFORE_HEAD;
-                    }
-                    else
-                    {
-                        _mode = InsertionMode.AFTER_HEAD;
-                    }
+                    _mode = _headPointer == null ? InsertionMode.BEFORE_HEAD : InsertionMode.AFTER_HEAD;
                     return;
                 }
-                else if (i == 0)
+                if (i == 0)
                 {
                     _mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
                     return;
@@ -4745,7 +4561,7 @@ namespace HtmlParserSharp.Portable.Core
                         formattingEltListPos = -1;
                         break;
                     }
-                    else if (listNode._name == name)
+                    if (listNode._name == name)
                     {
                         break;
                     }
@@ -4776,7 +4592,7 @@ namespace HtmlParserSharp.Portable.Core
                     {
                         break;
                     }
-                    else if (node.IsScoping)
+                    if (node.IsScoping)
                     {
                         inScope = false;
                     }
@@ -4964,7 +4780,7 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     return -1;
                 }
-                else if (node._name == name)
+                if (node._name == name)
                 {
                     return i;
                 }
@@ -5018,30 +4834,6 @@ namespace HtmlParserSharp.Portable.Core
                 }
             }
             return 0;
-        }
-
-        /// <summary>
-        ///     Attempt to add attribute to the body element.
-        /// </summary>
-        /// <param name="attributes">The attributes.</param>
-        /// <returns>
-        ///     <c>true</c> if the attributes were added
-        /// </returns>
-        private bool AddAttributesToBody(HtmlAttributes attributes)
-        {
-            // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
-            // ]NOCPP]
-            if (_currentPtr >= 1)
-            {
-                StackNode<T> body = _stack[1];
-                if (body.Group == DispatchGroup.BODY)
-                {
-                    AddAttributesToElement(body._node, attributes);
-                    return true;
-                }
-            }
-            return false;
         }
 
         private void AddAttributesToHtml(HtmlAttributes attributes)
@@ -5158,7 +4950,6 @@ namespace HtmlParserSharp.Portable.Core
 
         private void SilentPop()
         {
-            StackNode<T> node = _stack[_currentPtr];
             Debug.Assert(ClearLastStackSlot());
             _currentPtr--;
         }
@@ -5266,23 +5057,20 @@ namespace HtmlParserSharp.Portable.Core
             {
                 return name;
             }
-            else
+            switch (NamePolicy)
             {
-                switch (NamePolicy)
-                {
-                    case XmlViolationPolicy.Allow:
-                        Warn("Element name \u201C" + name
-                             + "\u201D cannot be represented as XML 1.0.");
-                        return name;
-                    case XmlViolationPolicy.AlterInfoset:
-                        Warn("Element name \u201C" + name
-                             + "\u201D cannot be represented as XML 1.0.");
-                        return NCName.EscapeName(name);
-                    case XmlViolationPolicy.Fatal:
-                        Fatal("Element name \u201C" + name
-                              + "\u201D cannot be represented as XML 1.0.");
-                        break;
-                }
+                case XmlViolationPolicy.Allow:
+                    Warn("Element name \u201C" + name
+                         + "\u201D cannot be represented as XML 1.0.");
+                    return name;
+                case XmlViolationPolicy.AlterInfoset:
+                    Warn("Element name \u201C" + name
+                         + "\u201D cannot be represented as XML 1.0.");
+                    return NCName.EscapeName(name);
+                case XmlViolationPolicy.Fatal:
+                    Fatal("Element name \u201C" + name
+                          + "\u201D cannot be represented as XML 1.0.");
+                    break;
             }
             return null; // keep compiler happy
         }
@@ -5464,12 +5252,8 @@ namespace HtmlParserSharp.Portable.Core
             {
                 AppendElement(elt, current._node);
             }
-            bool markAsHtmlIntegrationPoint = false;
-            if (ElementName.ANNOTATION_XML == elementName
-                && AnnotationXmlEncodingPermitsHtml(attributes))
-            {
-                markAsHtmlIntegrationPoint = true;
-            }
+            bool markAsHtmlIntegrationPoint = ElementName.ANNOTATION_XML == elementName
+                                              && AnnotationXmlEncodingPermitsHtml(attributes);
             var node = new StackNode<T>(elementName, elt, popName,
                                         markAsHtmlIntegrationPoint
                                         // [NOCPP[
@@ -6004,8 +5788,8 @@ namespace HtmlParserSharp.Portable.Core
                 {
                     continue;
                 }
-                else if (listCopy[i] == null
-                         || _listOfActiveFormattingElements[i] == null)
+                if (listCopy[i] == null
+                    || _listOfActiveFormattingElements[i] == null)
                 {
                     return false;
                 }
