@@ -286,7 +286,7 @@ namespace HtmlParserSharp.Portable.Core
 			//SAXParseException spe = new SAXParseException(
 			//        "Unclosed element \u201C" + node.popName + "\u201D.", locator);
 			//errorHandler.error(spe);
-			ErrNoCheck("Unclosed element \u201C" + node.popName + "\u201D.");
+			ErrNoCheck("Unclosed element \u201C" + node._popName + "\u201D.");
 		}
 
 		/// <summary>
@@ -683,7 +683,7 @@ namespace HtmlParserSharp.Portable.Core
 						 * comment token.
 						 */
 						FlushCharacters();
-						AppendComment(stack[0].node, buf, start, length);
+						AppendComment(stack[0]._node, buf, start, length);
 						return;
 					default:
 						break;
@@ -694,7 +694,7 @@ namespace HtmlParserSharp.Portable.Core
 			 * data attribute set to the data given in the comment token.
 			 */
 			FlushCharacters();
-			AppendComment(stack[currentPtr].node, buf, start, length);
+			AppendComment(stack[currentPtr]._node, buf, start, length);
 			return;
 		}
 
@@ -1133,7 +1133,7 @@ namespace HtmlParserSharp.Portable.Core
 			if (currentPtr >= 0)
 			{
 				StackNode<T> stackNode = stack[currentPtr];
-				if (stackNode.ns == "http://www.w3.org/1999/xhtml")
+				if (stackNode._ns == "http://www.w3.org/1999/xhtml")
 				{
 					return;
 				}
@@ -1416,7 +1416,7 @@ namespace HtmlParserSharp.Portable.Core
 				{
 					StackNode<T> currentNode = stack[currentPtr];
 					/*[NsUri]*/
-					string currNs = currentNode.ns;
+					string currNs = currentNode._ns;
 					if (!(currentNode.IsHtmlIntegrationPoint || (currNs == "http://www.w3.org/1998/Math/MathML" &&
 						((currentNode.Group == DispatchGroup.MI_MO_MN_MS_MTEXT && group != DispatchGroup.MGLYPH_OR_MALIGNMARK) ||
 						(currentNode.Group == DispatchGroup.ANNOTATION_XML && group == DispatchGroup.SVG)))))
@@ -1781,7 +1781,7 @@ namespace HtmlParserSharp.Portable.Core
 									else
 									{
 										Err("\u201Cframeset\u201D start tag seen.");
-										DetachFromParent(stack[1].node);
+										DetachFromParent(stack[1]._node);
 										while (currentPtr > 0)
 										{
 											Pop();
@@ -1934,7 +1934,7 @@ namespace HtmlParserSharp.Portable.Core
 										if (node.Group == group)
 										{ // LI or
 											// DD_OR_DT
-											GenerateImpliedEndTagsExceptFor(node.name);
+											GenerateImpliedEndTagsExceptFor(node._name);
 											if (ErrorEvent != null
 													&& eltPos != currentPtr)
 											{
@@ -1948,8 +1948,8 @@ namespace HtmlParserSharp.Portable.Core
 										}
 										else if (node.IsScoping
 											  || (node.IsSpecial
-													  && node.name != "p"
-													  && node.name != "address" && node.name != "div"))
+													  && node._name != "p"
+													  && node._name != "address" && node._name != "div"))
 										{
 											break;
 										}
@@ -2131,12 +2131,12 @@ namespace HtmlParserSharp.Portable.Core
 									if (promptIndex > -1)
 									{
 										char[] prompt = attributes.GetValue(promptIndex).ToCharArray();
-										AppendCharacters(stack[currentPtr].node,
+										AppendCharacters(stack[currentPtr]._node,
 												prompt, 0, prompt.Length);
 									}
 									else
 									{
-										AppendIsindexPrompt(stack[currentPtr].node);
+										AppendIsindexPrompt(stack[currentPtr]._node);
 									}
 									HtmlAttributes inputAttributes = new HtmlAttributes(
 											0);
@@ -3026,7 +3026,7 @@ namespace HtmlParserSharp.Portable.Core
 		private bool IsSpecialParentInForeign(StackNode<T> stackNode)
 		{
 			/*[NsUri]*/
-			string ns = stackNode.ns;
+			string ns = stackNode._ns;
 			return ("http://www.w3.org/1999/xhtml" == ns)
 					|| (stackNode.IsHtmlIntegrationPoint)
 					|| (("http://www.w3.org/1998/Math/MathML" == ns) && (stackNode.Group == DispatchGroup.MI_MO_MN_MS_MTEXT));
@@ -3254,17 +3254,17 @@ namespace HtmlParserSharp.Portable.Core
 			{
 				if (IsInForeign)
 				{
-					if (ErrorEvent != null && stack[currentPtr].name != name)
+					if (ErrorEvent != null && stack[currentPtr]._name != name)
 					{
 						Err("End tag \u201C"
 								+ name
 								+ "\u201D did not match the name of the current open element (\u201C"
-								+ stack[currentPtr].popName + "\u201D).");
+								+ stack[currentPtr]._popName + "\u201D).");
 					}
 					eltPos = currentPtr;
 					for (; ; )
 					{
-						if (stack[eltPos].name == name)
+						if (stack[eltPos]._name == name)
 						{
 							while (currentPtr >= eltPos)
 							{
@@ -3272,7 +3272,7 @@ namespace HtmlParserSharp.Portable.Core
 							}
 							goto breakEndtagloop;
 						}
-						if (stack[--eltPos].ns == "http://www.w3.org/1999/xhtml")
+						if (stack[--eltPos]._ns == "http://www.w3.org/1999/xhtml")
 						{
 							break;
 						}
@@ -3633,7 +3633,7 @@ namespace HtmlParserSharp.Portable.Core
 										Err("HTML start tag \u201C"
 												+ name
 												+ "\u201D in a foreign namespace context.");
-										while (stack[currentPtr].ns != "http://www.w3.org/1999/xhtml")
+										while (stack[currentPtr]._ns != "http://www.w3.org/1999/xhtml")
 										{
 											Pop();
 										}
@@ -3743,7 +3743,7 @@ namespace HtmlParserSharp.Portable.Core
 									Err("HTML start tag \u201C"
 											+ name
 											+ "\u201D in a foreign namespace context.");
-									while (stack[currentPtr].ns != "http://www.w3.org/1999/xhtml")
+									while (stack[currentPtr]._ns != "http://www.w3.org/1999/xhtml")
 									{
 										Pop();
 									}
@@ -3804,7 +3804,7 @@ namespace HtmlParserSharp.Portable.Core
 								for (; ; )
 								{
 									StackNode<T> node = stack[eltPos];
-									if (node.name == name)
+									if (node._name == name)
 									{
 										GenerateImpliedEndTags();
 										if (ErrorEvent != null
@@ -3904,7 +3904,7 @@ namespace HtmlParserSharp.Portable.Core
 								}
 							case DispatchGroup.OPTGROUP:
 								if (IsCurrent("option")
-										&& "optgroup" == stack[currentPtr - 1].name)
+										&& "optgroup" == stack[currentPtr - 1]._name)
 								{
 									Pop();
 								}
@@ -4145,7 +4145,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			for (int i = currentPtr; i > 0; i--)
 			{
-				if (stack[i].name == name)
+				if (stack[i]._name == name)
 				{
 					return i;
 				}
@@ -4157,11 +4157,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			for (int i = currentPtr; i > 0; i--)
 			{
-				if (stack[i].name == name)
+				if (stack[i]._name == name)
 				{
 					return i;
 				}
-				else if (stack[i].name == "table")
+				else if (stack[i]._name == "table")
 				{
 					return TreeBuilderConstants.NOT_FOUND_ON_STACK;
 				}
@@ -4173,11 +4173,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			for (int i = currentPtr; i > 0; i--)
 			{
-				if (stack[i].name == name)
+				if (stack[i]._name == name)
 				{
 					return i;
 				}
-				else if (stack[i].IsScoping || stack[i].name == "button")
+				else if (stack[i].IsScoping || stack[i]._name == "button")
 				{
 					return TreeBuilderConstants.NOT_FOUND_ON_STACK;
 				}
@@ -4189,7 +4189,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			for (int i = currentPtr; i > 0; i--)
 			{
-				if (stack[i].name == name)
+				if (stack[i]._name == name)
 				{
 					return i;
 				}
@@ -4205,11 +4205,11 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			for (int i = currentPtr; i > 0; i--)
 			{
-				if (stack[i].name == name)
+				if (stack[i]._name == name)
 				{
 					return i;
 				}
-				else if (stack[i].IsScoping || stack[i].name == "ul" || stack[i].name == "ol")
+				else if (stack[i].IsScoping || stack[i]._name == "ul" || stack[i]._name == "ol")
 				{
 					return TreeBuilderConstants.NOT_FOUND_ON_STACK;
 				}
@@ -4246,7 +4246,7 @@ namespace HtmlParserSharp.Portable.Core
 					case DispatchGroup.OPTION:
 					case DispatchGroup.OPTGROUP:
 					case DispatchGroup.RT_OR_RP:
-						if (node.name == name)
+						if (node._name == name)
 						{
 							return;
 						}
@@ -4405,7 +4405,7 @@ namespace HtmlParserSharp.Portable.Core
 			for (int i = currentPtr; i > 0; i--)
 			{
 				/*[Local]*/
-				string name = stack[i].name;
+				string name = stack[i]._name;
 				if ("td" == name || "th" == name)
 				{
 					return i;
@@ -4436,8 +4436,8 @@ namespace HtmlParserSharp.Portable.Core
 			for (int i = currentPtr; i >= 0; i--)
 			{
 				node = stack[i];
-				name = node.name;
-				ns = node.ns;
+				name = node._name;
+				ns = node._ns;
 				if (i == 0)
 				{
 					if (!(contextNamespace == "http://www.w3.org/1999/xhtml" && (contextName == "td" || contextName == "th")))
@@ -4566,7 +4566,7 @@ namespace HtmlParserSharp.Portable.Core
 				stack = newStack;
 			}
 			stack[currentPtr] = node;
-			ElementPushed(node.ns, node.popName, node.node);
+			ElementPushed(node._ns, node._popName, node._node);
 		}
 
 		private void SilentPush(StackNode<T> node)
@@ -4613,7 +4613,7 @@ namespace HtmlParserSharp.Portable.Core
 
 		private bool IsCurrent([Local] string name)
 		{
-			return name == stack[currentPtr].name;
+			return name == stack[currentPtr]._name;
 		}
 
 		private void RemoveFromStack(int pos)
@@ -4686,7 +4686,7 @@ namespace HtmlParserSharp.Portable.Core
 						formattingEltListPos = -1;
 						break;
 					}
-					else if (listNode.name == name)
+					else if (listNode._name == name)
 					{
 						break;
 					}
@@ -4794,9 +4794,9 @@ namespace HtmlParserSharp.Portable.Core
 					Debug.Assert(node == listOfActiveFormattingElements[nodeListPos]);
 					Debug.Assert(node == stack[nodePos]);
 					T clone = CreateElement("http://www.w3.org/1999/xhtml",
-							node.name, node.attributes.CloneAttributes());
-					StackNode<T> newNode = new StackNode<T>(node.Flags, node.ns,
-							node.name, clone, node.popName, node.attributes
+							node._name, node._attributes.CloneAttributes());
+					StackNode<T> newNode = new StackNode<T>(node.Flags, node._ns,
+							node._name, clone, node._popName, node._attributes
 						// [NOCPP[
 							, node.Locator
 						// ]NOCPP]       
@@ -4810,28 +4810,28 @@ namespace HtmlParserSharp.Portable.Core
 					listOfActiveFormattingElements[nodeListPos] = newNode;
 					node = newNode;
 					// } XXX AAA CHANGE
-					DetachFromParent(lastNode.node);
-					AppendElement(lastNode.node, node.node);
+					DetachFromParent(lastNode._node);
+					AppendElement(lastNode._node, node._node);
 					lastNode = node;
 				}
 				if (commonAncestor.IsFosterParenting)
 				{
 					Fatal();
-					DetachFromParent(lastNode.node);
-					InsertIntoFosterParent(lastNode.node);
+					DetachFromParent(lastNode._node);
+					InsertIntoFosterParent(lastNode._node);
 				}
 				else
 				{
-					DetachFromParent(lastNode.node);
-					AppendElement(lastNode.node, commonAncestor.node);
+					DetachFromParent(lastNode._node);
+					AppendElement(lastNode._node, commonAncestor._node);
 				}
 				T clone2 = CreateElement("http://www.w3.org/1999/xhtml",
-						formattingElt.name,
-						formattingElt.attributes.CloneAttributes());
+						formattingElt._name,
+						formattingElt._attributes.CloneAttributes());
 				StackNode<T> formattingClone = new StackNode<T>(
-						formattingElt.Flags, formattingElt.ns,
-						formattingElt.name, clone2, formattingElt.popName,
-						formattingElt.attributes
+						formattingElt.Flags, formattingElt._ns,
+						formattingElt._name, clone2, formattingElt._popName,
+						formattingElt._attributes
 					// [NOCPP[
 						, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
 					// ]NOCPP]
@@ -4841,8 +4841,8 @@ namespace HtmlParserSharp.Portable.Core
 				// stack
 				// below
 				formattingElt.DropAttributes(); // transfer ownership to formattingClone
-				AppendChildrenToNewParent(furthestBlock.node, clone2);
-				AppendElement(clone2, furthestBlock.node);
+				AppendChildrenToNewParent(furthestBlock._node, clone2);
+				AppendElement(clone2, furthestBlock._node);
 				RemoveFromListOfActiveFormattingElements(formattingEltListPos);
 				InsertIntoListOfActiveFormattingElements(formattingClone, bookmark);
 				Debug.Assert(formattingEltStackPos < furthestBlockPos);
@@ -4905,7 +4905,7 @@ namespace HtmlParserSharp.Portable.Core
 				{
 					return -1;
 				}
-				else if (node.name == name)
+				else if (node._name == name)
 				{
 					return i;
 				}
@@ -4925,7 +4925,7 @@ namespace HtmlParserSharp.Portable.Core
 				{
 					break;
 				}
-				if (node.name == name && node.attributes.Equals(attributes))
+				if (node._name == name && node._attributes.Equals(attributes))
 				{
 					candidate = i;
 					++count;
@@ -4941,7 +4941,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			for (int i = currentPtr; i > 0; i--)
 			{
-				if (stack[i].name == name)
+				if (stack[i]._name == name)
 				{
 					return i;
 				}
@@ -4976,7 +4976,7 @@ namespace HtmlParserSharp.Portable.Core
 				StackNode<T> body = stack[1];
 				if (body.Group == DispatchGroup.BODY)
 				{
-					AddAttributesToElement(body.node, attributes);
+					AddAttributesToElement(body._node, attributes);
 					return true;
 				}
 			}
@@ -4988,7 +4988,7 @@ namespace HtmlParserSharp.Portable.Core
 			// [NOCPP[
 			CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
 			// ]NOCPP]
-			AddAttributesToElement(stack[0].node, attributes);
+			AddAttributesToElement(stack[0]._node, attributes);
 		}
 
 		private void PushHeadPointerOntoStack()
@@ -5036,11 +5036,11 @@ namespace HtmlParserSharp.Portable.Core
 			{
 				entryPos++;
 				StackNode<T> entry = listOfActiveFormattingElements[entryPos];
-				T clone = CreateElement("http://www.w3.org/1999/xhtml", entry.name,
-						entry.attributes.CloneAttributes());
+				T clone = CreateElement("http://www.w3.org/1999/xhtml", entry._name,
+						entry._attributes.CloneAttributes());
 				StackNode<T> entryClone = new StackNode<T>(entry.Flags,
-						entry.ns, entry.name, clone, entry.popName,
-						entry.attributes
+						entry._ns, entry._name, clone, entry._popName,
+						entry._attributes
 					// [NOCPP[
 						, entry.Locator
 					// ]NOCPP]
@@ -5053,7 +5053,7 @@ namespace HtmlParserSharp.Portable.Core
 				}
 				else
 				{
-					AppendElement(clone, currentNode.node);
+					AppendElement(clone, currentNode._node);
 				}
 				Push(entryClone);
 				// stack takes ownership of the local variable
@@ -5066,13 +5066,13 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			int eltPos = FindLastOrRoot(DispatchGroup.TABLE);
 			StackNode<T> node = stack[eltPos];
-			T elt = node.node;
+			T elt = node._node;
 			if (eltPos == 0)
 			{
 				AppendElement(child, elt);
 				return;
 			}
-			InsertFosterParentedChild(child, elt, stack[eltPos - 1].node);
+			InsertFosterParentedChild(child, elt, stack[eltPos - 1]._node);
 		}
 
 		private bool IsInStack(StackNode<T> node)
@@ -5092,7 +5092,7 @@ namespace HtmlParserSharp.Portable.Core
 			StackNode<T> node = stack[currentPtr];
 			Debug.Assert(ClearLastStackSlot());
 			currentPtr--;
-			ElementPopped(node.ns, node.popName, node.node);
+			ElementPopped(node._ns, node._popName, node._node);
 		}
 
 		private void SilentPop()
@@ -5107,8 +5107,8 @@ namespace HtmlParserSharp.Portable.Core
 			StackNode<T> node = stack[currentPtr];
 			Debug.Assert(ClearLastStackSlot());
 			currentPtr--;
-			MarkMalformedIfScript(node.node);
-			ElementPopped(node.ns, node.popName, node.node);
+			MarkMalformedIfScript(node._node);
+			ElementPopped(node._ns, node._popName, node._node);
 		}
 
 		// [NOCPP[
@@ -5252,7 +5252,7 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", "head",
 					attributes);
-			AppendElement(elt, stack[currentPtr].node);
+			AppendElement(elt, stack[currentPtr]._node);
 			headPointer = elt;
 			StackNode<T> node = new StackNode<T>(ElementName.HEAD,
 					elt
@@ -5291,7 +5291,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			StackNode<T> node = new StackNode<T>(ElementName.FORM,
 					elt
@@ -5317,7 +5317,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			StackNode<T> node = new StackNode<T>(elementName, elt, attributes.CloneAttributes()
 				// [NOCPP[
@@ -5335,7 +5335,7 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 			// This method can't be called for custom elements
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", elementName.name, attributes);
-			AppendElement(elt, stack[currentPtr].node);
+			AppendElement(elt, stack[currentPtr]._node);
 			StackNode<T> node = new StackNode<T>(elementName, elt
 				// [NOCPP[
 					, ErrorEvent == null ? null : new TaintableLocator(tokenizer)
@@ -5365,7 +5365,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			StackNode<T> node = new StackNode<T>(elementName, elt, popName
 				// [NOCPP[
@@ -5397,7 +5397,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			bool markAsHtmlIntegrationPoint = false;
 			if (ElementName.ANNOTATION_XML == elementName
@@ -5448,7 +5448,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			StackNode<T> node = new StackNode<T>(elementName, popName, elt
 				// [NOCPP[
@@ -5474,7 +5474,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			StackNode<T> node = new StackNode<T>(elementName, elt
 				// [NOCPP[
@@ -5500,7 +5500,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			ElementPushed("http://www.w3.org/1999/xhtml", name, elt);
 			ElementPopped("http://www.w3.org/1999/xhtml", name, elt);
@@ -5527,7 +5527,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			ElementPushed("http://www.w3.org/1999/xhtml", popName, elt);
 			ElementPopped("http://www.w3.org/1999/xhtml", popName, elt);
@@ -5554,7 +5554,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			ElementPushed("http://www.w3.org/2000/svg", popName, elt);
 			ElementPopped("http://www.w3.org/2000/svg", popName, elt);
@@ -5580,7 +5580,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			else
 			{
-				AppendElement(elt, current.node);
+				AppendElement(elt, current._node);
 			}
 			ElementPushed("http://www.w3.org/1998/Math/MathML", popName, elt);
 			ElementPopped("http://www.w3.org/1998/Math/MathML", popName, elt);
@@ -5595,7 +5595,7 @@ namespace HtmlParserSharp.Portable.Core
 			// Can't be called for custom elements
 			T elt = CreateElement("http://www.w3.org/1999/xhtml", name, attributes, fragment ? null : form);
 			StackNode<T> current = stack[currentPtr];
-			AppendElement(elt, current.node);
+			AppendElement(elt, current._node);
 			ElementPushed("http://www.w3.org/1999/xhtml", name, elt);
 			ElementPopped("http://www.w3.org/1999/xhtml", name, elt);
 		}
@@ -5610,7 +5610,7 @@ namespace HtmlParserSharp.Portable.Core
 			formPointer = elt;
 			// ownership transferred to form pointer
 			StackNode<T> current = stack[currentPtr];
-			AppendElement(elt, current.node);
+			AppendElement(elt, current._node);
 			ElementPushed("http://www.w3.org/1999/xhtml", "form", elt);
 			ElementPopped("http://www.w3.org/1999/xhtml", "form", elt);
 		}
@@ -5634,7 +5634,7 @@ namespace HtmlParserSharp.Portable.Core
 
 		protected virtual void AccumulateCharacters(char[] buf, int start, int length)
 		{
-			AppendCharacters(stack[currentPtr].node, buf, start, length);
+			AppendCharacters(stack[currentPtr]._node, buf, start, length);
 		}
 
 		// ------------------------------- //
@@ -5779,7 +5779,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return currentPtr >= 0 && stack[currentPtr].ns != "http://www.w3.org/1999/xhtml";
+				return currentPtr >= 0 && stack[currentPtr]._ns != "http://www.w3.org/1999/xhtml";
 			}
 		}
 
@@ -5788,7 +5788,7 @@ namespace HtmlParserSharp.Portable.Core
 			get
 			{
 				return currentPtr >= 0
-					&& stack[currentPtr].ns != "http://www.w3.org/1999/xhtml"
+					&& stack[currentPtr]._ns != "http://www.w3.org/1999/xhtml"
 					&& !stack[currentPtr].IsHtmlIntegrationPoint;
 			}
 		}
@@ -5810,7 +5810,7 @@ namespace HtmlParserSharp.Portable.Core
 
 		protected T CurrentNode()
 		{
-			return stack[currentPtr].node;
+			return stack[currentPtr]._node;
 		}
 
 		/// <summary>
@@ -5835,7 +5835,7 @@ namespace HtmlParserSharp.Portable.Core
 					}
 					int eltPos = FindLastOrRoot(DispatchGroup.TABLE);
 					StackNode<T> node = stack[eltPos];
-					T elt = node.node;
+					T elt = node._node;
 					if (eltPos == 0)
 					{
 						AppendCharacters(elt, charBuffer, 0, charBufferLen);
@@ -5843,7 +5843,7 @@ namespace HtmlParserSharp.Portable.Core
 						return;
 					}
 					InsertFosterParentedCharacters(charBuffer, 0, charBufferLen,
-							elt, stack[eltPos - 1].node);
+							elt, stack[eltPos - 1]._node);
 					charBufferLen = 0;
 					return;
 				}
@@ -5888,9 +5888,9 @@ namespace HtmlParserSharp.Portable.Core
 				StackNode<T> node = listOfActiveFormattingElements[i];
 				if (node != null)
 				{
-					StackNode<T> newNode = new StackNode<T>(node.Flags, node.ns,
-							node.name, node.node, node.popName,
-							node.attributes.CloneAttributes()
+					StackNode<T> newNode = new StackNode<T>(node.Flags, node._ns,
+							node._name, node._node, node._popName,
+							node._attributes.CloneAttributes()
 						// [NOCPP[
 							, node.Locator
 						// ]NOCPP]
@@ -5909,8 +5909,8 @@ namespace HtmlParserSharp.Portable.Core
 				int listIndex = FindInListOfActiveFormattingElements(node);
 				if (listIndex == -1)
 				{
-					StackNode<T> newNode = new StackNode<T>(node.Flags, node.ns,
-							node.name, node.node, node.popName,
+					StackNode<T> newNode = new StackNode<T>(node.Flags, node._ns,
+							node._name, node._node, node._popName,
 							null
 						// [NOCPP[
 							, node.Locator
@@ -5958,7 +5958,7 @@ namespace HtmlParserSharp.Portable.Core
 				{
 					return false;
 				}
-				if (listCopy[i].node != listOfActiveFormattingElements[i].node)
+				if (listCopy[i]._node != listOfActiveFormattingElements[i]._node)
 				{
 					return false; // it's possible that this condition is overly
 					// strict
@@ -5966,7 +5966,7 @@ namespace HtmlParserSharp.Portable.Core
 			}
 			for (int i = stackLen - 1; i >= 0; i--)
 			{
-				if (stackCopy[i].node != stack[i].node)
+				if (stackCopy[i]._node != stack[i]._node)
 				{
 					return false;
 				}
@@ -5998,10 +5998,10 @@ namespace HtmlParserSharp.Portable.Core
 				StackNode<T> node = listCopy[i];
 				if (node != null)
 				{
-					StackNode<T> newNode = new StackNode<T>(node.Flags, node.ns,
-							node.name, node.node,
-							node.popName,
-							node.attributes.CloneAttributes()
+					StackNode<T> newNode = new StackNode<T>(node.Flags, node._ns,
+							node._name, node._node,
+							node._popName,
+							node._attributes.CloneAttributes()
 						// [NOCPP[
 							, node.Locator
 						// ]NOCPP]
@@ -6019,9 +6019,9 @@ namespace HtmlParserSharp.Portable.Core
 				int listIndex = FindInArray(node, listCopy);
 				if (listIndex == -1)
 				{
-					StackNode<T> newNode = new StackNode<T>(node.Flags, node.ns,
-							node.name, node.node,
-							node.popName,
+					StackNode<T> newNode = new StackNode<T>(node.Flags, node._ns,
+							node._name, node._node,
+							node._popName,
 							null
 						// [NOCPP[
 							, node.Locator
