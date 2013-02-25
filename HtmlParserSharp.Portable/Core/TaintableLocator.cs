@@ -23,19 +23,19 @@
 
 namespace HtmlParserSharp.Portable.Core
 {
-	public class TaintableLocator : Locator
-	{
-		public TaintableLocator(ILocator locator)
-			: base(locator)
-		{
-			IsTainted = false;
-		}
+    public class TaintableLocator : Locator
+    {
+        public TaintableLocator(ILocator locator)
+            : base(locator)
+        {
+            IsTainted = false;
+        }
 
-		public void MarkTainted()
-		{
-			IsTainted = true;
-		}
+        public void MarkTainted()
+        {
+            IsTainted = true;
+        }
 
-		public bool IsTainted { get; private set; }
-	}
+        public bool IsTainted { get; private set; }
+    }
 }
