@@ -46,8 +46,6 @@ namespace HtmlParserSharp.Portable.Core
 		// Only used on the list of formatting elements
 		internal HtmlAttributes attributes;
 
-		private int _refcount = 1;
-
 		// [NOCPP[
 
 		private readonly TaintableLocator locator;
@@ -140,7 +138,6 @@ namespace HtmlParserSharp.Portable.Core
 			this.ns = ns;
 			this.node = node;
 			this.attributes = attributes;
-			this._refcount = 1;
 			// [NOCPP[
 			this.locator = locator;
 			// ]NOCPP]
@@ -161,7 +158,6 @@ namespace HtmlParserSharp.Portable.Core
 			this.ns = "http://www.w3.org/1999/xhtml";
 			this.node = node;
 			this.attributes = null;
-			this._refcount = 1;
 			Debug.Assert(!elementName.IsCustom, "Don't use this constructor for custom elements.");
 			// [NOCPP[
 			this.locator = locator;
@@ -183,7 +179,6 @@ namespace HtmlParserSharp.Portable.Core
 			this.ns = "http://www.w3.org/1999/xhtml";
 			this.node = node;
 			this.attributes = attributes;
-			this._refcount = 1;
 			Debug.Assert(!elementName.IsCustom, "Don't use this constructor for custom elements.");
 			// [NOCPP[
 			this.locator = locator;
@@ -205,7 +200,6 @@ namespace HtmlParserSharp.Portable.Core
 			this.ns = "http://www.w3.org/1999/xhtml";
 			this.node = node;
 			this.attributes = null;
-			this._refcount = 1;
 			// [NOCPP[
 			this.locator = locator;
 			// ]NOCPP]
@@ -229,7 +223,6 @@ namespace HtmlParserSharp.Portable.Core
 			this.ns = "http://www.w3.org/2000/svg";
 			this.node = node;
 			this.attributes = null;
-			this._refcount = 1;
 			// [NOCPP[
 			this.locator = locator;
 			// ]NOCPP]
@@ -251,7 +244,6 @@ namespace HtmlParserSharp.Portable.Core
 			this.ns = "http://www.w3.org/1998/Math/MathML";
 			this.node = node;
 			this.attributes = null;
-			this._refcount = 1;
 			// [NOCPP[
 			this.locator = locator;
 			// ]NOCPP]
@@ -302,19 +294,5 @@ namespace HtmlParserSharp.Portable.Core
 		}
 
 		// ]NOCPP]
-
-		// TODO: probably we won't need these
-		public void Retain()
-		{
-			_refcount++;
-		}
-
-		public void Release()
-		{
-			_refcount--;
-			/*if (refcount == 0) {
-				Portability.delete(this);
-			}*/
-		}
 	}
 }

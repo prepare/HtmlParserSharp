@@ -1976,7 +1976,6 @@ namespace HtmlParserSharp.Portable.Core
 									{
 										Err("An \u201Ca\u201D start tag seen with already an active \u201Ca\u201D element.");
 										StackNode<T> activeA = listOfActiveFormattingElements[activeAPos];
-										activeA.Retain();
 										AdoptionAgencyEndTag("a");
 										RemoveFromStack(activeA);
 										activeAPos = FindInListOfActiveFormattingElements(activeA);
@@ -1984,7 +1983,6 @@ namespace HtmlParserSharp.Portable.Core
 										{
 											RemoveFromListOfActiveFormattingElements(activeAPos);
 										}
-										activeA.Release();
 									}
 									ReconstructTheActiveFormattingElements();
 									AppendToCurrentNodeAndPushFormattingElementMayFoster(
@@ -4609,7 +4607,6 @@ namespace HtmlParserSharp.Portable.Core
 					--listPtr;
 					return;
 				}
-				listOfActiveFormattingElements[listPtr].Release();
 				--listPtr;
 			}
 		}
@@ -4628,7 +4625,6 @@ namespace HtmlParserSharp.Portable.Core
 			else
 			{
 				Fatal();
-				stack[pos].Release();
 				Array.Copy(stack, pos + 1, stack, pos, currentPtr - pos);
 				Debug.Assert(ClearLastStackSlot());
 				currentPtr--;
@@ -4654,7 +4650,6 @@ namespace HtmlParserSharp.Portable.Core
 					return;
 				}
 				Fatal();
-				node.Release();
 				Array.Copy(stack, pos + 1, stack, pos, currentPtr - pos);
 				currentPtr--;
 			}
@@ -4663,7 +4658,6 @@ namespace HtmlParserSharp.Portable.Core
 		private void RemoveFromListOfActiveFormattingElements(int pos)
 		{
 			Debug.Assert(listOfActiveFormattingElements[pos] != null);
-			listOfActiveFormattingElements[pos].Release();
 			if (pos == listPtr)
 			{
 				Debug.Assert(ClearLastListSlot());
@@ -4813,10 +4807,7 @@ namespace HtmlParserSharp.Portable.Core
 					// stack
 					node.DropAttributes(); // adopt ownership to newNode
 					stack[nodePos] = newNode;
-					newNode.Retain(); // retain for list
 					listOfActiveFormattingElements[nodeListPos] = newNode;
-					node.Release(); // release from stack
-					node.Release(); // release from list
 					node = newNode;
 					// } XXX AAA CHANGE
 					DetachFromParent(lastNode.node);
@@ -4882,7 +4873,6 @@ namespace HtmlParserSharp.Portable.Core
 		private void InsertIntoListOfActiveFormattingElements(
 				StackNode<T> formattingClone, int bookmark)
 		{
-			formattingClone.Retain();
 			Debug.Assert(listPtr + 1 < listOfActiveFormattingElements.Length);
 			if (bookmark <= listPtr)
 			{
@@ -5069,8 +5059,6 @@ namespace HtmlParserSharp.Portable.Core
 				// stack takes ownership of the local variable
 				listOfActiveFormattingElements[entryPos] = entryClone;
 				// overwriting the old entry on the list, so release & retain
-				entry.Release();
-				entryClone.Retain();
 			}
 		}
 
@@ -5105,7 +5093,6 @@ namespace HtmlParserSharp.Portable.Core
 			Debug.Assert(ClearLastStackSlot());
 			currentPtr--;
 			ElementPopped(node.ns, node.popName, node.node);
-			node.Release();
 		}
 
 		private void SilentPop()
@@ -5113,7 +5100,6 @@ namespace HtmlParserSharp.Portable.Core
 			StackNode<T> node = stack[currentPtr];
 			Debug.Assert(ClearLastStackSlot());
 			currentPtr--;
-			node.Release();
 		}
 
 		private void PopOnEof()
@@ -5123,7 +5109,6 @@ namespace HtmlParserSharp.Portable.Core
 			currentPtr--;
 			MarkMalformedIfScript(node.node);
 			ElementPopped(node.ns, node.popName, node.node);
-			node.Release();
 		}
 
 		// [NOCPP[
@@ -5341,7 +5326,6 @@ namespace HtmlParserSharp.Portable.Core
 			);
 			Push(node);
 			Append(node);
-			node.Retain(); // append doesn't retain itself
 		}
 
 		private void AppendToCurrentNodeAndPushElement(ElementName elementName, HtmlAttributes attributes)
@@ -5937,7 +5921,6 @@ namespace HtmlParserSharp.Portable.Core
 				else
 				{
 					stackCopy[i] = listCopy[listIndex];
-					stackCopy[i].Retain();
 				}
 			}
 			return new StateSnapshot<T>(stackCopy, listCopy, formPointer, headPointer, deepTreeSurrogateParent, mode, originalMode, framesetOk, needToDropLF, quirks);
@@ -5998,23 +5981,12 @@ namespace HtmlParserSharp.Portable.Core
 			StackNode<T>[] listCopy = snapshot.ListOfActiveFormattingElements;
 			int listLen = snapshot.ListOfActiveFormattingElements.Length;
 
-			for (int i = 0; i <= listPtr; i++)
-			{
-				if (listOfActiveFormattingElements[i] != null)
-				{
-					listOfActiveFormattingElements[i].Release();
-				}
-			}
 			if (listOfActiveFormattingElements.Length < listLen)
 			{
 				listOfActiveFormattingElements = new StackNode<T>[listLen];
 			}
 			listPtr = listLen - 1;
 
-			for (int i = 0; i <= currentPtr; i++)
-			{
-				stack[i].Release();
-			}
 			if (stack.Length < stackLen)
 			{
 				stack = new StackNode<T>[stackLen];
@@ -6060,7 +6032,6 @@ namespace HtmlParserSharp.Portable.Core
 				else
 				{
 					stack[i] = listOfActiveFormattingElements[listIndex];
-					stack[i].Retain();
 				}
 			}
 			formPointer = snapshot.FormPointer;
