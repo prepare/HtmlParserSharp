@@ -30,33 +30,33 @@ namespace HtmlParserSharp.Portable.Core
 {
 	public sealed class StackNode<T>
 	{
-		readonly int flags;
+		readonly int _flags;
 
 		[Local]
-		internal readonly string name;
+		internal readonly string _name;
 
 		[Local]
-		internal readonly string popName;
+		internal readonly string _popName;
 
 		[NsUri]
-		internal readonly string ns;
+		internal readonly string _ns;
 
-		internal readonly T node;
+		internal readonly T _node;
 
 		// Only used on the list of formatting elements
-		internal HtmlAttributes attributes;
+		internal HtmlAttributes _attributes;
 
-		private int refcount = 1;
+		private int _refcount = 1;
 
 		// [NOCPP[
 
-		private readonly TaintableLocator locator;
+		private readonly TaintableLocator _locator;
 
 		public TaintableLocator Locator
 		{
 			get
 			{
-				return locator;
+				return _locator;
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return flags;
+				return _flags;
 			}
 		}
 
@@ -74,7 +74,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return (DispatchGroup)(flags & ElementName.GROUP_MASK);
+				return (DispatchGroup)(_flags & ElementName.GROUP_MASK);
 			}
 		}
 
@@ -82,7 +82,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return (flags & ElementName.SCOPING) != 0;
+				return (_flags & ElementName.SCOPING) != 0;
 			}
 		}
 
@@ -90,7 +90,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return (flags & ElementName.SPECIAL) != 0;
+				return (_flags & ElementName.SPECIAL) != 0;
 			}
 		}
 
@@ -98,7 +98,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return (flags & ElementName.FOSTER_PARENTING) != 0;
+				return (_flags & ElementName.FOSTER_PARENTING) != 0;
 			}
 		}
 
@@ -106,7 +106,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return (flags & ElementName.HTML_INTEGRATION_POINT) != 0;
+				return (_flags & ElementName.HTML_INTEGRATION_POINT) != 0;
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace HtmlParserSharp.Portable.Core
 		{
 			get
 			{
-				return (flags & ElementName.OPTIONAL_END_TAG) != 0;
+				return (_flags & ElementName.OPTIONAL_END_TAG) != 0;
 			}
 		}
 
@@ -134,15 +134,15 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 		)
 		{
-			this.flags = flags;
-			this.name = name;
-			this.popName = popName;
-			this.ns = ns;
-			this.node = node;
-			this.attributes = attributes;
-			this.refcount = 1;
+			this._flags = flags;
+			this._name = name;
+			this._popName = popName;
+			this._ns = ns;
+			this._node = node;
+			this._attributes = attributes;
+			this._refcount = 1;
 			// [NOCPP[
-			this.locator = locator;
+			this._locator = locator;
 			// ]NOCPP]
 		}
 
@@ -155,16 +155,16 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 		)
 		{
-			this.flags = elementName.Flags;
-			this.name = elementName.name;
-			this.popName = elementName.name;
-			this.ns = "http://www.w3.org/1999/xhtml";
-			this.node = node;
-			this.attributes = null;
-			this.refcount = 1;
+			this._flags = elementName.Flags;
+			this._name = elementName.name;
+			this._popName = elementName.name;
+			this._ns = "http://www.w3.org/1999/xhtml";
+			this._node = node;
+			this._attributes = null;
+			this._refcount = 1;
 			Debug.Assert(!elementName.IsCustom, "Don't use this constructor for custom elements.");
 			// [NOCPP[
-			this.locator = locator;
+			this._locator = locator;
 			// ]NOCPP]
 		}
 
@@ -177,16 +177,16 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 		)
 		{
-			this.flags = elementName.Flags;
-			this.name = elementName.name;
-			this.popName = elementName.name;
-			this.ns = "http://www.w3.org/1999/xhtml";
-			this.node = node;
-			this.attributes = attributes;
-			this.refcount = 1;
+			this._flags = elementName.Flags;
+			this._name = elementName.name;
+			this._popName = elementName.name;
+			this._ns = "http://www.w3.org/1999/xhtml";
+			this._node = node;
+			this._attributes = attributes;
+			this._refcount = 1;
 			Debug.Assert(!elementName.IsCustom, "Don't use this constructor for custom elements.");
 			// [NOCPP[
-			this.locator = locator;
+			this._locator = locator;
 			// ]NOCPP]
 		}
 
@@ -199,15 +199,15 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 		)
 		{
-			this.flags = elementName.Flags;
-			this.name = elementName.name;
-			this.popName = popName;
-			this.ns = "http://www.w3.org/1999/xhtml";
-			this.node = node;
-			this.attributes = null;
-			this.refcount = 1;
+			this._flags = elementName.Flags;
+			this._name = elementName.name;
+			this._popName = popName;
+			this._ns = "http://www.w3.org/1999/xhtml";
+			this._node = node;
+			this._attributes = null;
+			this._refcount = 1;
 			// [NOCPP[
-			this.locator = locator;
+			this._locator = locator;
 			// ]NOCPP]
 		}
 
@@ -223,15 +223,15 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 		)
 		{
-			this.flags = PrepareSvgFlags(elementName.Flags);
-			this.name = elementName.name;
-			this.popName = popName;
-			this.ns = "http://www.w3.org/2000/svg";
-			this.node = node;
-			this.attributes = null;
-			this.refcount = 1;
+			this._flags = PrepareSvgFlags(elementName.Flags);
+			this._name = elementName.name;
+			this._popName = popName;
+			this._ns = "http://www.w3.org/2000/svg";
+			this._node = node;
+			this._attributes = null;
+			this._refcount = 1;
 			// [NOCPP[
-			this.locator = locator;
+			this._locator = locator;
 			// ]NOCPP]
 		}
 
@@ -245,15 +245,15 @@ namespace HtmlParserSharp.Portable.Core
 			// ]NOCPP]
 		)
 		{
-			this.flags = PrepareMathFlags(elementName.Flags, markAsIntegrationPoint);
-			this.name = elementName.name;
-			this.popName = popName;
-			this.ns = "http://www.w3.org/1998/Math/MathML";
-			this.node = node;
-			this.attributes = null;
-			this.refcount = 1;
+			this._flags = PrepareMathFlags(elementName.Flags, markAsIntegrationPoint);
+			this._name = elementName.name;
+			this._popName = popName;
+			this._ns = "http://www.w3.org/1998/Math/MathML";
+			this._node = node;
+			this._attributes = null;
+			this._refcount = 1;
 			// [NOCPP[
-			this.locator = locator;
+			this._locator = locator;
 			// ]NOCPP]
 		}
 
@@ -285,7 +285,7 @@ namespace HtmlParserSharp.Portable.Core
 
 		public void DropAttributes()
 		{
-			attributes = null;
+			_attributes = null;
 		}
 
 		// [NOCPP[
@@ -298,7 +298,7 @@ namespace HtmlParserSharp.Portable.Core
 		/// </returns>
 		override public String ToString()
 		{
-			return name;
+			return _name;
 		}
 
 		// ]NOCPP]
@@ -306,12 +306,12 @@ namespace HtmlParserSharp.Portable.Core
 		// TODO: probably we won't need these
 		public void Retain()
 		{
-			refcount++;
+			_refcount++;
 		}
 
 		public void Release()
 		{
-			refcount--;
+			_refcount--;
 			/*if (refcount == 0) {
 				Portability.delete(this);
 			}*/
