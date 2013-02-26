@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -53,14 +54,23 @@ namespace HtmlParserSharp.Console
             var sw = new Stopwatch();
             System.Console.WriteLine("Parsing");
 
-            var results = new List<Tuple<TimeSpan, TimeSpan>>();
+            var results = new List<Tuple<TimeSpan, TimeSpan, TimeSpan>>();
             for (int i = 0; i < 10; i++)
             {
                 // Measure parsing time
                 sw.Restart();
-                var doc = await parser.Parse(new StreamReader("SampleData\\test2.html"));
+                XDocument doc = await parser.Parse(new StreamReader("SampleData\\test2.html"));
                 sw.Stop();
                 var parseTime = sw.Elapsed;
+
+                // Find all of the anchor elements
+
+                sw.Restart();
+                XNamespace xhtmlNamespace = "http://www.w3.org/1999/xhtml";
+                var anchors = from anchor in doc.Root.Descendants(xhtmlNamespace + "a")
+                              select new {AnchorNode = anchor, Uri = anchor.Attribute("href").ToString()};
+                sw.Stop();
+                var queryTime = sw.Elapsed;
 
                 // Exclude file write time
                 using (var stream = File.OpenWrite("test" + i + ".xml"))
@@ -83,26 +93,28 @@ namespace HtmlParserSharp.Console
                 sw.Stop();
                 var reparseTime = sw.Elapsed;
 
-                results.Add(new Tuple<TimeSpan, TimeSpan>(parseTime, reparseTime));
+                results.Add(new Tuple<TimeSpan, TimeSpan, TimeSpan>(parseTime, queryTime, reparseTime));
             }
 
             System.Console.WriteLine("Results ...");
-            TimeSpan totalParseTime = TimeSpan.Zero, totalReparseTime = TimeSpan.Zero;
+            TimeSpan totalParseTime = TimeSpan.Zero, totalQueryTime = TimeSpan.Zero, totalReparseTime = TimeSpan.Zero;
             for (int i = 0; i < results.Count; i++)
             {
-                System.Console.WriteLine(String.Format("Iteration {0}: Parse: {1}ms Reparse: {2}ms", i, results[i].Item1.TotalMilliseconds, results[i].Item2.TotalMilliseconds));
+                System.Console.WriteLine(String.Format("Iteration {0}: Parse: {1:0.0}ms Query: {2:0.000000}ms Reparse: {3:0.0}ms", i, results[i].Item1.TotalMilliseconds, results[i].Item2.TotalMilliseconds, results[i].Item3.TotalMilliseconds));
 
                 // Exclude first iteration
                 if (i > 0)
                 {
                     totalParseTime += results[i].Item1;
-                    totalReparseTime += results[i].Item2;
+                    totalQueryTime += results[i].Item2;
+                    totalReparseTime += results[i].Item3;
                 }
             }
-            var averageParseTime = totalParseTime.TotalMilliseconds/results.Count - 1;
-            var averageReparseTime = totalReparseTime.TotalMilliseconds/results.Count - 1;
-            System.Console.Write(String.Format("Average parse time: {0}, Average reparse time: {1}, Ratio: {2}",
-                                               averageParseTime, averageReparseTime, averageParseTime/averageReparseTime));
+            var averageParseTime = totalParseTime.TotalMilliseconds/(results.Count - 1);
+            var averageQueryTime = totalQueryTime.TotalMilliseconds/(results.Count - 1);
+            var averageReparseTime = totalReparseTime.TotalMilliseconds/(results.Count - 1);
+            System.Console.Write(String.Format("Average parse time: {0:0.0}ms, Average reparse time: {1:0.0}ms, Ratio: {2:0.0}, Average query time: {3:0.000000}",
+                                               averageParseTime, averageReparseTime, averageParseTime/averageReparseTime, averageQueryTime));
         }
 
 		public static void Main(string[] args)
