@@ -20,15 +20,14 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+using HtmlParserSharp.Portable;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
-using HtmlParserSharp.Portable;
-using System.Xml;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace HtmlParserSharp.Console
 {
@@ -37,7 +36,7 @@ namespace HtmlParserSharp.Console
 	/// </summary>
 	public class Program
 	{
-		static SimpleHtmlParser parser = new SimpleHtmlParser();
+		static readonly SimpleHtmlParser parser = new SimpleHtmlParser();
 
 		private static IEnumerable<FileInfo> GetTestFiles()
 		{
@@ -49,77 +48,67 @@ namespace HtmlParserSharp.Console
 			}
 		}
 
+        private async static void Benchmark()
+        {
+            var sw = new Stopwatch();
+            System.Console.WriteLine("Parsing");
+
+            var results = new List<Tuple<TimeSpan, TimeSpan>>();
+            for (int i = 0; i < 10; i++)
+            {
+                // Measure parsing time
+                sw.Restart();
+                var doc = await parser.Parse(new StreamReader("SampleData\\test2.html"));
+                sw.Stop();
+                var parseTime = sw.Elapsed;
+
+                // Exclude file write time
+                using (var stream = File.OpenWrite("test" + i + ".xml"))
+                {
+                    using (var writer = new XmlTextWriter(stream, Encoding.UTF8))
+                    {
+                        doc.Save(writer);
+                    }
+                }
+
+                // Measure reparse time
+                sw.Restart();
+                using (var streamRead = File.OpenRead("test" + i + ".xml"))
+                {
+                    using (var streamReader = new XmlTextReader(streamRead))
+                    {
+                        XDocument.Load(streamReader);
+                    }
+                }
+                sw.Stop();
+                var reparseTime = sw.Elapsed;
+
+                results.Add(new Tuple<TimeSpan, TimeSpan>(parseTime, reparseTime));
+            }
+
+            System.Console.WriteLine("Results ...");
+            TimeSpan totalParseTime = TimeSpan.Zero, totalReparseTime = TimeSpan.Zero;
+            for (int i = 0; i < results.Count; i++)
+            {
+                System.Console.WriteLine(String.Format("Iteration {0}: Parse: {1}ms Reparse: {2}ms", i, results[i].Item1.TotalMilliseconds, results[i].Item2.TotalMilliseconds));
+
+                // Exclude first iteration
+                if (i > 0)
+                {
+                    totalParseTime += results[i].Item1;
+                    totalReparseTime += results[i].Item2;
+                }
+            }
+            var averageParseTime = totalParseTime.TotalMilliseconds/results.Count - 1;
+            var averageReparseTime = totalReparseTime.TotalMilliseconds/results.Count - 1;
+            System.Console.Write(String.Format("Average parse time: {0}, Average reparse time: {1}, Ratio: {2}",
+                                               averageParseTime, averageReparseTime, averageParseTime/averageReparseTime));
+        }
+
 		public static void Main(string[] args)
 		{
-			//var fragment1 = parser.ParseStringFragment("<td>foo", "");
-			//var fragment2 = parser.ParseStringFragment("<td>foo", "table");
-
-			Stopwatch sw = new Stopwatch();
-
-
-
-			System.Console.Write("Parsing ... ");
-			var result = GetTestFiles().Select((file) =>
-			    {
-					sw.Restart();
-				    var doc = parser.Parse(new StreamReader(file.FullName));
-					sw.Stop();
-					var parseTime = sw.Elapsed;
-                    using (var stream = File.OpenWrite("test.xml"))
-                    {
-                        using (var writer = new XmlTextWriter(stream, Encoding.UTF8))
-                        {
-                            doc.Save(writer);
-                        }
-                    }
-					//doc.Save("test.xml", SaveOptions.DisableFormatting);
-					sw.Restart();
-                    using (var streamRead = File.OpenRead("test.xml"))
-                    {
-                        using (var streamReader = new XmlTextReader(streamRead))
-                        {
-                            XDocument.Load(streamReader);
-                        }
-                    }
-                    //XDocument.Load("test.xml");
-					sw.Stop();
-					var reparseTime = sw.Elapsed;
-					return new { Document = doc, Time = parseTime, ReparseTime = reparseTime };
-				}
-				).ToList();
-
-			TimeSpan total = result.Aggregate(new TimeSpan(), (passed, current) => passed + current.Time);
-			TimeSpan reparseTotal = result.Aggregate(new TimeSpan(), (passed, current) => passed + current.ReparseTime);
-
-			System.Console.WriteLine("done.");
-			System.Console.WriteLine("Found " + result.Count + " documents.");
-			System.Console.WriteLine();
-			PrintTime("Total", total);
-			PrintTime("First", result.First().Time);
-			PrintTime("Average", TimeSpan.FromTicks(total.Ticks / result.Count));
-			PrintTime("Average (without first)", TimeSpan.FromTicks((total.Ticks - result.First().Time.Ticks) / (result.Count - 1)));
-			PrintTime("Min", result.Min(val => val.Time));
-			PrintTime("Max", result.Max(val => val.Time));
-
-			System.Console.WriteLine();
-			System.Console.WriteLine("=== Reparsing (XDocument) ===");
-
-			// note: reparsing using XmlDocument instead gives similar results
-
-			PrintTime("Total", reparseTotal);
-			PrintTime("First", result.First().ReparseTime);
-			PrintTime("Average", TimeSpan.FromTicks(reparseTotal.Ticks / result.Count));
-			PrintTime("Average (without first)", TimeSpan.FromTicks((reparseTotal.Ticks - result.First().ReparseTime.Ticks) / (result.Count - 1)));
-			PrintTime("Min", result.Min(val => val.ReparseTime));
-			PrintTime("Max", result.Max(val => val.ReparseTime));
+		    Benchmark();
 			System.Console.ReadKey();
 		}
-
-		private static void PrintTime(string caption, TimeSpan time)
-		{
-			System.Console.WriteLine("{0}:\n  {1} ({2} ms)", caption, time.ToString(), time.TotalMilliseconds);
-		}
-
-
 	}
 }

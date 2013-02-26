@@ -26,6 +26,7 @@ using System;
 using System.IO;
 using System.Xml.Linq;
 using HtmlParserSharp.Portable.Core;
+using System.Threading.Tasks;
 
 namespace HtmlParserSharp.Portable
 {
@@ -45,7 +46,7 @@ namespace HtmlParserSharp.Portable
         //        return ParseFragment(reader, fragmentContext);
         //}
 
-        public XDocument ParseString(string str)
+        public Task<XDocument> ParseString(string str)
         {
             using (var reader = new StringReader(str))
                 return Parse(reader);
@@ -57,11 +58,14 @@ namespace HtmlParserSharp.Portable
         //        return Parse(reader);
         //}
 
-        public XDocument Parse(TextReader reader)
+        public Task<XDocument> Parse(TextReader reader)
         {
-            Reset();
-            Tokenize(reader, swallowBom: true);
-            return _treeBuilder.Document;
+            return Task<XDocument>.Factory.StartNew(() =>
+                {
+                    Reset();
+                    Tokenize(reader, swallowBom: true);
+                    return _treeBuilder.Document;
+                });
         }
 
         //public XmlDocumentFragment ParseFragment(TextReader reader, string fragmentContext)
