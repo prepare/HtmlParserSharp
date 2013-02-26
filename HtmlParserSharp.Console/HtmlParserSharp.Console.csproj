@@ -54,6 +54,9 @@
     <Content Include="SampleData\test.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="SampleData\test2.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HtmlParserSharp.Portable\HtmlParserSharp.Portable.csproj">

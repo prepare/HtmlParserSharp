@@ -27,6 +27,8 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using HtmlParserSharp.Portable;
+using System.Xml;
+using System.Text;
 
 namespace HtmlParserSharp.Console
 {
@@ -43,7 +45,7 @@ namespace HtmlParserSharp.Console
 			//return dir.GetFiles("*.html", SearchOption.AllDirectories);
 			for (int i = 0; i < 10; i++)
 			{
-				yield return new FileInfo(Path.Combine("SampleData", "test.html"));
+				yield return new FileInfo(Path.Combine("SampleData", "test2.html"));
 			}
 		}
 
@@ -58,14 +60,28 @@ namespace HtmlParserSharp.Console
 
 			System.Console.Write("Parsing ... ");
 			var result = GetTestFiles().Select((file) =>
-				{
+			    {
 					sw.Restart();
 				    var doc = parser.Parse(new StreamReader(file.FullName));
 					sw.Stop();
 					var parseTime = sw.Elapsed;
-					doc.Save("test.xml");
+                    using (var stream = File.OpenWrite("test.xml"))
+                    {
+                        using (var writer = new XmlTextWriter(stream, Encoding.UTF8))
+                        {
+                            doc.Save(writer);
+                        }
+                    }
+					//doc.Save("test.xml", SaveOptions.DisableFormatting);
 					sw.Restart();
-					XDocument.Load("test.xml");
+                    using (var streamRead = File.OpenRead("test.xml"))
+                    {
+                        using (var streamReader = new XmlTextReader(streamRead))
+                        {
+                            XDocument.Load(streamReader);
+                        }
+                    }
+                    //XDocument.Load("test.xml");
 					sw.Stop();
 					var reparseTime = sw.Elapsed;
 					return new { Document = doc, Time = parseTime, ReparseTime = reparseTime };
