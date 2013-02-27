@@ -39,17 +39,7 @@ namespace HtmlParserSharp.Console
 	{
 		static readonly SimpleHtmlParser parser = new SimpleHtmlParser();
 
-		private static IEnumerable<FileInfo> GetTestFiles()
-		{
-			//DirectoryInfo dir = new DirectoryInfo("SampleData");
-			//return dir.GetFiles("*.html", SearchOption.AllDirectories);
-			for (int i = 0; i < 10; i++)
-			{
-				yield return new FileInfo(Path.Combine("SampleData", "test2.html"));
-			}
-		}
-
-        private async static void Benchmark()
+	    private async static void Benchmark()
         {
             var sw = new Stopwatch();
             System.Console.WriteLine("Parsing");
