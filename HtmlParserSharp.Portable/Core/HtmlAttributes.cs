@@ -34,13 +34,9 @@ namespace HtmlParserSharp.Portable.Core
     /// </summary>
     public sealed class HtmlAttributes : IEquatable<HtmlAttributes> /* : Sax.IAttributes*/
     {
-        // [NOCPP[
-
         private static readonly AttributeName[] EMPTY_ATTRIBUTENAMES = new AttributeName[0];
 
         private static readonly string[] EMPTY_stringS = new string[0];
-
-        // ]NOCPP]
 
         public static readonly HtmlAttributes EMPTY_ATTRIBUTES = new HtmlAttributes(AttributeName.HTML);
 
@@ -52,8 +48,6 @@ namespace HtmlParserSharp.Portable.Core
 
         private string[] _values;
 
-        // [NOCPP[
-
         private string _idValue;
 
         private int _xmlnsLength;
@@ -61,8 +55,6 @@ namespace HtmlParserSharp.Portable.Core
         private AttributeName[] _xmlnsNames;
 
         private string[] _xmlnsValues;
-
-        // ]NOCPP]
 
         public HtmlAttributes(int mode)
         {
@@ -75,8 +67,6 @@ namespace HtmlParserSharp.Portable.Core
             _names = new AttributeName[5];
             _values = new string[5];
 
-            // [NOCPP[
-
             _idValue = null;
 
             _xmlnsLength = 0;
@@ -84,8 +74,6 @@ namespace HtmlParserSharp.Portable.Core
             _xmlnsNames = EMPTY_ATTRIBUTENAMES;
 
             _xmlnsValues = EMPTY_stringS;
-
-            // ]NOCPP]
         }
 
         /*
@@ -117,8 +105,6 @@ namespace HtmlParserSharp.Portable.Core
             }
             return -1;
         }
-
-        // [NOCPP[
 
         public int GetIndex(string qName)
         {
@@ -185,8 +171,6 @@ namespace HtmlParserSharp.Portable.Core
             return GetValue(index);
         }
 
-        // ]NOCPP]
-
         public int Length
         {
             get { return _length; }
@@ -201,8 +185,6 @@ namespace HtmlParserSharp.Portable.Core
             }
             return null;
         }
-
-        // [NOCPP[
 
         public string GetQName(int index)
         {
@@ -221,8 +203,6 @@ namespace HtmlParserSharp.Portable.Core
             }
             return null;
         }
-
-        // ]NOCPP]
 
         public AttributeName GetAttributeName(int index)
         {
@@ -274,8 +254,6 @@ namespace HtmlParserSharp.Portable.Core
             }
             return GetValue(index);
         }
-
-        // [NOCPP[
 
         public string Id
         {
@@ -347,15 +325,8 @@ namespace HtmlParserSharp.Portable.Core
             return null;
         }
 
-        // ]NOCPP]
-
-        internal void AddAttribute(AttributeName name, string value
-                                   // [NOCPP[
-                                   , XmlViolationPolicy xmlnsPolicy
-            // ]NOCPP]        
-            )
+        internal void AddAttribute(AttributeName name, string value, XmlViolationPolicy xmlnsPolicy)
         {
-            // [NOCPP[
             if (name == AttributeName.ID)
             {
                 _idValue = value;
@@ -388,8 +359,6 @@ namespace HtmlParserSharp.Portable.Core
                 }
             }
 
-            // ]NOCPP]
-
             if (_names.Length == _length)
             {
                 int newLen = _length << 1; // The first growth covers virtually
@@ -416,7 +385,6 @@ namespace HtmlParserSharp.Portable.Core
             }
             _length = 0;
             _mode = m;
-            // [NOCPP[
             _idValue = null;
             for (int i = 0; i < _xmlnsLength; i++)
             {
@@ -424,7 +392,6 @@ namespace HtmlParserSharp.Portable.Core
                 _xmlnsValues[i] = null;
             }
             _xmlnsLength = 0;
-            // ]NOCPP]
         }
 
         /// <summary>
@@ -450,7 +417,6 @@ namespace HtmlParserSharp.Portable.Core
                     return true;
                 }
             }
-            // [NOCPP[
             for (int i = 0; i < _xmlnsLength; i++)
             {
                 if (name.EqualsAnother(_xmlnsNames[i]))
@@ -458,7 +424,6 @@ namespace HtmlParserSharp.Portable.Core
                     return true;
                 }
             }
-            // ]NOCPP]
             return false;
         }
 
@@ -478,19 +443,12 @@ namespace HtmlParserSharp.Portable.Core
             var clone = new HtmlAttributes(0);
             for (int i = 0; i < _length; i++)
             {
-                clone.AddAttribute(_names[i].CloneAttributeName(), _values[i]
-                                   // [NOCPP[
-                                   , XmlViolationPolicy.Allow
-                    // ]NOCPP]
-                    );
+                clone.AddAttribute(_names[i].CloneAttributeName(), _values[i], XmlViolationPolicy.Allow);
             }
-            // [NOCPP[
             for (int i = 0; i < _xmlnsLength; i++)
             {
-                clone.AddAttribute(_xmlnsNames[i],
-                                   _xmlnsValues[i], XmlViolationPolicy.Allow);
+                clone.AddAttribute(_xmlnsNames[i], _xmlnsValues[i], XmlViolationPolicy.Allow);
             }
-            // ]NOCPP]
             return clone; // XXX!!!
         }
 
@@ -528,8 +486,6 @@ namespace HtmlParserSharp.Portable.Core
             }
             return true;
         }
-
-        // [NOCPP[
 
         internal void ProcessNonNcNames<T>(TreeBuilder<T> treeBuilder, XmlViolationPolicy namePolicy) where T : class
         {
@@ -570,7 +526,5 @@ namespace HtmlParserSharp.Portable.Core
                 }
             }
         }
-
-        // ]NOCPP]
     }
 }

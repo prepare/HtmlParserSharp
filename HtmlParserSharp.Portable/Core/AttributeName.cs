@@ -28,8 +28,6 @@ namespace HtmlParserSharp.Portable.Core
 {
     public sealed class AttributeName
     {
-        // [NOCPP[
-
         public const int NCNAME_HTML = 1;
 
         public const int NCNAME_FOREIGN = (1 << 1) | (1 << 2);
@@ -42,18 +40,13 @@ namespace HtmlParserSharp.Portable.Core
 
         public const int BOOLEAN = (1 << 6);
 
-        // ]NOCPP]
-
         /// <summary>
         ///     An array representing no namespace regardless of namespace mode (HTML,
         ///     SVG, MathML, lang-mapping HTML) used.
         /// </summary>
         [NsUri] private static readonly string[] ALL_NO_NS =
             {
-                "", "", "",
-                // [NOCPP[
-                ""
-                // ]NOCPP]
+                "", "", "", ""
             };
 
         /// <summary>
@@ -62,11 +55,7 @@ namespace HtmlParserSharp.Portable.Core
         /// </summary>
         [NsUri] private static readonly string[] XMLNS_NS =
             {
-                "",
-                "http://www.w3.org/2000/xmlns/", "http://www.w3.org/2000/xmlns/",
-                // [NOCPP[
-                ""
-                // ]NOCPP]
+                "", "http://www.w3.org/2000/xmlns/", "http://www.w3.org/2000/xmlns/", ""
             };
 
         /// <summary>
@@ -75,12 +64,7 @@ namespace HtmlParserSharp.Portable.Core
         /// </summary>
         [NsUri] private static readonly string[] XML_NS =
             {
-                "",
-                "http://www.w3.org/XML/1998/namespace",
-                "http://www.w3.org/XML/1998/namespace",
-                // [NOCPP[
-                ""
-                // ]NOCPP]
+                "", "http://www.w3.org/XML/1998/namespace", "http://www.w3.org/XML/1998/namespace", ""
             };
 
         /// <summary>
@@ -89,35 +73,24 @@ namespace HtmlParserSharp.Portable.Core
         /// </summary>
         [NsUri] private static readonly string[] XLINK_NS =
             {
-                "",
-                "http://www.w3.org/1999/xlink", "http://www.w3.org/1999/xlink",
-                // [NOCPP[
-                ""
-                // ]NOCPP]
+                "", "http://www.w3.org/1999/xlink", "http://www.w3.org/1999/xlink", ""
             };
 
-        // [NOCPP[
         /// <summary>
         ///     An array that has no namespace for the HTML, SVG and MathML modes but has
         ///     the XML namespace for the lang-mapping HTML mode.
         /// </summary>
         [NsUri] private static readonly string[] LANG_NS =
             {
-                "", "", "",
-                "http://www.w3.org/XML/1998/namespace"
+                "", "", "", "http://www.w3.org/XML/1998/namespace"
             };
-
-        // ]NOCPP]
 
         /// <summary>
         ///     An array for no prefixes in any mode.
         /// </summary>
         [Prefix] private static readonly string[] ALL_NO_PREFIX =
             {
-                null, null, null,
-                // [NOCPP[
-                null
-                // ]NOCPP]
+                null, null, null, null
             };
 
         /// <summary>
@@ -126,11 +99,7 @@ namespace HtmlParserSharp.Portable.Core
         /// </summary>
         [Prefix] private static readonly string[] XMLNS_PREFIX =
             {
-                null,
-                "xmlns", "xmlns",
-                // [NOCPP[
-                null
-                // ]NOCPP]
+                null, "xmlns", "xmlns", null
             };
 
         /// <summary>
@@ -140,11 +109,7 @@ namespace HtmlParserSharp.Portable.Core
         /// </summary>
         [Prefix] private static readonly string[] XLINK_PREFIX =
             {
-                null,
-                "xlink", "xlink",
-                // [NOCPP[
-                null
-                // ]NOCPP]
+                null, "xlink", "xlink", null
             };
 
         /// <summary>
@@ -153,19 +118,12 @@ namespace HtmlParserSharp.Portable.Core
         /// </summary>
         [Prefix] private static readonly string[] XML_PREFIX =
             {
-                null, "xml",
-                "xml",
-                // [NOCPP[
-                null
-                // ]NOCPP]
+                null, "xml", "xml", null
             };
-
-        // [NOCPP[
 
         [Prefix] private static readonly string[] LANG_PREFIX =
             {
-                null, null,
-                null, "xml"
+                null, null, null, "xml"
             };
 
         private static string[] COMPUTE_QNAME(String[] local, String[] prefix)
@@ -185,8 +143,6 @@ namespace HtmlParserSharp.Portable.Core
             return arr;
         }
 
-        // ]NOCPP]
-
         /// <summary>
         ///     An initialization helper for having a one name in the SVG mode and
         ///     another name in the other modes.
@@ -202,9 +158,7 @@ namespace HtmlParserSharp.Portable.Core
             arr[0] = name;
             arr[1] = name;
             arr[2] = camel;
-            // [NOCPP[
             arr[3] = name;
-            // ]NOCPP]
             return arr;
         }
 
@@ -223,9 +177,7 @@ namespace HtmlParserSharp.Portable.Core
             arr[0] = name;
             arr[1] = camel;
             arr[2] = name;
-            // [NOCPP[
             arr[3] = name;
-            // ]NOCPP]
             return arr;
         }
 
@@ -244,9 +196,7 @@ namespace HtmlParserSharp.Portable.Core
             arr[0] = name;
             arr[1] = suffix;
             arr[2] = suffix;
-            // [NOCPP[
             arr[3] = name;
-            // ]NOCPP]
             return arr;
         }
 
@@ -263,9 +213,7 @@ namespace HtmlParserSharp.Portable.Core
             arr[0] = name;
             arr[1] = name;
             arr[2] = name;
-            // [NOCPP[
             arr[3] = name;
-            // ]NOCPP]
             return arr;
         }
 
@@ -284,11 +232,7 @@ namespace HtmlParserSharp.Portable.Core
         /// <returns>
         ///     An <code>AttributeName</code> corresponding to the argument data
         /// </returns>
-        internal static AttributeName NameByBuffer(char[] buf, int offset, int length
-                                                   // [NOCPP[
-                                                   , bool checkNcName
-            // ]NOCPP]
-            )
+        internal static AttributeName NameByBuffer(char[] buf, int offset, int length, bool checkNcName)
         {
             // XXX deal with offset
             int hash = BufToHash(buf, length);
@@ -297,9 +241,7 @@ namespace HtmlParserSharp.Portable.Core
             {
                 return CreateAttributeName(
                     Portability.NewLocalNameFromBuffer(buf, offset, length)
-                    // [NOCPP[
                     , checkNcName
-                    // ]NOCPP]
                     );
             }
             AttributeName attributeName = ATTRIBUTE_NAMES[index];
@@ -309,9 +251,7 @@ namespace HtmlParserSharp.Portable.Core
             {
                 return CreateAttributeName(
                     Portability.NewLocalNameFromBuffer(buf, offset, length)
-                    // [NOCPP[
                     , checkNcName
-                    // ]NOCPP]
                     );
             }
             return attributeName;
@@ -358,40 +298,32 @@ namespace HtmlParserSharp.Portable.Core
         /// </summary>
         public const int SVG = 2;
 
-        // [NOCPP[
-
         /// <summary>
         ///     The mode value for lang-mapping HTML.
         /// </summary>
         public const int HTML_LANG = 3;
 
-        // ]NOCPP]
-
         /// <summary>
         ///     The namespaces indexable by mode.
         /// </summary>
-        [NsUri] private readonly string[] uri;
+        [NsUri] private readonly string[] _uri;
 
         /// <summary>
         ///     The local names indexable by mode.
         /// </summary>
-        [Local] private readonly string[] local;
+        [Local] private readonly string[] _local;
 
         /// <summary>
         ///     The prefixes indexably by mode.
         /// </summary>
-        [Prefix] private readonly string[] prefix;
+        [Prefix] private readonly string[] _prefix;
 
-        // [NOCPP[
-
-        private readonly int flags;
+        private readonly int _flags;
 
         /// <summary>
         ///     The qnames indexable by mode.
         /// </summary>
-        private readonly string[] qName;
-
-        // ]NOCPP]
+        private readonly string[] _qName;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="AttributeName" /> class (The startup-time constructor).
@@ -400,20 +332,13 @@ namespace HtmlParserSharp.Portable.Core
         /// <param name="local">The local name.</param>
         /// <param name="prefix">The prefix.</param>
         /// <param name="flags">The flags.</param>
-        /*protected*/
-        private AttributeName([NsUri] string[] uri, [Local] string[] local, [Prefix] string[] prefix
-                              // [NOCPP[
-                              , int flags
-            // ]NOCPP]        
-            )
+        private AttributeName([NsUri] string[] uri, [Local] string[] local, [Prefix] string[] prefix, int flags)
         {
-            this.uri = uri;
-            this.local = local;
-            this.prefix = prefix;
-            // [NOCPP[
-            qName = COMPUTE_QNAME(local, prefix);
-            this.flags = flags;
-            // ]NOCPP]
+            this._uri = uri;
+            this._local = local;
+            this._prefix = prefix;
+            _qName = COMPUTE_QNAME(local, prefix);
+            this._flags = flags;
         }
 
         /// <summary>
@@ -424,13 +349,8 @@ namespace HtmlParserSharp.Portable.Core
         /// <returns>
         ///     An <code>AttributeName</code>
         /// </returns>
-        private static AttributeName CreateAttributeName([Local] string name
-                                                         // [NOCPP[
-                                                         , bool checkNcName
-            // ]NOCPP]
-            )
+        private static AttributeName CreateAttributeName([Local] string name, bool checkNcName)
         {
-            // [NOCPP[
             int flags = NCNAME_HTML | NCNAME_FOREIGN | NCNAME_LANG;
             if (name.StartsWith("xmlns:"))
             {
@@ -440,7 +360,6 @@ namespace HtmlParserSharp.Portable.Core
             {
                 flags = 0;
             }
-            // ]NOCPP]
             return new AttributeName(ALL_NO_NS, SAME_LOCAL(name), ALL_NO_PREFIX, flags);
         }
 
@@ -450,12 +369,11 @@ namespace HtmlParserSharp.Portable.Core
         ///     <code>this</code> in Java and for non-dynamic instances in C++.
         /// </summary>
         /// <returns>A clone</returns>
-        public /*virtual*/ AttributeName CloneAttributeName( /*Interner interner*/)
+        public AttributeName CloneAttributeName( /*Interner interner*/)
         {
             return this;
         }
 
-        // [NOCPP[
         /// <summary>
         ///     Creator for use when the XML violation policy requires an attribute name
         ///     to be changed.
@@ -478,7 +396,7 @@ namespace HtmlParserSharp.Portable.Core
         /// </returns>
         public bool IsNcName(int mode)
         {
-            return (flags & (1 << mode)) != 0;
+            return (_flags & (1 << mode)) != 0;
         }
 
         /// <summary>
@@ -489,7 +407,7 @@ namespace HtmlParserSharp.Portable.Core
         /// </returns>
         public bool IsXmlns
         {
-            get { return (flags & IS_XMLNS) != 0; }
+            get { return (_flags & IS_XMLNS) != 0; }
         }
 
         /// <summary>
@@ -501,37 +419,35 @@ namespace HtmlParserSharp.Portable.Core
         /// </returns>
         internal bool IsCaseFolded
         {
-            get { return (flags & CASE_FOLDED) != 0; }
+            get { return (_flags & CASE_FOLDED) != 0; }
         }
 
         internal bool IsBoolean
         {
-            get { return (flags & BOOLEAN) != 0; }
+            get { return (_flags & BOOLEAN) != 0; }
         }
 
         public string GetQName(int mode)
         {
-            return qName[mode];
+            return _qName[mode];
         }
-
-        // ]NOCPP]
 
         [NsUri]
         public string GetUri(int mode)
         {
-            return uri[mode];
+            return _uri[mode];
         }
 
         [Local]
         public string GetLocal(int mode)
         {
-            return local[mode];
+            return _local[mode];
         }
 
         [Prefix]
         public string GetPrefix(int mode)
         {
-            return prefix[mode];
+            return _prefix[mode];
         }
 
         internal bool EqualsAnother(AttributeName another)
