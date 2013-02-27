@@ -50,6 +50,7 @@ namespace HtmlParserSharp.Console
                 // Measure parsing time
                 sw.Restart();
                 XDocument doc = await parser.Parse(new StreamReader("SampleData\\test2.html"));
+                var encoding = parser.DocumentEncoding;
                 sw.Stop();
                 var parseTime = sw.Elapsed;
 
@@ -57,6 +58,15 @@ namespace HtmlParserSharp.Console
 
                 sw.Restart();
                 XNamespace xhtmlNamespace = "http://www.w3.org/1999/xhtml";
+                var metas = from meta in doc.Root.Descendants(xhtmlNamespace + "meta")
+                            select new {Charset = meta.Attribute("charset")};
+                if (metas.Count() > 0)
+                {
+                    foreach (var metatag in metas)
+                    {
+                        System.Console.WriteLine(metatag.Charset);
+                    }
+                }
                 var anchors = from anchor in doc.Root.Descendants(xhtmlNamespace + "a")
                               select new {AnchorNode = anchor, Uri = anchor.Attribute("href").ToString()};
                 sw.Stop();

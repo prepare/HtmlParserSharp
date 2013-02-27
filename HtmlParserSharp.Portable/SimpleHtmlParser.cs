@@ -40,6 +40,8 @@ namespace HtmlParserSharp.Portable
         private Tokenizer _tokenizer;
         private DomTreeBuilder _treeBuilder;
 
+        public string DocumentEncoding { get; private set; }
+
         //public XmlDocumentFragment ParseStringFragment(string str, string fragmentContext)
         //{
         //    using (var reader = new StringReader(str))
@@ -79,8 +81,13 @@ namespace HtmlParserSharp.Portable
         private void Reset()
         {
             _treeBuilder = new DomTreeBuilder();
-            _tokenizer = new Tokenizer(_treeBuilder, false);
             _treeBuilder.IsIgnoringComments = false;
+
+            _tokenizer = new Tokenizer(_treeBuilder, false);
+            _tokenizer.EncodingDeclared += (sender, args) =>
+                {
+                    DocumentEncoding = args.Encoding;
+                };
 
             // optionally: report errors and more
 
