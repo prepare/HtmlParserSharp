@@ -18,6 +18,10 @@ namespace HtmlParserSharp.Tests
             {
                 XDocument doc = await parser.Parse(reader);
                 Assert.IsNotNull(doc);
+
+                // TODO: parser is probably the wrong place for this property today. It should
+                // be somewhere on the document, but not sure where on the XDocument it belongs
+                Assert.AreEqual("ISO-8859-1", parser.DocumentEncoding);
             }
         }
     }
