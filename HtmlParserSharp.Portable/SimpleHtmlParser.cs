@@ -50,15 +50,8 @@ namespace HtmlParserSharp.Portable
 
         public Task<XDocument> ParseString(string str)
         {
-            using (var reader = new StringReader(str))
-                return Parse(reader);
+            return Parse(new StringReader(str));
         }
-
-        //public XDocument Parse(string path)
-        //{
-        //    using (var reader = new StreamReader(path))
-        //        return Parse(reader);
-        //}
 
         public Task<XDocument> Parse(TextReader reader)
         {
@@ -83,10 +76,20 @@ namespace HtmlParserSharp.Portable
             _treeBuilder = new DomTreeBuilder();
             _treeBuilder.IsIgnoringComments = false;
 
+            // TODO: need to move this somewhere else
+            DocumentEncoding = "Windows-1252"; // default encoding -- how is this defined properly???
             _tokenizer = new Tokenizer(_treeBuilder, false);
             _tokenizer.EncodingDeclared += (sender, args) =>
                 {
-                    DocumentEncoding = args.Encoding;
+                    // TODO: understand what this really does?
+                    if (args.Encoding.ToUpper() == "ISO-8859-1")
+                    {
+                        DocumentEncoding = "Windows-1252";
+                    }
+                    else
+                    {
+                        DocumentEncoding = args.Encoding;
+                    }
                 };
 
             // optionally: report errors and more
