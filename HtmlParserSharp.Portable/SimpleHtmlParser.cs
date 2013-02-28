@@ -82,6 +82,7 @@ namespace HtmlParserSharp.Portable
             _tokenizer.EncodingDeclared += (sender, args) =>
                 {
                     // TODO: understand what this really does?
+                    // TODO: there is an allow list of encodings that we need to check against
                     if (args.Encoding.ToUpper() == "ISO-8859-1")
                     {
                         DocumentEncoding = "Windows-1252";

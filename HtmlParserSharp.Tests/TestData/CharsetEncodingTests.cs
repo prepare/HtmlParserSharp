@@ -75,7 +75,8 @@ namespace HtmlParserSharp.Tests.TestData
             foreach (var testCase in testCases)
             {
                 var doc = await parser.ParseString(testCase.Html);
-                if (!string.Equals(testCase.Encoding, parser.DocumentEncoding, StringComparison.CurrentCultureIgnoreCase))
+                var cleanedUpDocumentEncoding = parser.DocumentEncoding.Trim();
+                if (!string.Equals(testCase.Encoding, cleanedUpDocumentEncoding, StringComparison.CurrentCultureIgnoreCase))
                 {
                     errorOffsets.Add(counter);
                 }
@@ -103,6 +104,13 @@ namespace HtmlParserSharp.Tests.TestData
         public async Task EncodingTests3()
         {
             await RunTestFile("Encodings\\test-yahoo-jp.dat");
+        }
+
+        [TestMethod]
+        [DeploymentItem("TestData")]
+        public async Task EncodingTests4()
+        {
+            await RunTestFile("Encodings\\tests3.dat");
         }
     }
 }
