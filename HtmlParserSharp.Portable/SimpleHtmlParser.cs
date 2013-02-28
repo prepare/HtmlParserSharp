@@ -70,6 +70,7 @@ namespace HtmlParserSharp.Portable
         //    Tokenize(reader);
         //    return treeBuilder.getDocumentFragment();
         //}
+        private bool _charsetSetAlready;
 
         private void Reset()
         {
@@ -78,19 +79,24 @@ namespace HtmlParserSharp.Portable
 
             // TODO: need to move this somewhere else
             DocumentEncoding = "Windows-1252"; // default encoding -- how is this defined properly???
+            _charsetSetAlready = false;
             _tokenizer = new Tokenizer(_treeBuilder, false);
             _tokenizer.EncodingDeclared += (sender, args) =>
                 {
-                    // TODO: understand what this really does?
-                    // TODO: there is an allow list of encodings that we need to check against
-                    if (args.Encoding.ToUpper() == "ISO-8859-1")
+                    // Semantics are that the first one sticks
+                    // TODO: there is an allow list of encodings that we need to check against?
+                    if (!_charsetSetAlready)
                     {
-                        DocumentEncoding = "Windows-1252";
+                        if (String.Equals(args.Encoding, "ISO-8859-1", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            DocumentEncoding = "Windows-1252";
+                        }
+                        else
+                        {
+                            DocumentEncoding = args.Encoding;
+                        }
                     }
-                    else
-                    {
-                        DocumentEncoding = args.Encoding;
-                    }
+                    _charsetSetAlready = true;
                 };
 
             // optionally: report errors and more
