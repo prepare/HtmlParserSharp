@@ -64,7 +64,6 @@
     <Compile Include="CharsetEncodingTests.cs" />
     <Compile Include="SanitizerTests.cs" />
     <Compile Include="TokenizerTests.cs" />
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="WholeDocumentTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

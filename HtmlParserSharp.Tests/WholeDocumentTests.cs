@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace HtmlParserSharp.Tests
@@ -19,9 +20,14 @@ namespace HtmlParserSharp.Tests
                 XDocument doc = await parser.Parse(reader);
                 Assert.IsNotNull(doc);
 
-                // TODO: parser is probably the wrong place for this property today. It should
-                // be somewhere on the document, but not sure where on the XDocument it belongs
-                Assert.AreEqual("ISO-8859-1", parser.DocumentEncoding);
+                // Baseline the # of types of elements that we find inside of this
+                XNamespace xhtmlNamespace = "http://www.w3.org/1999/xhtml";
+                var anchors = from anchor in doc.Root.Descendants(xhtmlNamespace + "a")
+                              select new {AnchorNode = anchor, Uri = anchor.Attribute("href").ToString()};
+                Assert.AreEqual(33886, anchors.Count());
+                var paragraphs = from paragraph in doc.Root.Descendants(xhtmlNamespace + "p")
+                                 select new {Paragraph = paragraph};
+                Assert.AreEqual(11727, paragraphs.Count());
             }
         }
     }
