@@ -24,6 +24,8 @@
 
 using System;
 using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Xml.Linq;
 using HtmlParserSharp.Portable.Core;
 using System.Threading.Tasks;
@@ -42,11 +44,11 @@ namespace HtmlParserSharp.Portable
 
         public string DocumentEncoding { get; private set; }
 
-        //public XmlDocumentFragment ParseStringFragment(string str, string fragmentContext)
-        //{
-        //    using (var reader = new StringReader(str))
-        //        return ParseFragment(reader, fragmentContext);
-        //}
+        public XNode ParseStringFragment(string str, string fragmentContext)
+        {
+            using (var reader = new StringReader(str))
+                return ParseFragment(reader, fragmentContext);
+        }
 
         public Task<XDocument> ParseString(string str)
         {
@@ -63,19 +65,25 @@ namespace HtmlParserSharp.Portable
                 });
         }
 
-        //public XmlDocumentFragment ParseFragment(TextReader reader, string fragmentContext)
-        //{
-        //    Reset();
-        //    treeBuilder.SetFragmentContext(fragmentContext);
-        //    Tokenize(reader);
-        //    return treeBuilder.getDocumentFragment();
-        //}
+        public XNode ParseFragment(TextReader reader, string fragmentContext)
+        {
+            Reset();
+            _treeBuilder.SetFragmentContext(fragmentContext);
+            Tokenize(reader, true);
+            XDocument doc = _treeBuilder.Document;
+            var root = doc.Root as XElement;
+            XNode firstChild = root.Nodes().First();
+            return firstChild;
+        }
+
         private bool _charsetSetAlready;
 
         private void Reset()
         {
-            _treeBuilder = new DomTreeBuilder();
-            _treeBuilder.IsIgnoringComments = false;
+            _treeBuilder = new DomTreeBuilder()
+                {
+                    IsIgnoringComments = false
+                };
 
             // TODO: need to move this somewhere else
             DocumentEncoding = "Windows-1252"; // default encoding -- how is this defined properly???
@@ -99,16 +107,14 @@ namespace HtmlParserSharp.Portable
                     _charsetSetAlready = true;
                 };
 
-            // optionally: report errors and more
-
-            //treeBuilder.ErrorEvent +=
-            //    (sender, a) =>
-            //    {
-            //        ILocator loc = tokenizer as ILocator;
-            //        Console.WriteLine("{0}: {1} (Line: {2})", a.IsWarning ? "Warning" : "Error", a.Message, loc.LineNumber);
-            //    };
+            _treeBuilder.ErrorEvent +=
+                (sender, a) =>
+                {
+                    ILocator loc = _tokenizer as ILocator;
+                    var message = String.Format("{0}: {1} (Line: {2})", a.IsWarning ? "Warning" : "Error", a.Message, loc.LineNumber);
+                    // TODO: figure out where to write this out to
+                };
             //treeBuilder.DocumentModeDetected += (sender, a) => Console.WriteLine("Document mode: " + a.Mode.ToString());
-            //tokenizer.EncodingDeclared += (sender, a) => Console.WriteLine("Encoding: " + a.Encoding + " (currently ignored)");
         }
 
         private void Tokenize(TextReader reader, bool swallowBom)

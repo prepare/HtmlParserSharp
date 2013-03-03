@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using HtmlParserSharp.Portable;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ServiceStack.Text;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace HtmlParserSharp.Tests
 {
@@ -18,24 +19,29 @@ namespace HtmlParserSharp.Tests
             public string ReXml { get; set; }
         }
 
-        private List<SanitizerTestCase> LoadTestCases(string path)
+        private IEnumerable<SanitizerTestCase> LoadTestCases(string path)
         {
-            string testCaseData;
             using (var reader = new StreamReader(path))
             {
-                testCaseData = reader.ReadToEnd();
+                return JsonSerializer.DeserializeFromReader<List<SanitizerTestCase>>(reader);
             }
-
-            var result = JsonSerializer.DeserializeFromString<List<SanitizerTestCase>>(testCaseData);
-            return result;
         }
         
+        // To get these tests to work, we need to enable HTML fragment parsing and not whole-doc parsing
+
         [TestMethod]
         [DeploymentItem("TestData")]
         public void TestMethod1()
         {
             var testCases = LoadTestCases("sanitizer_tests.dat");
+            var parser = new SimpleHtmlParser();
 
+            foreach (var testCase in testCases)
+            {
+                var doc = parser.ParseStringFragment(testCase.Input, String.Empty);
+                var node = doc.Dump();
+                var y = 42;
+            }
         }
     }
 }

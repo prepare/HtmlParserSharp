@@ -45,7 +45,9 @@ namespace HtmlParserSharp.Portable.Core
             {
                 string localName = attributes.GetLocalName(i);
                 string namespaceUri = attributes.GetURI(i);
-                element.SetAttributeValue("{" + namespaceUri + "}" + localName, attributes.GetValue(i));
+                XNamespace ns = namespaceUri;
+                XName name = ns + localName;
+                element.SetAttributeValue(name, attributes.GetValue(i));
             }
         }
 
@@ -146,20 +148,6 @@ namespace HtmlParserSharp.Portable.Core
             get { return _document; }
         }
 
-        /// <summary>
-        ///     Return the document fragment.
-        /// </summary>
-        /// <returns>The document fragment</returns>
-        /// HUH???
-        //internal XmlDocumentFragment getDocumentFragment() {
-        //    XmlDocumentFragment rv = _document.CreateDocumentFragment();
-        //    XmlNode rootElt = _document.FirstChild;
-        //    while (rootElt.HasChildNodes) {
-        //        rv.AppendChild(rootElt.FirstChild);
-        //    }
-        //    _document = null;
-        //    return rv;
-        //}
         protected override void InsertFosterParentedCharacters(string text, XElement table, XElement stackParent)
         {
             XNode parent = table.Parent;
