@@ -128,7 +128,7 @@ namespace HtmlParserSharp.Portable.Core
             _flags = elementName.Flags;
             _name = elementName.name;
             _popName = elementName.name;
-            _ns = "http://www.w3.org/1999/xhtml";
+            _ns = Namespaces.XHtml;
             _node = node;
             _attributes = null;
             Debug.Assert(!elementName.IsCustom, "Don't use this constructor for custom elements.");
@@ -149,7 +149,7 @@ namespace HtmlParserSharp.Portable.Core
             _flags = elementName.Flags;
             _name = elementName.name;
             _popName = elementName.name;
-            _ns = "http://www.w3.org/1999/xhtml";
+            _ns = Namespaces.XHtml;
             _node = node;
             _attributes = attributes;
             Debug.Assert(!elementName.IsCustom, "Don't use this constructor for custom elements.");
@@ -170,7 +170,7 @@ namespace HtmlParserSharp.Portable.Core
             _flags = elementName.Flags;
             _name = elementName.name;
             _popName = popName;
-            _ns = "http://www.w3.org/1999/xhtml";
+            _ns = Namespaces.XHtml;
             _node = node;
             _attributes = null;
             // [NOCPP[

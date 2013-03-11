@@ -1139,7 +1139,7 @@ namespace HtmlParserSharp.Portable.Core
             if (_currentPtr >= 0)
             {
                 StackNode<T> stackNode = _stack[_currentPtr];
-                if (stackNode._ns == "http://www.w3.org/1999/xhtml")
+                if (stackNode._ns == Namespaces.XHtml)
                 {
                     return;
                 }
@@ -2924,7 +2924,7 @@ namespace HtmlParserSharp.Portable.Core
         {
             /*[NsUri]*/
             string ns = stackNode._ns;
-            return ("http://www.w3.org/1999/xhtml" == ns)
+            return (Namespaces.XHtml == ns)
                    || (stackNode.IsHtmlIntegrationPoint)
                    ||
                    (("http://www.w3.org/1998/Math/MathML" == ns) && (stackNode.Group == DispatchGroup.MI_MO_MN_MS_MTEXT));
@@ -3170,7 +3170,7 @@ namespace HtmlParserSharp.Portable.Core
                             }
                             goto breakEndtagloop;
                         }
-                        if (_stack[--eltPos]._ns == "http://www.w3.org/1999/xhtml")
+                        if (_stack[--eltPos]._ns == Namespaces.XHtml)
                         {
                             break;
                         }
@@ -3528,7 +3528,7 @@ namespace HtmlParserSharp.Portable.Core
                                         Err("HTML start tag \u201C"
                                             + name
                                             + "\u201D in a foreign namespace context.");
-                                        while (_stack[_currentPtr]._ns != "http://www.w3.org/1999/xhtml")
+                                        while (_stack[_currentPtr]._ns != Namespaces.XHtml)
                                         {
                                             Pop();
                                         }
@@ -3638,7 +3638,7 @@ namespace HtmlParserSharp.Portable.Core
                                     Err("HTML start tag \u201C"
                                         + name
                                         + "\u201D in a foreign namespace context.");
-                                    while (_stack[_currentPtr]._ns != "http://www.w3.org/1999/xhtml")
+                                    while (_stack[_currentPtr]._ns != Namespaces.XHtml)
                                     {
                                         Pop();
                                     }
@@ -4316,7 +4316,7 @@ namespace HtmlParserSharp.Portable.Core
                 if (i == 0)
                 {
                     if (
-                        !(_contextNamespace == "http://www.w3.org/1999/xhtml" &&
+                        !(_contextNamespace == Namespaces.XHtml &&
                           (_contextName == "td" || _contextName == "th")))
                     {
                         name = _contextName;
@@ -4364,7 +4364,7 @@ namespace HtmlParserSharp.Portable.Core
                     _mode = InsertionMode.IN_TABLE;
                     return;
                 }
-                if ("http://www.w3.org/1999/xhtml" != ns)
+                if (Namespaces.XHtml != ns)
                 {
                     _mode = _framesetOk ? InsertionMode.FRAMESET_OK : InsertionMode.IN_BODY;
                     return;
@@ -4664,7 +4664,7 @@ namespace HtmlParserSharp.Portable.Core
                     // if (hasChildren(node.node)) { XXX AAA CHANGE
                     Debug.Assert(node == _listOfActiveFormattingElements[nodeListPos]);
                     Debug.Assert(node == _stack[nodePos]);
-                    T clone = CreateElement("http://www.w3.org/1999/xhtml",
+                    T clone = CreateElement(Namespaces.XHtml,
                                             node._name, node._attributes.CloneAttributes());
                     var newNode = new StackNode<T>(node.Flags, node._ns,
                                                    node._name, clone, node._popName, node._attributes
@@ -4696,7 +4696,7 @@ namespace HtmlParserSharp.Portable.Core
                     DetachFromParent(lastNode._node);
                     AppendElement(lastNode._node, commonAncestor._node);
                 }
-                T clone2 = CreateElement("http://www.w3.org/1999/xhtml",
+                T clone2 = CreateElement(Namespaces.XHtml,
                                          formattingElt._name,
                                          formattingElt._attributes.CloneAttributes());
                 var formattingClone = new StackNode<T>(
@@ -4835,7 +4835,7 @@ namespace HtmlParserSharp.Portable.Core
         private void AddAttributesToHtml(HtmlAttributes attributes)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
             AddAttributesToElement(_stack[0]._node, attributes);
         }
@@ -4885,7 +4885,7 @@ namespace HtmlParserSharp.Portable.Core
             {
                 entryPos++;
                 StackNode<T> entry = _listOfActiveFormattingElements[entryPos];
-                T clone = CreateElement("http://www.w3.org/1999/xhtml", entry._name,
+                T clone = CreateElement(Namespaces.XHtml, entry._name,
                                         entry._attributes.CloneAttributes());
                 var entryClone = new StackNode<T>(entry.Flags,
                                                   entry._ns, entry._name, clone, entry._popName,
@@ -4997,7 +4997,7 @@ namespace HtmlParserSharp.Portable.Core
                             }
                         }
                     }
-                    else if (ns != "http://www.w3.org/1999/xhtml"
+                    else if (ns != Namespaces.XHtml
                              && name == AttributeName.XMLNS_XLINK)
                     {
                         string xmlns = attributes.GetXmlnsValue(i);
@@ -5076,7 +5076,7 @@ namespace HtmlParserSharp.Portable.Core
         private void AppendHtmlElementToDocumentAndPush(HtmlAttributes attributes)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
             T elt = CreateHtmlElementSetAsRoot(attributes);
             var node = new StackNode<T>(ElementName.HTML,
@@ -5096,9 +5096,9 @@ namespace HtmlParserSharp.Portable.Core
         private void AppendToCurrentNodeAndPushHeadElement(HtmlAttributes attributes)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", "head",
+            T elt = CreateElement(Namespaces.XHtml, "head",
                                   attributes);
             AppendElement(elt, _stack[_currentPtr]._node);
             _headPointer = elt;
@@ -5126,9 +5126,9 @@ namespace HtmlParserSharp.Portable.Core
             HtmlAttributes attributes)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", "form",
+            T elt = CreateElement(Namespaces.XHtml, "form",
                                   attributes);
             _formPointer = elt;
             StackNode<T> current = _stack[_currentPtr];
@@ -5154,10 +5154,10 @@ namespace HtmlParserSharp.Portable.Core
                                                                           HtmlAttributes attributes)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
             // This method can't be called for custom elements
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", elementName.name, attributes);
+            T elt = CreateElement(Namespaces.XHtml, elementName.name, attributes);
             StackNode<T> current = _stack[_currentPtr];
             if (current.IsFosterParenting)
             {
@@ -5180,10 +5180,10 @@ namespace HtmlParserSharp.Portable.Core
         private void AppendToCurrentNodeAndPushElement(ElementName elementName, HtmlAttributes attributes)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
             // This method can't be called for custom elements
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", elementName.name, attributes);
+            T elt = CreateElement(Namespaces.XHtml, elementName.name, attributes);
             AppendElement(elt, _stack[_currentPtr]._node);
             var node = new StackNode<T>(elementName, elt
                                         // [NOCPP[
@@ -5199,13 +5199,13 @@ namespace HtmlParserSharp.Portable.Core
             /*[Local]*/
             string popName = elementName.name;
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             if (elementName.IsCustom)
             {
                 popName = CheckPopName(popName);
             }
             // ]NOCPP]
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", popName, attributes);
+            T elt = CreateElement(Namespaces.XHtml, popName, attributes);
             StackNode<T> current = _stack[_currentPtr];
             if (current.IsFosterParenting)
             {
@@ -5307,10 +5307,10 @@ namespace HtmlParserSharp.Portable.Core
                                                                 T form)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
             // Can't be called for custom elements
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", elementName.name, attributes, _fragment
+            T elt = CreateElement(Namespaces.XHtml, elementName.name, attributes, _fragment
                                                                                                     ? null
                                                                                                     : form);
             StackNode<T> current = _stack[_currentPtr];
@@ -5335,10 +5335,10 @@ namespace HtmlParserSharp.Portable.Core
             [Local] string name, HtmlAttributes attributes, T form)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
             // Can't be called for custom elements
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", name, attributes, _fragment ? null : form);
+            T elt = CreateElement(Namespaces.XHtml, name, attributes, _fragment ? null : form);
             StackNode<T> current = _stack[_currentPtr];
             if (current.IsFosterParenting)
             {
@@ -5349,8 +5349,8 @@ namespace HtmlParserSharp.Portable.Core
             {
                 AppendElement(elt, current._node);
             }
-            ElementPushed("http://www.w3.org/1999/xhtml", name, elt);
-            ElementPopped("http://www.w3.org/1999/xhtml", name, elt);
+            ElementPushed(Namespaces.XHtml, name, elt);
+            ElementPopped(Namespaces.XHtml, name, elt);
         }
 
         private void AppendVoidElementToCurrentMayFoster(
@@ -5359,13 +5359,13 @@ namespace HtmlParserSharp.Portable.Core
             /*[Local]*/
             string popName = elementName.name;
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             if (elementName.IsCustom)
             {
                 popName = CheckPopName(popName);
             }
             // ]NOCPP]
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", popName, attributes);
+            T elt = CreateElement(Namespaces.XHtml, popName, attributes);
             StackNode<T> current = _stack[_currentPtr];
             if (current.IsFosterParenting)
             {
@@ -5376,8 +5376,8 @@ namespace HtmlParserSharp.Portable.Core
             {
                 AppendElement(elt, current._node);
             }
-            ElementPushed("http://www.w3.org/1999/xhtml", popName, elt);
-            ElementPopped("http://www.w3.org/1999/xhtml", popName, elt);
+            ElementPushed(Namespaces.XHtml, popName, elt);
+            ElementPopped(Namespaces.XHtml, popName, elt);
         }
 
         private void AppendVoidElementToCurrentMayFosterSVG(
@@ -5437,29 +5437,29 @@ namespace HtmlParserSharp.Portable.Core
             [Local] string name, HtmlAttributes attributes, T form)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
             // Can't be called for custom elements
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", name, attributes, _fragment ? null : form);
+            T elt = CreateElement(Namespaces.XHtml, name, attributes, _fragment ? null : form);
             StackNode<T> current = _stack[_currentPtr];
             AppendElement(elt, current._node);
-            ElementPushed("http://www.w3.org/1999/xhtml", name, elt);
-            ElementPopped("http://www.w3.org/1999/xhtml", name, elt);
+            ElementPushed(Namespaces.XHtml, name, elt);
+            ElementPopped(Namespaces.XHtml, name, elt);
         }
 
         private void AppendVoidFormToCurrent(HtmlAttributes attributes)
         {
             // [NOCPP[
-            CheckAttributes(attributes, "http://www.w3.org/1999/xhtml");
+            CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
-            T elt = CreateElement("http://www.w3.org/1999/xhtml", "form",
+            T elt = CreateElement(Namespaces.XHtml, "form",
                                   attributes);
             _formPointer = elt;
             // ownership transferred to form pointer
             StackNode<T> current = _stack[_currentPtr];
             AppendElement(elt, current._node);
-            ElementPushed("http://www.w3.org/1999/xhtml", "form", elt);
-            ElementPopped("http://www.w3.org/1999/xhtml", "form", elt);
+            ElementPushed(Namespaces.XHtml, "form", elt);
+            ElementPopped(Namespaces.XHtml, "form", elt);
         }
 
         // [NOCPP[
@@ -5497,7 +5497,7 @@ namespace HtmlParserSharp.Portable.Core
         protected virtual T CreateElement([NsUri] string ns, [Local] string name,
                                           HtmlAttributes attributes, T form)
         {
-            return CreateElement("http://www.w3.org/1999/xhtml", name, attributes);
+            return CreateElement(Namespaces.XHtml, name, attributes);
         }
 
         protected abstract T CreateHtmlElementSetAsRoot(HtmlAttributes attributes);
@@ -5586,7 +5586,7 @@ namespace HtmlParserSharp.Portable.Core
         public void SetFragmentContext([Local] string context)
         {
             _contextName = context;
-            _contextNamespace = "http://www.w3.org/1999/xhtml";
+            _contextNamespace = Namespaces.XHtml;
             _contextNode = null;
             _fragment = (_contextName != null);
             _quirks = false;
@@ -5607,7 +5607,7 @@ namespace HtmlParserSharp.Portable.Core
 
         private bool IsInForeign
         {
-            get { return _currentPtr >= 0 && _stack[_currentPtr]._ns != "http://www.w3.org/1999/xhtml"; }
+            get { return _currentPtr >= 0 && _stack[_currentPtr]._ns != Namespaces.XHtml; }
         }
 
         private bool IsInForeignButNotHtmlIntegrationPoint
@@ -5615,7 +5615,7 @@ namespace HtmlParserSharp.Portable.Core
             get
             {
                 return _currentPtr >= 0
-                       && _stack[_currentPtr]._ns != "http://www.w3.org/1999/xhtml"
+                       && _stack[_currentPtr]._ns != Namespaces.XHtml
                        && !_stack[_currentPtr].IsHtmlIntegrationPoint;
             }
         }

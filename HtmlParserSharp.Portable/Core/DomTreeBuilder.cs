@@ -29,6 +29,10 @@ using HtmlParserSharp.Portable.Common;
 
 namespace HtmlParserSharp.Portable.Core
 {
+    internal class Namespaces
+    {
+        internal const string XHtml = "http://www.w3.org/1999/xhtml";
+    }
     /// <summary>
     ///     The tree builder glue for building a tree through the public DOM APIs.
     /// </summary>
@@ -106,7 +110,7 @@ namespace HtmlParserSharp.Portable.Core
 
         protected override XElement CreateHtmlElementSetAsRoot(HtmlAttributes attributes)
         {
-            XElement htmlElement = CreateElement("http://www.w3.org/1999/xhtml", "html", attributes);
+            XElement htmlElement = CreateElement(Namespaces.XHtml, "html", attributes);
             _document.Add(htmlElement);
             return htmlElement;
         }
