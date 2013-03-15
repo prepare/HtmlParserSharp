@@ -3537,62 +3537,68 @@ namespace HtmlParserSharp.Portable.Core
                         // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
                         goto case DECIMAL_NRC_LOOP;
                     case DECIMAL_NRC_LOOP:
-                        /*decimalloop:*/
-                        for (;;)
-                        {
-                            if (reconsume)
-                            {
-                                reconsume = false;
-                            }
-                            else
-                            {
-                                if (++pos == endPos)
-                                {
-                                    goto breakStateloop;
-                                }
-                                c = CheckChar(buf, pos);
-                            }
-                            // Deal with overflow gracefully
-                            if (_value < _prevValue)
-                            {
-                                _value = 0x110000; // Value above Unicode range but
-                                // within int
-                                // range
-                            }
-                            _prevValue = _value;
-                            /*
+						/*decimalloop:*/
+						for (; ; )
+						{
+							if (reconsume)
+							{
+								reconsume = false;
+							}
+							else
+							{
+								if (++pos == endPos)
+								{
+									goto breakStateloop;
+								}
+								c = CheckChar(buf, pos);
+							}
+							// Deal with overflow gracefully
+							if (_value < _prevValue)
+							{
+								_value = 0x110000; // Value above Unicode range but
+								// within int
+								// range
+							}
+							_prevValue = _value;
+							/*
 							 * Consume as many characters as match the range of
 							 * characters given above.
 							 */
-                            if (c >= '0' && c <= '9')
-                            {
-                                _seenDigits = true;
-                                _value *= 10;
-                                _value += c - '0';
-                            }
-                            if (c == ';')
-                            {
-                                if (_seenDigits)
-                                {
-                                    if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                                    {
-                                        _cstart = pos + 1;
-                                    }
-                                    state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
-                                    // FALL THROUGH goto continueStateloop;
-                                    goto breakDecimalloop;
-                                }
-                                ErrNoDigitsInNCR();
-                                AppendStrBuf(';');
-                                EmitOrAppendStrBuf(returnState);
-                                if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                                {
-                                    _cstart = pos + 1;
-                                }
-                                state = Transition(state, returnState, reconsume, pos);
-                                goto continueStateloop;
-                            }
-                            /*
+							if (c >= '0' && c <= '9')
+							{
+								_seenDigits = true;
+								_value *= 10;
+								_value += c - '0';
+								continue;
+							}
+							else if (c == ';')
+							{
+								if (_seenDigits)
+								{
+									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+									{
+										_cstart = pos + 1;
+									}
+									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
+									// FALL THROUGH goto continueStateloop;
+									goto breakDecimalloop;
+								}
+								else
+								{
+									ErrNoDigitsInNCR();
+									AppendStrBuf(';');
+									EmitOrAppendStrBuf(returnState);
+									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+									{
+										_cstart = pos + 1;
+									}
+									state = Transition(state, returnState, reconsume, pos);
+									goto continueStateloop;
+								}
+							}
+							else
+							{
+								/*
 								 * If no characters match the range, then don't
 								 * consume any characters (and unconsume the U+0023
 								 * NUMBER SIGN character and, if appropriate, the X
@@ -3603,29 +3609,33 @@ namespace HtmlParserSharp.Portable.Core
 								 * SEMICOLON, consume that too. If it isn't, there
 								 * is a parse error.
 								 */
-                            if (!_seenDigits)
-                            {
-                                ErrNoDigitsInNCR();
-                                EmitOrAppendStrBuf(returnState);
-                                if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                                {
-                                    _cstart = pos;
-                                }
-                                state = Transition(state, returnState, reconsume, pos);
-                                reconsume = true;
-                                goto continueStateloop;
-                            }
-                            ErrCharRefLacksSemicolon();
-                            if ((returnState & DATA_AND_RCDATA_MASK) == 0)
-                            {
-                                _cstart = pos;
-                            }
-                            state = Transition(state, HANDLE_NCR_VALUE, reconsume, pos);
-                            reconsume = true;
-                            // FALL THROUGH goto continueStateloop;
-                            goto breakDecimalloop;
-                        }
-                        breakDecimalloop:
+								if (!_seenDigits)
+								{
+									ErrNoDigitsInNCR();
+									EmitOrAppendStrBuf(returnState);
+									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+									{
+										_cstart = pos;
+									}
+									state = Transition(state, returnState, reconsume, pos);
+									reconsume = true;
+									goto continueStateloop;
+								}
+								else
+								{
+									ErrCharRefLacksSemicolon();
+									if ((returnState & DATA_AND_RCDATA_MASK) == 0)
+									{
+										_cstart = pos;
+									}
+									state = Transition(state, Tokenizer.HANDLE_NCR_VALUE, reconsume, pos);
+									reconsume = true;
+									// FALL THROUGH goto continueStateloop;
+									goto breakDecimalloop;
+								}
+							}
+						}
+					breakDecimalloop:
                         goto case HANDLE_NCR_VALUE;
                         // WARNING FALLTHRU CASE TRANSITION: DON'T REORDER
                     case HANDLE_NCR_VALUE:
