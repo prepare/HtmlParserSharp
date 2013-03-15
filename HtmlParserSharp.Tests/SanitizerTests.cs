@@ -40,7 +40,6 @@ namespace HtmlParserSharp.Tests
             {
                 var doc = parser.ParseStringFragment(testCase.Input, String.Empty);
                 var node = doc.Dump();
-                var y = 42;
             }
         }
     }

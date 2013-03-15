@@ -26,6 +26,7 @@ using System;
 using System.Linq;
 using System.Xml.Linq;
 using HtmlParserSharp.Portable.Common;
+using System.Net;
 
 namespace HtmlParserSharp.Portable.Core
 {

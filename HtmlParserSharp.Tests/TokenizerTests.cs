@@ -14,6 +14,26 @@ namespace HtmlParserSharp.Tests
         public TestContext TestContext { get; set; }
 
         [TestMethod]
+        public void TestAngleBracketEncoding()
+        {
+            const string input = "&gt;";
+            var parser = new SimpleHtmlParser();
+            var node = parser.ParseStringFragment(input, string.Empty);
+            var textNode = node as XText;
+            Assert.AreEqual(">", textNode.Value);
+        }
+
+        [TestMethod]
+        public void TestAngleBracketEncoding2()
+        {
+            const string input = "&#62;";
+            var parser = new SimpleHtmlParser();
+            var node = parser.ParseStringFragment(input, string.Empty);
+            var textNode = node as XText;
+            Assert.AreEqual(">", textNode.Value);
+        }
+
+        [TestMethod]
         public void ExemplarTokenizerTest()
         {
             const string input = "&AElig;";
