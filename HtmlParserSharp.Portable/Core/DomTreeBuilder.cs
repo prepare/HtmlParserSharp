@@ -26,7 +26,6 @@ using System;
 using System.Linq;
 using System.Xml.Linq;
 using HtmlParserSharp.Portable.Common;
-using System.Net;
 
 namespace HtmlParserSharp.Portable.Core
 {
@@ -61,11 +60,13 @@ namespace HtmlParserSharp.Portable.Core
             parent.Add(new XText(text));
         }
 
+        // This method is terribly named. This is actually a MOVE operation, not an append / copy operation
         protected override void AppendChildrenToNewParent(XElement oldParent, XElement newParent)
         {
-            foreach (XNode node in oldParent.Nodes())
+            while (oldParent.FirstNode != null) 
             {
-                newParent.Add(node);
+                newParent.Add(oldParent.FirstNode); 
+                oldParent.FirstNode.Remove();
             }
         }
 
@@ -132,6 +133,9 @@ namespace HtmlParserSharp.Portable.Core
             //rv.setUserData("nu.validator.form-pointer", form, null); // TODO
         }
 
+        // The interesting thing about fragments is that they are not legal docs.
+        // A fragment could contain something like <i></i><p>foo</p> for example
+        // where there are two top-level elements.
         protected override void Start(bool fragment)
         {
             _document = new XDocument(); // implementation.createDocument(null, null, null);
