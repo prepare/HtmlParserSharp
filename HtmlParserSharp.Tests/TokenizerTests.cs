@@ -1,4 +1,5 @@
-﻿using HtmlParserSharp.Portable;
+﻿using System.Linq;
+using HtmlParserSharp.Portable;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -18,9 +19,9 @@ namespace HtmlParserSharp.Tests
         {
             const string input = "&gt;";
             var parser = new SimpleHtmlParser();
-            var node = parser.ParseStringFragment(input, string.Empty);
-            var textNode = node as XText;
-            Assert.AreEqual(">", textNode.Value);
+            var fragment = parser.ParseStringFragment(input, string.Empty).ToArray();
+            var answer = new XText(">");
+            Assert.IsTrue(XNodeHelpers.DeepEquals(fragment[0], answer));
         }
 
         [TestMethod]
@@ -28,9 +29,9 @@ namespace HtmlParserSharp.Tests
         {
             const string input = "&#62;";
             var parser = new SimpleHtmlParser();
-            var node = parser.ParseStringFragment(input, string.Empty);
-            var textNode = node as XText;
-            Assert.AreEqual(">", textNode.Value);
+            var fragment = parser.ParseStringFragment(input, string.Empty).ToArray();
+            var answer = new XText(">");
+            Assert.IsTrue(XNodeHelpers.DeepEquals(fragment[0], answer));
         }
 
         [TestMethod]
@@ -38,9 +39,9 @@ namespace HtmlParserSharp.Tests
         {
             const string input = "&AElig;";
             var parser = new SimpleHtmlParser();
-            var node = parser.ParseStringFragment(input, "bob");
-            var textNode = node as XText;
-            Assert.AreEqual("\u00c6", textNode.Value, "Named entity: AElig; with a semi-colon");
+            var fragment = parser.ParseStringFragment(input, string.Empty).ToArray();
+            var answer = new XText("\u00c6");
+            Assert.IsTrue(XNodeHelpers.DeepEquals(fragment[0], answer));
         }
 
         [TestMethod]
@@ -48,9 +49,9 @@ namespace HtmlParserSharp.Tests
         {
             const string input = "&AElig";
             var parser = new SimpleHtmlParser();
-            var node = parser.ParseStringFragment(input, "bob");
-            var textNode = node as XText;
-            Assert.AreEqual("\u00c6", textNode.Value, "Named entity: AElig without a semi-colon");
+            var fragment = parser.ParseStringFragment(input, string.Empty).ToArray();
+            var answer = new XText("\u00c6");
+            Assert.IsTrue(XNodeHelpers.DeepEquals(fragment[0], answer));
         }
 
         [TestMethod]
@@ -78,10 +79,9 @@ namespace HtmlParserSharp.Tests
                         if (characters.Count == 2)
                         {
                             var characterEntity = characters[1].Value<string>();
-                            var node = parser.ParseStringFragment(input, "bob");
-                            var parsedTextNode = node as XText;
-                            Assert.IsNotNull(parsedTextNode);
-                            if (characterEntity != parsedTextNode.Value)
+                            var fragment = parser.ParseStringFragment(input, string.Empty).ToArray();
+                            var answer = new XText(characterEntity);
+                            if (!XNodeHelpers.DeepEquals(fragment[0], answer))
                             {
                                 failedTestCount++;
                                 TestContext.WriteLine(description);

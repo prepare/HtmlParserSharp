@@ -29,6 +29,7 @@ using System.Linq.Expressions;
 using System.Xml.Linq;
 using HtmlParserSharp.Portable.Core;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace HtmlParserSharp.Portable
 {
@@ -44,7 +45,7 @@ namespace HtmlParserSharp.Portable
 
         public string DocumentEncoding { get; private set; }
 
-        public XNode ParseStringFragment(string str, string fragmentContext)
+        public IEnumerable<XNode> ParseStringFragment(string str, string fragmentContext)
         {
             using (var reader = new StringReader(str))
                 return ParseFragment(reader, fragmentContext);
@@ -65,15 +66,15 @@ namespace HtmlParserSharp.Portable
                 });
         }
 
-        public XNode ParseFragment(TextReader reader, string fragmentContext)
+        // Return an IEnumerable<XNode> which will be the child nodes of the
+        // dummy <html> node in the XDocument.
+        public IEnumerable<XNode> ParseFragment(TextReader reader, string fragmentContext)
         {
             Reset();
             _treeBuilder.SetFragmentContext(fragmentContext);
             Tokenize(reader, true);
             XDocument doc = _treeBuilder.Document;
-            var root = doc.Root as XElement;
-            XNode firstChild = root.Nodes().First();
-            return firstChild;
+            return doc.Root.Nodes();
         }
 
         private bool _charsetSetAlready;

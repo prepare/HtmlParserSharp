@@ -45,6 +45,7 @@
     <Compile Include="Common\EncodingDetectedEventArgs.cs" />
     <Compile Include="Common\ITokenHandler.cs" />
     <Compile Include="Common\ParserErrorEventArgs.cs" />
+    <Compile Include="Common\XHtml.cs" />
     <Compile Include="Common\XmlViolationPolicy.cs" />
     <Compile Include="Core\AttributeName.cs" />
     <Compile Include="Core\CharsetState.cs" />

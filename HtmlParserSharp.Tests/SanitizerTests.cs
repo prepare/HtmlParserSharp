@@ -1,7 +1,6 @@
 ﻿using HtmlParserSharp.Portable;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ServiceStack.Text;
-using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -31,15 +30,15 @@ namespace HtmlParserSharp.Tests
 
         [TestMethod]
         [DeploymentItem("TestData")]
-        public void TestMethod1()
+        public void RunSanitizerTests()
         {
             var testCases = LoadTestCases("sanitizer_tests.dat");
             var parser = new SimpleHtmlParser();
 
             foreach (var testCase in testCases)
             {
-                var doc = parser.ParseStringFragment(testCase.Input, String.Empty);
-                var node = doc.Dump();
+                // TODO: write the correct form of these tests
+                //var doc = parser.ParseStringFragment(testCase.Input, String.Empty);
             }
         }
     }

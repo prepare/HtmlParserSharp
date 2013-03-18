@@ -62,6 +62,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CharsetEncodingTests.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="SanitizerTests.cs" />
     <Compile Include="TokenizerTests.cs" />
     <Compile Include="ParserTests.cs" />
