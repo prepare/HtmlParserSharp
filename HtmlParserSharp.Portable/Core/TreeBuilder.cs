@@ -1958,6 +1958,15 @@ namespace HtmlParserSharp.Portable.Core
                                         elementName,
                                         attributes);
                                     goto breakStarttagloop;
+                                // TEST: there could be a bug in one of the methods above that are called
+                                    // But using the below impl for FONT will workaround the bug that is currently 
+                                    // in HackerNews
+                                //case DispatchGroup.FONT:
+                                //    ImplicitlyCloseP();
+                                //    AppendToCurrentNodeAndPushElementMayFoster(
+                                //        elementName,
+                                //        attributes);
+                                //    goto breakStarttagloop;
                                 case DispatchGroup.NOBR:
                                     ReconstructTheActiveFormattingElements();
                                     if (TreeBuilderConstants.NOT_FOUND_ON_STACK != FindLastInScope("nobr"))
