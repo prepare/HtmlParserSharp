@@ -51,12 +51,12 @@ namespace HtmlParserSharp.Portable
                 return ParseFragment(reader, fragmentContext);
         }
 
-        public Task<XDocument> ParseString(string str)
+        public Task<XDocument> ParseStringAsync(string html)
         {
-            return Parse(new StringReader(str));
+            return ParseAsync(new StringReader(html));
         }
 
-        public Task<XDocument> Parse(TextReader reader)
+        public Task<XDocument> ParseAsync(TextReader reader)
         {
             return Task<XDocument>.Factory.StartNew(() =>
                 {
@@ -64,6 +64,18 @@ namespace HtmlParserSharp.Portable
                     Tokenize(reader, swallowBom: true);
                     return _treeBuilder.Document;
                 });
+        }
+
+        public XDocument ParseString(string html)
+        {
+            return Parse(new StringReader(html));
+        }
+
+        public XDocument Parse(TextReader reader)
+        {
+            Reset();
+            Tokenize(reader, swallowBom: true);
+            return _treeBuilder.Document;
         }
 
         // Return an IEnumerable<XNode> which will be the child nodes of the
