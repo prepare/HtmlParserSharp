@@ -98,7 +98,7 @@ namespace HtmlParserSharp.Portable.Core
         {
             for (int i = 0; i < _length; i++)
             {
-                if (_names[i].EqualsAnother(name))
+                if (_names[i].Equals(name))
                 {
                     return i;
                 }
@@ -298,7 +298,7 @@ namespace HtmlParserSharp.Portable.Core
         {
             for (int i = 0; i < _xmlnsLength; i++)
             {
-                if (_xmlnsNames[i].EqualsAnother(name))
+                if (_xmlnsNames[i].Equals(name))
                 {
                     return i;
                 }
@@ -327,7 +327,7 @@ namespace HtmlParserSharp.Portable.Core
 
         internal void AddAttribute(AttributeName name, string value, XmlViolationPolicy xmlnsPolicy)
         {
-            if (name.EqualsAnother(AttributeName.ID))
+            if (name.Equals(AttributeName.ID))
             {
                 _idValue = value;
             }
@@ -412,14 +412,14 @@ namespace HtmlParserSharp.Portable.Core
         {
             for (int i = 0; i < _length; i++)
             {
-                if (name.EqualsAnother(_names[i]))
+                if (name.Equals(_names[i]))
                 {
                     return true;
                 }
             }
             for (int i = 0; i < _xmlnsLength; i++)
             {
-                if (name.EqualsAnother(_xmlnsNames[i]))
+                if (name.Equals(_xmlnsNames[i]))
                 {
                     return true;
                 }

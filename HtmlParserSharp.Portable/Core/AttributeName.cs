@@ -450,10 +450,37 @@ namespace HtmlParserSharp.Portable.Core
             return _prefix[mode];
         }
 
-        internal bool EqualsAnother(AttributeName another)
-        {
-            return GetLocal(HTML) == another.GetLocal(HTML);
+        public override int GetHashCode()  
+        {  
+            return GetLocal(0).GetHashCode();  
         }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as AttributeName;
+
+            return other != null && GetLocal(0) == other.GetLocal(0);
+        }
+        public static bool operator ==(AttributeName a, AttributeName b)
+        {
+            if (ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            if (((object)a == null) || ((object)b == null))
+            {
+                return false;
+            }
+
+            // Return true if the fields match:  
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(AttributeName a, AttributeName b)
+        {
+            return !(a == b);
+        }  
 
         // START CODE ONLY USED FOR GENERATING CODE uncomment to regenerate
 
