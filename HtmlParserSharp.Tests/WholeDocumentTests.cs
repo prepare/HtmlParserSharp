@@ -1,7 +1,6 @@
 ﻿using HtmlParserSharp.Portable;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -10,14 +9,26 @@ namespace HtmlParserSharp.Tests
     [TestClass]
     public class WholeDocumentTests
     {
+        // This document results a parent XElement null exception
+        [TestMethod]
+        public void ParseErrorDoc1()
+        {
+            var parser = new SimpleHtmlParser();
+            using (var reader = new StreamReader("LargeDocuments\\doc1.html"))
+            {
+                var doc = parser.Parse(reader);
+                Assert.IsNotNull(doc);
+            }
+        }
+
         [TestMethod]
         [DeploymentItem("TestData")]
-        public async Task ParseHtml5Specification()
+        public void ParseHtml5Specification()
         {
             var parser = new SimpleHtmlParser();
             using (var reader = new StreamReader("LargeDocuments\\Html5Specification.html"))
             {
-                XDocument doc = await parser.Parse(reader);
+                XDocument doc = parser.Parse(reader);
                 Assert.IsNotNull(doc);
 
                 // Baseline the # of types of elements that we find inside of this

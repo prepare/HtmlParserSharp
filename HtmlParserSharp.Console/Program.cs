@@ -39,7 +39,7 @@ namespace HtmlParserSharp.Console
 	{
 		static readonly SimpleHtmlParser parser = new SimpleHtmlParser();
 
-	    private async static void Benchmark()
+	    private static void Benchmark()
         {
             var sw = new Stopwatch();
             System.Console.WriteLine("Parsing");
@@ -49,7 +49,7 @@ namespace HtmlParserSharp.Console
             {
                 // Measure parsing time
                 sw.Restart();
-                XDocument doc = await parser.Parse(new StreamReader("SampleData\\test2.html"));
+                XDocument doc = parser.Parse(new StreamReader("SampleData\\test2.html"));
                 var encoding = parser.DocumentEncoding;
                 sw.Stop();
                 var parseTime = sw.Elapsed;

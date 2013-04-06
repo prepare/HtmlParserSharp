@@ -4,9 +4,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace HtmlParserSharp.Tests.TestData
+namespace HtmlParserSharp.Tests
 {
     [TestClass]
     public class CharsetEncodingTests
@@ -66,7 +65,7 @@ namespace HtmlParserSharp.Tests.TestData
             return result;
         }
 
-        public async Task RunTestFile(string path)
+        public void RunTestFile(string path)
         {
             List<EncodingTestCase> testCases = ParseTestData(path);
             var parser = new SimpleHtmlParser();
@@ -74,7 +73,7 @@ namespace HtmlParserSharp.Tests.TestData
             List<int> errorOffsets = new List<int>();
             foreach (var testCase in testCases)
             {
-                var doc = await parser.ParseString(testCase.Html);
+                var doc = parser.ParseString(testCase.Html);
                 var cleanedUpDocumentEncoding = parser.DocumentEncoding.Trim();
                 if (!string.Equals(testCase.Encoding, cleanedUpDocumentEncoding, StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -87,30 +86,30 @@ namespace HtmlParserSharp.Tests.TestData
 
         [TestMethod]
         [DeploymentItem("TestData")]
-        public async Task EncodingTests1()
+        public void EncodingTests1()
         {
-            await RunTestFile("Encodings\\tests1.dat");
+            RunTestFile("Encodings\\tests1.dat");
         }
 
         [TestMethod]
         [DeploymentItem("TestData")]
-        public async Task EncodingTests2()
+        public void EncodingTests2()
         {
-            await RunTestFile("Encodings\\tests2.dat");
+            RunTestFile("Encodings\\tests2.dat");
         }
 
         [TestMethod]
         [DeploymentItem("TestData")]
-        public async Task EncodingTests3()
+        public void EncodingTests3()
         {
-            await RunTestFile("Encodings\\test-yahoo-jp.dat");
+            RunTestFile("Encodings\\test-yahoo-jp.dat");
         }
 
         [TestMethod]
         [DeploymentItem("TestData")]
-        public async Task EncodingTests4()
+        public void EncodingTests4()
         {
-            await RunTestFile("Encodings\\tests3.dat");
+            RunTestFile("Encodings\\tests3.dat");
         }
     }
 }

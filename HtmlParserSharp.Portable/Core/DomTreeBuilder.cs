@@ -29,8 +29,10 @@ using HtmlParserSharp.Portable.Common;
 
 namespace HtmlParserSharp.Portable.Core
 {
+    // TODO: figure out how to parameterize this guy
     internal class Namespaces
     {
+        //internal const string XHtml = "";
         internal const string XHtml = "http://www.w3.org/1999/xhtml";
     }
     /// <summary>
