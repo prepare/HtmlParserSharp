@@ -119,7 +119,12 @@ namespace HtmlParserSharp.Console
 
 		public static void Main(string[] args)
 		{
-		    Benchmark();
+            //Benchmark();
+            var parser = new SimpleHtmlParser();
+            using (var reader = new StreamReader("c:\\temp\\testcase.html"))
+            {
+                var doc = parser.Parse(reader);
+            }
 			System.Console.ReadKey();
 		}
 	}

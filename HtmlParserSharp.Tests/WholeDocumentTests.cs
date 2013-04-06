@@ -11,6 +11,7 @@ namespace HtmlParserSharp.Tests
     {
         // This document results a parent XElement null exception
         [TestMethod]
+        [DeploymentItem("TestData")]
         public void ParseErrorDoc1()
         {
             var parser = new SimpleHtmlParser();
