@@ -24,8 +24,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Xml.Linq;
 using HtmlParserSharp.Portable.Core;
 using System.Threading.Tasks;
@@ -33,6 +31,15 @@ using System.Collections.Generic;
 
 namespace HtmlParserSharp.Portable
 {
+    public class SimpleHtmlParserEventArgs : EventArgs
+    {
+        public string Message { get; set; }
+        
+        public SimpleHtmlParserEventArgs(string message)
+        {
+            Message = message;
+        }
+    }
     /// <summary>
     ///     This is a simple API for the parsing process.
     ///     Part of this is a port of the nu.validator.htmlparser.io.Driver class.
@@ -123,12 +130,18 @@ namespace HtmlParserSharp.Portable
             _treeBuilder.ErrorEvent +=
                 (sender, a) =>
                 {
-                    ILocator loc = _tokenizer as ILocator;
-                    var message = String.Format("{0}: {1} (Line: {2})", a.IsWarning ? "Warning" : "Error", a.Message, loc.LineNumber);
-                    // TODO: figure out where to write this out to
+                    var loc = _tokenizer as ILocator;
+                    if (ParserErrors != null && loc != null)
+                    {
+                        var message = String.Format("{0}: {1} (Line: {2})", a.IsWarning ? "Warning" : "Error", a.Message, loc.LineNumber);
+                        var error = new SimpleHtmlParserEventArgs(message);
+                        ParserErrors(this, error);
+                    }
                 };
             //treeBuilder.DocumentModeDetected += (sender, a) => Console.WriteLine("Document mode: " + a.Mode.ToString());
         }
+
+        public event EventHandler<SimpleHtmlParserEventArgs> ParserErrors;
 
         private void Tokenize(TextReader reader, bool swallowBom)
         {
