@@ -125,8 +125,8 @@ namespace HtmlParserSharp.Console
             using (var reader = new StreamReader("c:\\temp\\doc1.html"))
             {
                 var doc = parser.Parse(reader);
+                System.Console.ReadKey();
             }
-			System.Console.ReadKey();
 		}
 	}
 }

@@ -185,9 +185,13 @@ namespace HtmlParserSharp.Portable.Core
             }
         }
 
+        // This method really removes an element from parent IF IT HAS A PARENT
         protected override void DetachFromParent(XElement element)
         {
-            element.Remove();
+            if (element.Parent != null)
+            {
+                element.Remove();
+            }
         }
     }
 }
