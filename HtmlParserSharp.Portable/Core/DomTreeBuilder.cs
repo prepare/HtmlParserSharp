@@ -29,11 +29,10 @@ using HtmlParserSharp.Portable.Common;
 
 namespace HtmlParserSharp.Portable.Core
 {
-    // TODO: figure out how to parameterize this guy
     internal class Namespaces
     {
-        //internal const string XHtml = "";
-        internal const string XHtml = "http://www.w3.org/1999/xhtml";
+        //internal const string XHtml = "http://www.w3.org/1999/xhtml";
+        internal const string XHtml = "";
     }
     /// <summary>
     ///     The tree builder glue for building a tree through the public DOM APIs.
@@ -94,8 +93,17 @@ namespace HtmlParserSharp.Portable.Core
 
         protected override XElement CreateElement(string namespaceUri, string localName, HtmlAttributes attributes)
         {
-            XNamespace aw = namespaceUri;
-            XName n = aw + localName;
+            // First test to see if attributes defines an xmlns attribute
+            XNamespace ns;
+            if (attributes.Contains(AttributeName.XMLNS))
+            {
+                ns = attributes.GetValue(AttributeName.XMLNS);
+            }
+            else
+            {
+                ns = namespaceUri;
+            }
+            XName n = ns + localName;
             var rv = new XElement(n);
             for (int i = 0; i < attributes.Length; i++)
             {
@@ -114,7 +122,7 @@ namespace HtmlParserSharp.Portable.Core
 
         protected override XElement CreateHtmlElementSetAsRoot(HtmlAttributes attributes)
         {
-            XElement htmlElement = CreateElement(Namespaces.XHtml, "html", attributes);
+            XElement htmlElement = CreateElement(String.Empty, "html", attributes);
             _document.Add(htmlElement);
             return htmlElement;
         }

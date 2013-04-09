@@ -1136,22 +1136,15 @@ namespace HtmlParserSharp.Portable.Core
                 AccumulateCharacters(TreeBuilderConstants.REPLACEMENT_CHARACTER, 0, 1);
                 return;
             }
+
+            // Bugfix: this is taken from the current sources of Treebuilder.java
             if (_currentPtr >= 0)
             {
-                StackNode<T> stackNode = _stack[_currentPtr];
-                if (stackNode._ns == Namespaces.XHtml)
+                if (!IsSpecialParentInForeign(_stack[_currentPtr]))
                 {
                     return;
                 }
-                if (stackNode.IsHtmlIntegrationPoint)
-                {
-                    return;
-                }
-                //if (stackNode.ns == "http://www.w3.org/1998/Math/MathML"
-                //        && stackNode.Group == DispatchGroup.MI_MO_MN_MS_MTEXT)
-                //{
-                //    return;
-                //}
+                
                 AccumulateCharacters(TreeBuilderConstants.REPLACEMENT_CHARACTER, 0, 1);
             }
         }
@@ -1834,6 +1827,11 @@ namespace HtmlParserSharp.Portable.Core
                                     if (_mode == InsertionMode.FRAMESET_OK)
                                     {
                                         _mode = InsertionMode.IN_BODY;
+                                    }
+                                    // From JAVA code
+                                    if (AddAttributesToBody(attributes))
+                                    {
+                                        attributes = null;
                                     }
                                     goto breakStarttagloop;
                                 case DispatchGroup.P:
@@ -4832,6 +4830,23 @@ namespace HtmlParserSharp.Portable.Core
             return 0;
         }
 
+        // From Java Code
+        private bool AddAttributesToBody(HtmlAttributes attributes)
+        {
+            CheckAttributes(attributes, Namespaces.XHtml);
+
+            if (_currentPtr >= 1)
+            {
+                var body = _stack[1];
+                if (body.Group == DispatchGroup.BODY)
+                {
+                    AddAttributesToElement(body._node, attributes);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private void AddAttributesToHtml(HtmlAttributes attributes)
         {
             // [NOCPP[
@@ -5128,6 +5143,7 @@ namespace HtmlParserSharp.Portable.Core
             // [NOCPP[
             CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
+            // BUGFIX: was Namespaces.XHtml
             T elt = CreateElement(Namespaces.XHtml, "form",
                                   attributes);
             _formPointer = elt;
@@ -5452,7 +5468,8 @@ namespace HtmlParserSharp.Portable.Core
             // [NOCPP[
             CheckAttributes(attributes, Namespaces.XHtml);
             // ]NOCPP]
-            T elt = CreateElement(Namespaces.XHtml, "form",
+            // BUGFIX: was Namespaces.XHtml
+            T elt = CreateElement(String.Empty, "form",
                                   attributes);
             _formPointer = elt;
             // ownership transferred to form pointer
