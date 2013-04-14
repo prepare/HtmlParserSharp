@@ -24,6 +24,7 @@
 
 using System;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using HtmlParserSharp.Portable.Common;
 
@@ -58,7 +59,16 @@ namespace HtmlParserSharp.Portable.Core
 
         protected override void AppendCharacters(XElement parent, string text)
         {
-            parent.Add(new XText(text));
+            var lastChild = parent.LastNode;
+            if (lastChild != null && lastChild.NodeType == XmlNodeType.Text)
+            {
+                XText lastChildAsText = (XText) lastChild;
+                lastChildAsText.Value = lastChildAsText.Value + text;
+            }
+            else
+            {
+                parent.Add(new XText(text));
+            }
         }
 
         // This method is terribly named. This is actually a MOVE operation, not an append / copy operation
