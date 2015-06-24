@@ -16,28 +16,28 @@ using HtmlParserSharp.Common;
 
 namespace HtmlParserSharp.Core
 {
-	/// <summary>
-	/// Moved the constants (and pseude-enums) out of the TreeBuilder class.
-	/// </summary>
-	public class TreeBuilderConstants
-	{
-		/// <summary>
-		/// Array version of U+FFFD.
-		/// </summary>
-		internal static readonly char[] REPLACEMENT_CHARACTER = { '\uFFFD' };
+    /// <summary>
+    /// Moved the constants (and pseude-enums) out of the TreeBuilder class.
+    /// </summary>
+    class TreeBuilderConstants
+    {
+        /// <summary>
+        /// Array version of U+FFFD.
+        /// </summary>
+        internal static readonly char[] REPLACEMENT_CHARACTER = { '\uFFFD' };
 
-		// [NOCPP[
+        // [NOCPP[
 
-		internal readonly static string[] HTML4_PUBLIC_IDS = {
+        internal readonly static string[] HTML4_PUBLIC_IDS = {
 			"-//W3C//DTD HTML 4.0 Frameset//EN",
 			"-//W3C//DTD HTML 4.0 Transitional//EN",
 			"-//W3C//DTD HTML 4.0//EN", "-//W3C//DTD HTML 4.01 Frameset//EN",
 			"-//W3C//DTD HTML 4.01 Transitional//EN",
 			"-//W3C//DTD HTML 4.01//EN" };
 
-		// ]NOCPP]
+        // ]NOCPP]
 
-		internal readonly static string[] QUIRKY_PUBLIC_IDS = {
+        internal readonly static string[] QUIRKY_PUBLIC_IDS = {
 			"+//silmaril//dtd html pro v0r11 19970101//",
 			"-//advasoft ltd//dtd html 3.0 aswedit + extensions//",
 			"-//as//dtd html 3.0 aswedit + extensions//",
@@ -89,13 +89,13 @@ namespace HtmlParserSharp.Core
 			"-//w3o//dtd w3 html 3.0//", "-//webtechs//dtd mozilla html 2.0//",
 			"-//webtechs//dtd mozilla html//" };
 
-		internal const int NOT_FOUND_ON_STACK = int.MaxValue;
+        internal const int NOT_FOUND_ON_STACK = int.MaxValue;
 
-		// [NOCPP[
+        // [NOCPP[
 
-		[Local]
-		internal const string HTML_LOCAL = "html";
+        [Local]
+        internal const string HTML_LOCAL = "html";
 
-		// ]NOCPP]
-	}
+        // ]NOCPP]
+    }
 }
