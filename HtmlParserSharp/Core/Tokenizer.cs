@@ -56,7 +56,7 @@ namespace HtmlParserSharp.Core
     public enum TokenizerState : byte
     {
         s01_DATA = 128,
-        
+
         //TODO: 02_CharacterReferenceInData()
 
         s03_RCDATA = 129,
@@ -68,7 +68,7 @@ namespace HtmlParserSharp.Core
         s06_SCRIPT_DATA = 2,
 
         s07_PLAINTEXT = 8,
-        
+
         s08_TAG_OPEN = 9,
 
         s09_CLOSE_TAG_OPEN = 10,
@@ -76,7 +76,7 @@ namespace HtmlParserSharp.Core
         s10_TAG_NAME = 11,
 
         s11_RAWTEXT_RCDATA_LESS_THAN_SIGN = 65,
-        
+
         //TODO: R12_RcDataEndTagOpen();
 
         //TODO:  R13_RcDataEndTagName();
@@ -140,7 +140,7 @@ namespace HtmlParserSharp.Core
         s42__AFTER_ATTRIBUTE_VALUE_QUOTED = 16,
 
         s43_SELF_CLOSING_START_TAG = 54,
-        
+
         s44_BOGUS_COMMENT = 17,
 
         s45_MARKUP_DECLARATION_OPEN = 18,
@@ -200,9 +200,9 @@ namespace HtmlParserSharp.Core
         DOCTYPE_UBLIC = 41,
 
         DOCTYPE_YSTEM = 42,
-          
+
         CONSUME_CHARACTER_REFERENCE = 46,
-         
+
         CONSUME_NCR = 47, //ncr->numeric character reference
 
         CHARACTER_REFERENCE_TAIL = 48,
@@ -216,7 +216,7 @@ namespace HtmlParserSharp.Core
         HANDLE_NCR_VALUE_RECONSUME = 52,
 
         CHARACTER_REFERENCE_HILO_LOOKUP = 53,
-         
+
         CDATA_START = 55,
 
         CDATA_RSQB = 57,
@@ -224,7 +224,7 @@ namespace HtmlParserSharp.Core
         CDATA_RSQB_RSQB = 58,
 
         BOGUS_COMMENT_HYPHEN = 64,
-             
+
 
         PROCESSING_INSTRUCTION = 73,
 
@@ -875,6 +875,7 @@ namespace HtmlParserSharp.Core
             }
             cstart = int.MaxValue;
         }
+
         void FlushChars(TextSnapshotReader reader)
         {
             if (reader.Position > cstart)
@@ -1191,7 +1192,8 @@ namespace HtmlParserSharp.Core
              */
 
             // [NOCPP[
-            pos = StateLoop(state, c, pos, buffer.Buffer, false, returnState, buffer.End);
+            //pos = StateLoop(state, c, pos, buffer.Buffer, false, returnState, buffer.End);
+            StateLoop3(state, returnState);
             // ]NOCPP]
             if (pos == buffer.End)
             {

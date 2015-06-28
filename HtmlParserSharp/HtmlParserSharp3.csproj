@@ -47,10 +47,10 @@
     <Compile Include="Core\AttributeName.cs" />
     <Compile Include="Core\AttributeName.Generated.cs" />
     <Compile Include="Core\AttributeName.static.cs" />
+    <Compile Include="Core\TokenBufferReader.cs" />
     <Compile Include="Core\CharsetState.cs" />
     <Compile Include="Core\CoalescingTreeBuilder.cs" />
     <Compile Include="Core\Tokenizer.StateLoop3.cs" />
-    <Compile Include="Core\OldTokenizer.cs" />
     <Compile Include="Core\DispatchGroup.cs" />
     <Compile Include="Core\ElementName.cs" />
     <Compile Include="Core\HtmlAttributes.cs" />
@@ -67,8 +67,13 @@
     <Compile Include="Core\Tokenizer.cs" />
     <Compile Include="Core\Tokenizer.Emit.cs" />
     <Compile Include="Core\Tokenizer.ErrHandling.cs" />
-    <Compile Include="Core\Tokenizer.StateLoop.cs" />
-    <Compile Include="Core\Tokenizer.StateLoop2.cs" />
+    <Compile Include="Core\Tokenizer.StateLoop3_Comment.cs" />
+    <Compile Include="Core\Tokenizer.StateLoop3_DocType.cs" />
+    <Compile Include="Core\Tokenizer.StateLoop3_Emitter.cs" />
+    <Compile Include="Core\Tokenizer.StateLoop3_NCR.cs" />
+    <Compile Include="Core\Tokenizer.StateLoop3_RawText_CData_RcRef.cs" />
+    <Compile Include="Core\Tokenizer.StateLoop3_ScriptData.cs" />
+    <Compile Include="Core\Tokenizer.StateLoop3_TagAndAttrs.cs" />
     <Compile Include="Core\TreeBuilder.cs" />
     <Compile Include="Core\TreeBuilder.Snapshot.cs" />
     <Compile Include="Core\TreeBuilderConstants.cs" />
